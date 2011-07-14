@@ -1,17 +1,6 @@
 
 + Constructing parsers with UniCC +
 
-++ Where to begin? ++
-Parsing and compiler-construction is on of the most complex, on the first view impenetrable-looking, but even fascinating and challenging topic on computer sciences. The knowledge and experience learned by this topic can be integrated into many software development issues of a programmer's everyday life and opens new possibilities and faster ways to success.
-
-Some readers of this manual would have already taken some experiences on this complex topic, maybe from a study on computer sciences, a private approach of writing a compiler or a domain-specific programming task. Rather others don't have any knowledge, yet.
-
-The UniCC user's manual is - as it stands for - a manual for the UniCC parser generator, and not a common textbook on compiler-construction. So this manual immediately starts into the topic of practical parsing, with the assistance of examples and the learning-by-doing principle. Deep knowledge on what's going on behind the grammars, how the parser internally works in detail and how it is constructed is not required or even covered here. But if you're interested in these details, e.g. language theories, parsing concepts, machine code generation and their optimization, or if you generally want to get deeper information on the topic of parsing and compiler construction, it is heavily recommended to read some adequate textbooks covering all this information. Here, we only focus on the usage of UniCC itself, and how parsers are implemented with it.
-
-For those of you, who first get the impression, that parsing and compiler-construction is and will only be a topic for high-graduate students and real computer freaks: You're wrong! But you need time to understand the details, to see the light at the end of the tunnel - nobody is an Einstein in all of life's areas - but with enough ambition, you'll reach this target faster than you can imagine.
-
-So let's start!
-
 ++ What does 'parsing' mean? ++
 Parsing is required in many situations of a programmer's everyday business. Information is fed to a program and must be analyzed, sometimes with a more or less logical structure. Information can be a data dump in a character separated file, the command-line parameters of a program, a stream of data in various formattings, an XML-file or another type of file with a logical, meaningful structure, and input syntax - maybe even a program source code written in a programming language.
 
