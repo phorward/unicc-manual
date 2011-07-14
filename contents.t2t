@@ -1,0 +1,6 @@
+
+%!include: intro/intro.t2t
+%!include: howto/howto.t2t
+%!include: reference/reference.t2t
+%!include: stdcparser/stdcparser.t2t
+

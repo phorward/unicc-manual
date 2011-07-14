@@ -1,0 +1,4 @@
+#!mode insensitive;
+#parser "Simple";
+
+start$ -> "Hello" "World"+ ;

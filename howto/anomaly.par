@@ -1,0 +1,18 @@
+#lexeme            ident;
+#lexeme separation on;
+#whitespaces       ' ';
+
+program$        -> empty_or_stmt* '\0'
+                ;
+
+empty_or_stmt   -> '\n'
+                |  stmt
+                ;
+
+stmt            -> "IF" empty_or_stmt*
+                       "ELSE" empty_or_stmt*
+                           "ENDIF"
+                |  ident
+                ;
+
+ident           -> 'A-Za-z_' 'A-Za-z0-9_'*

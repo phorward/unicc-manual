@@ -1,0 +1,783 @@
+
++ Constructing parsers with UniCC +
+
+++ Where to begin? ++
+Parsing and compiler-construction is on of the most complex, on the first view impenetrable-looking, but even fascinating and challenging topic on computer sciences. The knowledge and experience learned by this topic can be integrated into many software development issues of a programmer's everyday life and opens new possibilities and faster ways to success.
+
+Some readers of this manual would have already taken some experiences on this complex topic, maybe from a study on computer sciences, a private approach of writing a compiler or a domain-specific programming task. Rather others don't have any knowledge, yet.
+
+The UniCC user's manual is - as it stands for - a manual for the UniCC parser generator, and not a common textbook on compiler-construction. So this manual immediately starts into the topic of practical parsing, with the assistance of examples and the learning-by-doing principle. Deep knowledge on what's going on behind the grammars, how the parser internally works in detail and how it is constructed is not required or even covered here. But if you're interested in these details, e.g. language theories, parsing concepts, machine code generation and their optimization, or if you generally want to get deeper information on the topic of parsing and compiler construction, it is heavily recommended to read some adequate textbooks covering all this information. Here, we only focus on the usage of UniCC itself, and how parsers are implemented with it.
+
+For those of you, who first get the impression, that parsing and compiler-construction is and will only be a topic for high-graduate students and real computer freaks: You're wrong! But you need time to understand the details, to see the light at the end of the tunnel - nobody is an Einstein in all of life's areas - but with enough ambition, you'll reach this target faster than you can imagine.
+
+So let's start!
+
+++ What does 'parsing' mean? ++
+Parsing is required in many situations of a programmer's everyday business. Information is fed to a program and must be analyzed, sometimes with a more or less logical structure. Information can be a data dump in a character separated file, the command-line parameters of a program, a stream of data in various formattings, an XML-file or another type of file with a logical, meaningful structure, and input syntax - maybe even a program source code written in a programming language.
+
+This syntax can be analyzed and verified for correctness using a special type of program task: A parser! This parser is used to analyze a sequence of input data and produces a logical interpretation of this data according to an underlying grammar, which describes the data's valid syntax - rules that express this data in its logical way. If the syntax a parser follows is not met, the information is useless and cannot be processed by subsequent tasks which depend on the interpreted representation which is analyzed by the parser.
+
+Every compiler, as the most obvious example, has a parser for the language it compiles - the language must follow the correct syntax to let the compiler produce valid output, e. g. an assembly program. In nearly all business and trough the whole bunch of areas where information technology is used, languages are created to describe data structures, configuration files, workflows, ways of how information could be accessed - all such tasks may require an underlying parser that fetches the information expressed in a domain-specific language approach. Serving another example, a program like an appointment assistant, allows to import appointments from a file and accepts date and time-values in different, human-readable formats, for example "May  5, 2008" or "5.5.08" - a parser is required to analyze the correct format, based on a syntax which describes all possible formats a date can expressed. As you can see, there are so many different applications requiring a parser, that all of them never can be mentioned or grouped. The limit is only the creativity of every individual, and his or her skills and ideas.
+
+The UniCC parser generator supports the programmer dealing with any type of parsing issue in two important steps: A new (or existing) language can quickly be prototyped and tested. This prototype then can be used to implement the parser that constructs an abstract syntax tree out of the given input, which is in turn used for the further processing of this fetched information.
+
+++ Defining grammars ++
+The ways of how data is analyzed, their syntax rules, can be defined using a so called //grammar// - the grammar of the language the parser accepts. Every kind of computer language - even simple text matching patterns - can be defined in some kind of grammar.
+
+Grammars for computer languages, so called //context-free languages//, are expressed in a special notation, which is called the //Backus-Naur-Form//, or shortened just //BNF//. It was invented in 1959 by John Backus and Peter Naur in the course of the ALGOL programming language.
+
+Grammars expressed in Backus-Naur-Form exists of three fundamental elements: The terminal-symbols, the nonterminals-symbols and the productions. Because all of these elements integrate together, it is not possible to explain them separately. Moreover, lets first define what the purpose of these elements is.
+
+- **Terminal symbols**, or simply called //terminals//, are language atomics, which are directly read from the input stream. A terminal symbol can be a single character, a character from a set of possible (allowed) characters, a string sequence or a regular expression that matches a classifying pattern. It is on the language designer's choice which how terminal symbols are made up in the particular implementation. Some examples for widely used terminals in programming languages are identifiers for variables and functions, operators, brackets, keywords like //IF// or //WHILE//, floating point or integer numbers. The parser will expect these terminals in a valid order according to the position it is during the parse - which is in turn defined by the underlying grammatical rules it follows.
+
+- **Nonterminal symbols**, or simply called //nonterminals//, can be seen as "variables" or "function calls" within a grammar, although they aren't. They reference to one or a bunch of the so called //productions//, which means that each production is always associated with one (and only one!) nonterminal; but one nonterminal may exist of several productions.
+
+- Finally, the **productions**, sometimes even called //grammar rules// or just //rules//, describe the syntax - or let's better say: a syntactical part of the grammar - which can be replaced by the specific nonterminal each production is associated with. This syntactical description is done by defining a sequence in which terminals and nonterminals may occur to form a valid sentence. This includes, that a nonterminal can reference itself recursively in its own productions, which is a very important aspect of grammar theories in non-regular languages.
+
+
+Let's see an example to get more familiar with these new terms. We want to define a language that allows for the detection of integer numbers. We have one terminal, which is a character-class that exists of a digit from "0" to "9". This means, that the characters 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9 are our valid characters forming this specific terminal, and we generalize them by defining a character-class by saying ``'0-9'``. Characters and character-classes are enclosed by single quotation marks to identify them as terminals.
+
+Then we have one nonterminal in our grammar, let's call it //integer//. Nonterminals are directly identified by writing their name, like ``integer``.
+
+Using these two elements, we can now define productions for them. We begin with the requirement that //integer// should only exist of a single digit. Then we write
+
+```
+integer -> '0-9' ;
+```
+
+This single line defines all three elements described above: One //nonterminal// called ``integer``, one //terminal// defined as ``0-9``, and one //production// that is associated with the nonterminal ``integer``. This production defines that one digit is the valid input to match the rule that forms an integer.
+
+The arrow-symbol ``->`` separates the nonterminal-name from its production definitions, semicolon ``;`` closes the definition block. Because of this syntactical structuring of grammar elements (note that BNF //is// even a language with its own grammar to express grammars!) the nonterminal-name is sometimes called as the "left-hand side", where the associated productions resist on the "right-hand side". Using this definition, our grammar allows for integer numbers with one digit.
+
+If we want to extend the grammar now to allow for one or multiple digits forming an integer, we have to add a new production which calls nonterminal ``integer`` recursively, besides its one-digit rule. 
+
+Adding such a new production is done by separating the first production from the second, using a pipe-character ``|``. Adding more productions requires even more pipes to separate them.
+
+```
+integer -> '0-9' | integer '0-9' ;
+```
+
+This is now a finished and valid grammar to detect multiple-digit integer numbers.
+
+The concept becomes increasingly clear when we see how the parser moves along the input for a number, e. g. "321", and how it consumes productions each digit. Let ``$`` act as an end of input marker.
+
+CENTER
+| **Input** | ``321$`` | ``21$`` | ``1$`` | ``$`` |
+| **Productions** | ``integer -> '0-9'`` | ``integer -> integer '0-9'`` | ``integer -> integer '0-9'`` | ``integer' -> integer`` |
+| **Parse tree** | [parsetree_intro1.png] | [parsetree_intro2.png] | [parsetree_intro3.png] | [parsetree_intro4.png] |
+
+FIGURE:Construction of parse tree from the string ``321``
+/CENTER
+
+From this parse-process and the structure, how the input string is absorbed by the parser, the following visualized recursion tree is constructed.
+
+IMAGE:parsetree_full.png:Parse tree derived from the input "321"
+
+This structure is called the //parse tree// of the input, where the input is broken down into its grammatical structure created by the parser. Due the left-recursion of our simple grammar, the tree grows left-leaning, because the leftmost, recursive call to nonterminal //integer// results in a new branch each level. As you can see, all leafs of the parse tree are terminal symbols.
+It is also possible to write right-leaning trees, but in the LALR parse algorithm, right-recursive grammars require much more parse stack usage than leftmost ones while the parser analyzes the input. Parser stack usage should always be kept low, and this is the case in leftmost grammars.
+
+A tree of this kind is automatically generated for each input a parser analyzes. But its only a fictitious tree, a data structure that is constructed virtually from the natural and logical flow of the parse process and the underlying grammar. It is only a visualization of how the parser walks along the grammar and maps the input into this structure. Like with the above grammar, each call to a nonterminal in a production allows the parser to parse this nonterminal's entire underlying structure, which includes all its productions, the productions of the nonterminals in these productions and so on, in any possibility the syntax allows for. This can cause branches to giant structures in this virtual parse tree! Just imagine what happens when we parse a thirty-thousand digits huge integer number using the above grammar; It won't be a problem for the computer to parse this input, but it results in a giant, logical structure, that can be visually mapped into such a parse tree. And a thirty-thousand digit integer can never be stored to a normal computer variable for further calculation.
+
+To have a more abstract view on such a parse tree, compiler-writers are rather dealing with another kind of tree-structure, which is called the //abstract syntax tree//. Abstract syntax trees are derived from the parse-tree, and represent only the logical structure of information from the parse-tree, by hiding or merging syntactical details which are not mandatory to keep-up the parsed structure.
+
+By using these virtually constructed trees, compiler-writers can perform several actions to be executed on the particular production, e. g. generating output code or building-up data structures to be used by subsequent compiler-related actions - this is the way how compilers are written along the parser. Unconsciously, compiler-writers do excessively make use of abstract tree structures along the parse tree when writing compilers. But this will be discussed in the next chapters. We now only rely on the definition of the grammars itself.
+
+This example was really very simple. What about, if we go back to the idea of the appointment assistant mentioned in the above chapter - a simple grammar to detect dates in various formats? First, we want to parse dates like ``August 18, 2008`` which follows the basic syntax ``<Name of Month> <Day>, <Year>``.
+
+Semantic checks, e. g. if a valid day for the month or year is given, will be ignored to simplify matters. For the day and year number, we can re-use the integer-grammar from above here to integrate with this new "date grammar".
+
+The date grammar definition will simply be:
+
+```
+#end of input  '\n';
+#whitespaces   ' \t';
+#lexeme        integer;
+
+date$          -> month integer ',' integer
+               ;
+
+month          -> "January"
+               | "February"
+               | "March"
+               | "April"
+               | "May"
+               | "June"
+               | "July"
+               | "August"
+               | "September"
+               | "October"
+               | "November"
+               | "December"
+               ;
+
+integer        -> '0-9'
+               | integer '0-9'
+               ;
+```
+
+This is a valid UniCC grammar definition. Instead of the first, simple grammar definition, this grammar can be fed to UniCC as it is, and produces a working parser.
+
+In the first three lines, some parser configuration is performed. An //end-of-input symbol// is defined as a line break (by default, this is the zero-byte), and a character-class acting as whitespace symbol is defined. How this special kind of symbol is handled will be discussed later. You currently just have to know what its meaning is.
+
+The third line defines nonterminal ``integer`` to be a //lexeme//. This must be done to disallow whitespace between the terminals of ``integer`` itself, to let it act as a syntactical coherent unit. If this is not done, the input "12 34" would also be valid for one single integer, although it would be stored as "1234" internally - but this isn't our goal, nor a syntax that we allow for a valid date.
+
+Nonterminal ``date`` defines the basic syntax of a date. The dollar-symbol ``$`` behind ``date`` defines ``date`` to be the //goal symbol//. In terms of LALR-parsing, the goal symbol is the last symbol identified by the parser to ensure that the parse is finished, complete and valid. This is due the bottom-up approach of LALR-parsers: The parse tree is constructed from the leafs (the terminal symbols) up to all nonterminal symbols, to finally match the goal symbol. The nonterminal marked as goal is always the root from which all subsequent branches in the yielding parse tree will start.
+
+Next to ``date``, nonterminal ``month`` defines all month names in its productions, where each month name is represented by a so called //string//. String terminals are enclosed by double quotation-marks, and are a kind of terminal symbol. In comparison to characters and character classes, strings require that the character sequence from which they are made up exactly match to the input characters coming up next in the input stream. More on this topic will even be discussed later.
+
+Finally, we use the same nonterminal, which is ``integer``, for day- and year-number.
+The parse tree of the input string "August 17, 2008" using this grammar will be
+
+IMAGE:parsetree_date.png:Parse tree derived from the input "August 17, 2008"
+
+++ Grammar modularity ++
+Grammars are modular. They can simply be extended and rewritten, by re-using already defined grammatical constructs as part of other grammatical constructs. Due the build-up, that one nonterminal can be derived from one or multiple productions, grammars are defined in a modular structure, where existing elements can be replaced or enhanced without rewriting the whole grammar.
+
+This will be demonstrated by the next example: What about extending the appointment assistant to even accept other date formats, e. g. the format ``<Day>.<Month>.<Year>`` and ``<Month>/<Day>/<Year>``?
+
+In this case, we can reuse the nonterminals of the above grammar, and extend the grammar to fit our requirements simply by adding some productions. Extending nonterminal ``date`` will tune up our grammar to recognize more than one date format.
+
+```
+date$          -> month integer ',' integer
+               | integer '.' integer '.' integer
+               | integer '/' integer '/' integer
+               ;
+```
+
+Fine! And now, we want to extend our appointment assistant grammar to allow for adding an appointment message using the format ``<Date> "<Title>"``, or why not even ``"<Title>" <Date>``?
+
+Here, the grammar's goal symbol, which was ``date`` until now, must be replace with another goal symbol, the ``appointment``, which is a more meaningful goal for the input we want match. The final grammar fulfilling this request is shown next.
+
+```
+#end of input  '\n';
+#whitespaces   ' \t';
+#lexeme        integer title;
+
+appointment$   -> date title
+               | title date
+               ;
+
+title          -> '"' !'"'* '"'
+               ;
+
+date           -> month integer ',' integer
+               | integer '.' integer '.' integer
+               | integer '/' integer '/' integer
+               ;
+
+month          -> "January"
+               | "February"
+               | "March"
+               | "April"
+               | "May"
+               | "June"
+               | "July"
+               | "August"
+               | "September"
+               | "October"
+               | "November"
+               | "December"
+               ;
+
+integer        -> '0-9'
+               | integer '0-9'
+               ;
+```
+
+You see, that we have quickly extended the original grammar for simple dates to match a small language, that allows for entering appointments with a date in several formats.
+
+Maybe you already noticed some new elements used in this grammar, e. g.  the production
+
+```
+title          -> '"' !'"'* '"'
+               ;
+```
+
+This production is enabling a title that is enclosed as a string literal. The terminal definition ``!'"'*`` defines a terminal that exists of all possible characters instead of the double quotation mark (which is specified by the prefixed exclamation mark), and this with an automatic repetition of zero or multiple characters (invoked by the postfixed star-character).
+
+The first of these two new symbols, the exclamation mark, is a negation which belongs to the character class it precedes.
+
+Secondary, the star is a modifying operator that causes a Kleene-closure of zero or multiple of the preceding symbol, in this case the negated quotation mark character class. These modifier operators can be used everywhere in the grammar definition behind nonterminal and terminal symbols on the right-hand side and invokes the so-called //virtual production// feature of UniCC. For each of these virtual productions, UniCC automatically inserts a virtual nonterminal that implements the desired syntactical element in its correct, well-formed grammatical structure.
+
+UniCC provides the following three virtual production operators, which are well-known from regular expressions.
+
+- ***** for kleene closure
+- **+** for positive
+- **?** for optional closure
+
+
+For the above shortcut, the contract-out version would be
+
+```
+title          -> '"' virtual1 '"'
+               ;
+
+virtual1       -> virtual2
+               |
+               ;
+
+virtual2       -> !'"'
+               | virtual2 !'"'
+               ;
+```
+
+You can see: Much lesser efforts in writing the grammar by reaching the same effect, right?
+
+++ Building a working parser ++
+
+UniCC is a parser generator. This means that is generates parsers from such as the above shown grammar definitions into an adequate, simplified parser representation. UniCC parses grammar definitions, performs some revisions on it, constructs the parse tables and lexical analyzers, which are required by the underlying parser driver to match the defined grammar and produces some output. In terms of a compiler-writer, UniCC is nothing else than a compiler to compile grammars into parsers. So this is also the reason why UniCC is used to compile its own grammar during its build.
+
+Since the first line of UniCC was written, one of its major design goals had been to be universal, related to the parsers it outputs: UniCC is not bounded to one or a special set of programming language a UniCC-compiled parser can be written in. UniCC is //target-language independent//, which means that the parsers it outputs could be implemented in any programming language a parser template or code generator is provided for.
+
+UniCC provides two different parser generation target approaches. The first approach is a static, build-in code-generator working with a so called //parser code template//. This code-generator is a build-in part of UniCC and allows to directly turn a UniCC grammar definition into a program written in the syntax of a particular programming language. Because UniCC itself is written in C, its build-in code-generator is also optimized to generate parsers in C-similar, procedural-oriented languages. Hence there is only one parser template for C parsers yet, UniCC's build-in code-generator can only output C parsers for now.
+
+But for an //really// target-language independent approach, UniCC provides a secondary way for generating a parser, which is a parser description file. This file is expressed in an XML-language and includes much information on the grammar, its symbols, the parser and lexer states and the parser behavior itself. Using this type of output, third-party code-generators or other related software can be used to build or analyze parsers according to their specialized area using UniCC as their parser-generator.
+
+In this and the following chapters, we only rely UniCC's build-in code-generator. Because the C parser template, which is delivered with UniCC is the most stable and widely used one, we implement parsers in this manual only in C. You can easily adapt the knowledge from here to other languages when using other parser templates or code-generators in combination with UniCC. The examples we will deal with are hold simple, so even those of you who have no experience in C will understand them with ease. What is needed to run the examples in this manual is an installed C or C++ compiler, e. g. gcc on Linux.
+
+General build order for parsers implemented using UniCC is the following, once your grammar is written and stored into a file.
+
+# Compile (generate) the grammar using UniCC into a parser
+# Compile or run the generated parser with the particular compiler your parser is written for (not required if your language is interpretered!)
+# Run the resulting program
+
+
+Using specialized code-generation tools e.g. which use the parser definition file feature may use another approach, in order they call UniCC or use a subsequent call to a generator which builds the output file for a particular programming language or solution.
+
+Experienced programmers usually will put the above actions into a Makefile or other kind of build system, but we will run them manually for now.
+
+The first step is the same on all platforms and with all versions of UniCC. Store the grammar you want to compile into a format-free text file, let's use //dates.par// as filename for the above grammar. To invoke UniCC from a shell or Makefile, simply type
+
+```
+unicc -w dates.par
+```
+
+If UniCC does output nothing at all, the grammar is valid, consistent and has been successfully compiled and generated without any errors and warnings.
+
+If UniCC reports //errors//, these must be fixed. If errors are reported, this always causes that no output (respective a parser) is generated. Errors arise if UniCC comes into a situation where a valid result is not possible to generate, or the algorithm on generating the parser is initiated with missing or incomplete data. This can be e. g. a parse error in the input, where no valid grammar can be recognized, or wrong use of left-hand side items within a productions, which avoids replacing a placeholder within executable code with a valid item access actions.
+
+Some //warnings// are normal in the daily use of UniCC. Warnings can normally be ignored, because the reference to automatically fixed grammar ambiguities or default mechanisms taking place if they where not explicitly defined. If you want to suppress all warnings, run UniCC without the ``-w`` or ``--warnings`` option. Using the ``-v`` or ``--verbose`` option in combination with ``-s`` or ``--stats``, UniCC outputs some processing informations and grammar statistics.
+
+%!include: ``howto/unicc.out``
+
+To get an overview about all supported command-line options, run ``unicc`` without any parameters. There is also a section abount [command-line parameters #ref_commandline_parameters] in the reference manual.
+
+In case of the standard C parser template delivered with UniCC, above call will generate two output files, which are the program source file ``dates.c`` and ``dates.h``, a header file, containing some definitions. This output can immediatelly be compiled with a suiting C compiler. It is not required to write a main() function because the default UniCC parser template for C parsers uses a predefined main function if no individual code for the parser's footer is specified. Note, that this feature is always parser-template related; Especially third-party drivers and own modifications may not support this feature.
+
+Building, compiling and playing a little bit around with the parser looks like this.
+
+TODO:
+```
+$ unicc -w dates.par
+$ cc -o dates dates.c
+$ ./dates
+ok
+August 24, 2010 "An important meeting!"
+
+ok
+23.5.2011 "Birthday of Mr. X"
+
+ok
+"Holidays!" 24.7.    
+line 1: unexpected character '
+'
+ok
+29.10.2010 Hello
+line 1: unexpected character 'H'
+ok
+line 1: unexpected character 'e'
+ok
+line 1: unexpected character 'l'
+ok
+line 1: unexpected character 'l'
+ok
+line 1: unexpected character 'o'
+ok
+line 1: unexpected character '
+'
+ok
+```
+
+++ Writing compilers ++
+
+With above examples, we only created parsers that match valid and reject invalid input. Based upon the above grammar for parsing dates, it can now be simply turned it into a real compiler.
+
++++ Using semantic actions +++
+
+This example is not a compiler in terms of a programming language, but some kind of converter to compile an input date into an other output format. For this purpose, the parser is augmented with semantic operations to be performed during the parse. A semantic action is a piece of program code that is executed on a part of the parse tree when a production rule has been entirely matched. This causes an internal reduction of the rule to its left-hand side (the nonterminal it belongs to), which is then a part of another production again, or at least the goal symbol.
+
+For this purpose, UniCC allows to store values into the different symbols used in each production definition - this includes all symbols on the right-hand side of the particular production and the left-hand side symbol (the nonterminal!) the production belongs to. Storing a value to the left-hand side means that it is taken over to the right-hand side of the next rule reduction.
+
+Before we drift now into a too complex textual clutter, lets assign some semantic actions to the original, simple date grammar from above!
+
+```
+#end of input   '\n';
+#whitespaces    ' \t';
+#lexeme         integer;
+#default action [* @@ = @1; *];
+
+//Defining the grammar
+date$           -> month:month integer:day ',' integer:year
+                       [* printf( "%02d.%02d.%04d\n",
+                               @day, @month, @year );
+                       *]
+                ;
+
+month           -> "January"    [* @@ = 1; *]	
+                | "February"    [* @@ = 2; *]
+                | "March"       [* @@ = 3; *]
+                | "April"       [* @@ = 4; *]
+                | "May"         [* @@ = 5; *]
+                | "June"        [* @@ = 6; *]
+                | "July"        [* @@ = 7; *]
+                | "August"      [* @@ = 8; *]
+                | "September"   [* @@ = 9; *]
+                | "October"     [* @@ = 10; *]
+                | "November"    [* @@ = 11; *]
+                | "December"    [* @@ = 12; *]
+                ;
+
+integer         -> '0-9'        [* @@ = @1 - '0'; *]
+                | integer '0-9' [* @@ = @1 * 10 + @2 - '0'; *]
+                ;
+```
+
+That's everything required for a simple date-format compiler, parsing an input date in the format ``Name-of-Month Day, Year`` and compiling it into the format ``Day.Month.Year``.
+
+In comparison to the grammar-draft from above, this augmented version contains programmed actions, which define what the parser should do on the different grammatical elements during the parse, and how values are passed trough the parse tree. The following, visualized parse tree shows how the input-string ``August 17, 2008`` is parsed, including the semantic values stored into every node, which is an instance of a nonterminal symbol.
+
+IMAGE:parsetree_semantic.png:Parse tree with augmentation.
+
+Every code-segment, which is enclosed between ``[*`` and ``*]``, is executed when the parser successfully matches a production. This is why the semantic-code invoked on a rule's reduction is even called as the //reduction action// in LR and LALR-parsers.
+
+In such a reduction action, the compiler-writer is able to access all values of the current production and "return" values to the higher nodes of the parse tree, which are based on these semantic values. It is also possible to perform code-generation within these reduction codes, or mixed semantic checks, symbol table management, and more. These are all the things to be done in a real compiler, and go beyond the task of parsing.
+
+For all elements of the reduced production, the right-hand side, values are accessed using an ``@`` character followed by the number of the desired tokens position, which begins with token number 1 from the left. It is also possible to assign meaningful names to right-hand side symbols, simply by separating the symbol from the identifying name using a colon ``:``. This is done in the production
+
+```
+date$           -> month integer:day ',' integer:year
+                       [* printf( "%02d.%02d.%04d\n",
+                               @day, @month, @year );
+                       *]
+                ;
+```
+
+from above, so we are able to access ``month``, ``day`` and ``year`` over their meaningful names instead of their position offsets. There is no label specified for ``month`` because UniCC automatically associates the nonterminal's name with an right-hand side value specifier. This default can be overwritten by defining it manually, as its done with ``day`` and ``year``.
+
+By using the position offsets, the same result could be reached by writing
+
+```
+date$           -> month integer ',' integer
+                       [* printf( "%02d.%02d.%04d\n",
+                               @2, @1, @4 );
+                       *]
+                ;
+```
+
+If names are given, the symbols of the right-hand side can be accesses both via offset or by name. The advantage of using identifying names is that no changes in the semantic action code is required if the production symbol order changes, e. g. when a new separation symbol is introduced between two symbols.
+
+To assign a value to the left-hand side, which is the upper node in the parse tree, an ``@@`` placeholder is used. ``@@`` never contains a value (it is initialized to zero), and is only used to pass a result from one successfully recognized production to another (at the time the production is reduced) uncompleted, upper lying production calling the current production's nonterminal it is associated with. Here, this value can be accessed again by a reduction action to compute or output a result from it.
+
+All values stored to nonterminals are written there by reduction actions. The atomic values from the input-stream, the terminals, are the base for these values, and obtain their values directly from the input, or an lexical analyzer, which is introduced later.
+
+In the standard C parser template delivered with UniCC, every character terminal gets the character-code of the character it matches in the input. Therefore, the semantic value that is constructed using nonterminal ``integer`` is 
+
+```
+integer         -> '0-9'        [* @@ = @1 - '0'; *]
+                | integer '0-9' [* @@ = @1 * 10 + @2 - '0'; *]
+                ;
+```
+
+to result in a true, decimal number that is stored into memory as an integer data type.
+
+This looks a little bit tricky for those who are not familiar with C. For the parse of the number "17", for example, the first scanned digit (which can be a digit between 0 and 9) in the reduction code of the first production only exists in its character-coded form from the input, which is code 0x31 (decimal 049) for the digit "1" in the ASCII character map. To easily get an integer number 1 from this coded representation of the character, we have to subtract the value of the character-code of digit "0", which is 0x30 (decimal 048), so the operation 0x31-0x30 returns the correct value 0x1, which is then passed to the left-hand side.
+
+In the second step of our parse of the input sequence "17", we first have to multiply the first digit by its base, 10 (to derive 10 from the 1), and then perform the same procedure as in the first production, but with the difference that is will be added to this 10. The result is 17, as a true, decimal number to be stored to an **int** data typed variable.
+
+This latter step can then be performed for every digit in the integer; The already parsed value is multiplied with 10 (to be moved one digit to the left) again and then added by the next digit. Note the recursion of nonterminal ``integer``: It can parse one single digit or a chain of digits as one unit.
+
+As a beginner, you can now say that coding parsers in UniCC is hard to understand. Well, you might be a little right. But this is only the first impression on it. The more you learn about the techniques, the more practical experience you will have, things will make sense, and the parse trees you want to climb will grow in your mind. Don't give up, even if you feel so - it wouldn't be worthwhile!
+
+If you're already familiar with parsing, this "low-level"-looking way of extracting atomic integer numbers from the input will look unconventional to most of you. This is done because UniCC allows (but not relies) to perform lexical analysis by the grammar rather than an upstreamed lexer. To let the reader become more familar with grammar definitions in UniCC first, this approach was chosen here. All possibilites and facilities on lexical analysis will be introduced later on. The advantage of this approach is, that full LALR power is available on this character-based parsing method, so even recursive "lexemes" can be parsed as true context-free grammars, not only regular ones. Terminal symbol based on regular-expressions are even possible in UniCC, but this will be discussed later on.
+
++++ Precedences +++
+
+In the last chapters, we did some experience on how grammars are written and how a simple parser is furnished and attributed with semantic actions. A real compiler, compiling a programming language (or similar!) into another representation (e.g. assembly code) is nothing else than this - but much more effort in writing the grammar and especially the semantic code is required. To build grammars for such higher and complex targets, you need experience, time and the most important thing: Patience.
+
+We will now write a grammar that parses mathematical expressions. Nearly every high-level programming language supports mathematical expressions, so why not to begin here?
+
+Mathematical expressions have special demands to their grammar. Multiplicative operations (multiplication and division) take precedence over additive operations (addition and subtraction), but this order can be broken by bracketing terms to take same precedence as operands.
+
+Let's first implement a grammar for additive calculations. Simple terms of the syntax
+
+```
+integer + integer
+integer - integer
+```
+
+shall be valid and parsed. A first draft of the new grammar would be
+
+```
+//Some grammar-related directives
+#end of input '\n';
+#whitespaces  ' \t';
+#lexeme       integer;
+
+//Defining the grammar
+expression$   -> integer '+' integer
+              | integer '-' integer
+              ;
+
+integer       -> '0-9'
+              | integer '0-9'
+              ;
+
+//End of definition
+```
+
+Compiled and run, this works for simple terms with always two operands, but terms with just one single operand, or even terms with three operand to be added or subtracted, are punished with a syntax error. Extending nonterminal ``expression`` to read as
+
+```
+expression$   -> expression '+' integer
+              | expression '-' integer
+              | integer
+              ;
+```
+
+will allow for a recursion, which is the correct method to enable terms with variable length.
+
+But how to add precedence now to this grammar, enabling multiplicative operators? There are two methods in UniCC. The first is obvious, and the second is for lazy geeks! We choose the obvious method first, requiring more efforts in writing the grammar and even more parse-states in the resulting parser. The lazy method is described below, when the expression parser is finished.
+
+Our obvious approach is simple: Why not copy the definition of nonterminal ``expression`` to fit the demands of operators with higher precedence, and then call this higher-level nonterminal from ``expression``? The resulting grammar of this idea is
+
+```
+//Some grammar-related directives
+#end of input '\n';
+#whitespaces  ' \t';
+#lexeme       integer;
+
+//Defining the grammar
+expression$   -> expression '+' term
+              | expression '-' term
+              | term
+              ;
+
+term          -> term '*' integer
+              | term '/' integer
+              | integer
+              ;
+
+integer       -> '0-9'
+              | integer '0-9'
+              ;
+
+//End of definition
+```
+
+The new nonterminal ``term`` matches this idea, and is called by ``expression`` where ``integer`` was called before. The compiled and run version of this grammar allows to enter any desired expression with mixed additive and multiplicative operators. One demand is missing: Overwriting precedence rules with bracketing. Because brackets may appear in the same positions where our operand-nonterminal ``integer`` currently appears, a replacement for ``integer`` must be added to allow for both ways in this uppermost precedence level.
+
+Rewriting the grammar with a new decider between ``integer`` and a call to a new ``expression`` enclosed with brackets results in a terminal ``factor``, which is then called by ``term``.
+
+```
+factor        -> integer
+              | '(' expression ')'
+              ;
+```
+
+Finally, we have the complete grammar to parse expressions the correct way.
+
+The only disadvantage: We still see no results, again! So there's just a little bit of augmentation required to this grammar to make it a working expression calculator.
+
+```
+//Some grammar-related directives
+#end of input    '\n';
+#whitespaces     ' \t';
+#lexeme          integer;
+#default action	 [* @@ = @1; *];
+
+
+//Defining the grammar
+calculator$   -> expression           [* printf( "= %d\n",
+                                              @expression ); *]
+              ;
+
+expression    -> expression '+' term  [* @@ = @e + @3; *]
+              | expression '-' term   [* @@ = @1 - @3; *]
+              | term
+              ;
+
+term          -> term '*' factor      [* @@ = @1 * @3; *]
+              | term '/' factor       [* @@ = @1 / @3; *]
+              | factor
+              ;
+
+factor        -> integer
+              | '(' expression ')'    [* @@ = @expression; *]
+              ;
+
+integer       -> '0-9'                [* @@ = @1 - '0'; *]
+              | integer '0-9'         [* @@ = @integer * 10 +
+                                              @2 - '0'; *]
+              ;
+
+//End of definition
+```
+
+That's the complete program code which calculates any desired expression for you the correct way! Simple, isn't it? Maybe you recognized the line with
+
+```
+#default action	[* @@ = @1; *];
+```
+
+which was already present in our first example using semantic actions. This parser directive is required to define a default action that should be performed at an (nonempty productions) reduction code if no code has been provided by the grammar. For example in
+
+```
+factor        -> integer
+              | '(' expression ')'    [* @@ = @2; *]
+              ;
+```
+
+The first production uses this default action code to assign the return-value of the ``integer`` nonterminal automatically to the value of ``factor``. Just keep this in mind, if you feel that your parser is loosing values because you'd forgotten to add this directive to your grammar. Because UniCC is a target-language independent parser generator, it was decided to let the grammar designer choose the way of how values are passed by default.
+
+Some sentences above, we mentioned that there are two ways of implementing precedences within UniCC grammar definitions. We first chose to implement the obvious method as described above, but there is also a version for those lazy people among you! "Lazy" means, that you write lesser grammar code but take the same precedences effect as you will get with writing an obvious grammars as the one above. Another advantage is, that UniCC produces lesser states for the same parsing behavior - even the same semantic actions can be used.
+
+The key elements for lazy grammar writers are the parser configuration directives ``#left``, ``#right`` and ``#nonassoc``, whereas for our case of the expression language, we only require the ``#left`` directive. These directives furnish grammar symbols with precedence- and associativity-weighting to influence the parse table generator and to resolve parse table conflicts, which come up with ambiguous grammars.
+
+Such an grammar would be the following, when we try to compile it.
+
+```
+//Some grammar-related directives
+#end of input   '\n';
+#whitespaces    ' \t';
+#lexeme         integer;
+
+//Defining the grammar
+calculator$     -> expression
+                ;
+
+expression      -> expression '+' expression
+                | expression '-' expression
+                | expression '*' expression
+                | expression '/' expression
+                | '(' expression ')'
+                | integer
+                ;
+
+integer         -> '0-9'
+                | integer '0-9'
+                ;
+
+//End of definition
+```
+
+When this grammar is fed to UniCC using the ``-w`` command line switch, we get many lines looking like the following.
+
+```
+warning: State 16: Shift-reduce conflict on lookahead: '+'
+         expression -> expression .+' expression
+         expression -> expression .-' expression
+         expression -> expression .*' expression
+         expression -> expression ./' expression
+         expression -> expression +' expression . { '\n' '+' '-' '*' '/' ')' }
+```
+
+TODO: Screenshot
+
+This is caused due the ambiguity of the grammar, which comes up in the nonterminal definition of ``expression``. This ambiguity can be visualized when analyzing the expression //1+2+3//. Because our grammar defines each operator production as ``expression operator expression`` and ``expression`` itself can exists of such a composition again, the grammar allows for parsing it as //(1+2)+3// and as //1+(2+3)//, which results in completely different parse trees. It is correct, that the order of the operators in additions doesn't care, but what about //1+2*3//? Here, again, the grammar from above allows both for //(1+2)*3// and //1+(2*3)//, but only latter one is a valid result we want to accept.
+
+For these cases, precedence and associativity assignments to terminals can be used to define the correct way of how UniCC should handle these conflicts.
+
+Using a ``#left`` directive, we give terminal symbols a left-sided associativity, which means that the left expression of the terminal is resolved first. When we do this to addition and subtraction, these operators will resolve the left expression first, so the parse tree grows left-derivative. The input string //1+2+3// will then be parsed as //(1+2)+3//, and //1+2+3+4// will be parsed as //((1+2)+3)+4//. Because substraction is on the same precedence level as addition, //1+2-3// will correctly be parsed as //(1+2)-3//.
+
+But what about multiplication and division? When we assign the same, left-bounded associativity to these operators, //1+2*3// will be incorrectly parsed as //(1+2)*3//. So another, higher precedence level than to addition and subtraction must be added, which we do with yet another call to the ``#left``-directive. As deeper a precedence-directive in the grammar occurs below other ``#left``, ``#right`` and ``#nonassoc`` directives, so higher the precedence will be.
+
+When this secondary precedence and associativity assignment is done, the grammar will behave the correct way, even for things like //1+2*3+4+5*6+7// - which will then correctly be parsed as //(((1+(2*3))+4)+(5*6))+7//.
+
+Adding this precedence directives to above grammar, we'll get its unambiguous pendant.
+
+```
+//Some grammar-related directives
+#end of input    '\n';
+#whitespaces     ' \t';
+#lexeme          integer;
+#default action	 [* @@ = @1; *];
+
+#left            '+' '-';
+#left            '*' '/';
+
+//Defining the grammar
+calculator$     -> expression                [* printf( "= %d\n",
+                                                    @expression ); *]
+                ;
+
+expression      -> expression '+' expression [* @@ = @1 + @3; *]
+                | expression '-' expression  [* @@ = @1 - @3; *]
+                | expression '*' expression  [* @@ = @1 * @3; *]
+                | expression '/' expression  [* @@ = @1 / @3; *]
+                | '(' expression ')'         [* @@ = @2; *]
+                | integer
+                ;
+
+integer         -> '0-9'                     [* @@ = @1 - '0'; *]
+                | integer '0-9'              [* @@ = @integer * 10 +
+                                                     @2 - '0'; *]
+                ;
+
+//End of definition
+```
+
+which will parse and calculate the correct values, including all precedence relations.
+
++++ A little more language construction +++
+
+Now that we have a working parser for an expression calculator, we can do some pretty extensions on it, which helps us continuing on implementing a real programming language.
+So lets introduce simple variables, assignments and value input/output commands.
+
+```
+//Some grammar-related directives
+#end of input               '\0';
+#whitespaces                ' \t';
+#lexeme                     integer;
+#default action             [* @@ = @1; *];
+#case insensitive strings   on;
+
+#left                       '+' '-';
+#left                       '*' '/';
+
+#prologue
+[*
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+static int variables[ 26 ];
+*];
+
+//Defining the grammar
+calculator$     -> statement*
+                ;
+
+statement       -> "LET"? variable:var '=' expression:expr '\n'
+                        [* *@var = @expr; *]
+
+                | "PRINT" expression:expr '\n'
+                        [* printf( "~> %d\n", @expr ); *]
+
+                | "INPUT" variable:var '\n'
+                        [* char inp[10+1];
+                           printf( "<~ " );
+                           fgets( inp, sizeof( inp ), stdin );
+                           *@var = atoi( inp );
+                         *]
+                | '\n'
+                ;
+
+expression      -> expression '+' expression [* @@ = @1 + @3; *]
+                | expression '-' expression  [* @@ = @1 - @3; *]
+                | expression '*' expression  [* @@ = @1 * @3; *]
+                | expression '/' expression  [* @@ = @1 / @3; *]
+                | '(' expression ')'         [* @@ = @2; *]
+                | integer
+                | variable                   [* @@ = *@variable; *]
+                ;
+
+integer         -> '0-9'                     [* @@ = @1 - '0'; *]
+                | integer '0-9'              [* @@ = @1 * 10 +
+                                                     @2 - '0'; *]
+                ;
+
+variable<int*>  -> 'a-z':name                [* @@ = &variables[
+                                                  @name - 'a' ]; *]
+                ;
+
+//End of definition
+```
+
+This implements a very simple, BASIC-styled language interpreter from the calculator. Until we don't use any branch-related language constructs like IF, GOTO or iterations, the "program" fed to this interpreter can be interpreted immediatelly as it comes in.
+
+An example code to run input and run in this interpreter is
+
+```
+let a = 20
+input b
+print a * b
+a = a * b - 13
+print a
+```
+
+Maybe you recognized some new grammar definition-related elements within this grammar. First, there is a new parser configuration directive, ``#case insensitive strings``, at the top, which directs UniCC to handle string terminals case-insentive. By default, ``#case insensitive strings`` is switched ``off``.
+
+We already used string terminals for the month names in our date grammar example, some sections above. Here, the newly introduced string terminals are the keywords ``PRINT``, ``INPUT`` and ``LET``, at which ``LET`` is optionally required trough the use of an optional virtual production modifier **?**. By enabling the ``#case insensitive strings`` directive, all string terminals are recognized in any order, so the input tokens ``print``, ``PRINT``, ``Print`` and ``PrInT`` match to the same terminal symbol. The ``#case insensitive strings`` directive is a global setting for all string terminals; To mix case-insentive with case-sensitive string patterns, you have to use terminals based on regular expression, which will be disussed in the next chapter.
+
+Also, we use another new parser configuration directive, this is ``#prologue``. It defines a semantic code action to be inserted into the target parser module __before__ any other parser-related definitions and functions.  Equivalently, defining ``#epilogue`` will insert code at the bottom of the resulting parser. If ``#epilogue`` is used with the C standard parser template, no automatic main() function will be generated by default. In such a case, you can define the **UNICC_MAIN** preprocessor directive to turn it on - or implement your own, encapsulated call of the parser.  
+At least, the nonterminal symbol ``variable`` defined on the bottom uses a different semantic datatype, an //int*// (pointer to integer). If a nonterminal defines another datatype, UniCC introduces this data type to be alternatively handled on the internally used value stack. Defining another data type is performed by enclosing the datatype identifier ``<`` and ``>``, as in
+
+```
+variable<int*>  -> 'a-z':name  [* @@ = &variables[ @name - 'a' ]; *]
+                ;
+```
+
+Wherever nonterminal ``variable`` is called from, the semantic value for each ``variable`` item on the right-hand side will automatically be of the type associated with this nonterminal, so one can simply dereference the pointer and say
+
+```
+expression      -> variable  [* @@ = *@variable; *]
+                ;
+```
+
+without another type specification for the first item of this production, ``variable`` is a pointer of int here, and can be used as a pointer.
+
+The technical implementation of how this data type integration is handled relies on the used parser template or output code generator. The C standard template delivered with UniCC uses a union structure. This structure is entirely constructed and handled by the UniCC program module generator and the standard C parser template, so the grammar developer has not to deal with its definiton.
+
+++ Going beyond grammars ++
+
+For now, we learned a lot of things about writing grammars. How they are expressed, how the input is parsed by the parsers that are produced with UniCC and how to turn these grammars into programs solving some kind of compiler-related task.
+
+But we still didn't reached UniCC's limits. It has much more useful tools and features integrated, to make parser prototyping and development faster and more comfortable.
+
+So let's move on!
+
++++ Regular expression terminals +++
+
+For a maximum of flexibility in the task of the lexical analysis, UniCC also features terminal symbols that are made up by regular expressions. Regular expressions describe string patterns in a regular languages (type-3 languages) of the Chomsky hierarchy of languages, and therefore they form a subset of the context-free languages (type-2 langauges).
+
+The use of regular expression terminals depends on the grammar designer's choice. BLABLA
+
+In previous examples, we constructed multi-character tokens like a string within the grammar using
+
+``` string -> '"' !'"'* '"' ;
+
+This construct could also be expressed as a regular expression terminal, by expressing it as:
+
+``` @string '"' !'"'* '"' ;
+
+
+
+The difference between these two solutions is, that the first approach is solved within the parser, but the last is solved within the lexical analyzer. The lexical analyzer runs much more faster than the parser does, so the regular expression terminal will be matched faster and can be extracted 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+In all of the above examples, we only dealed with two kinds of terminal-symbol, the //characters// and the //keywords//. But UniCC features a third class of terminal symbol that we didn't discuss yet: **regular expression terminals**. Regular expression terminals can be seen as a mixture of character-classes and keywords, combined with virtual productions, alternatives and sub-expressions. They form the most powerful and richest class of terminal symbol, and allow to match any string in the input that matches the regular language defined by the expression. Because they can't be expressed and re-used in one place, regular expression terminals are identified by an alias and defined using an own definition block which is an embedded part of the grammar definition code.
+
+It is obvious that all constructs that can be defined as regular expressions can be directly stated as part of the grammar in an own nonterminal symbol. This is because regular expressions describe regular languages (type-3 languages) in the Chomsky hierarchy of languages, and therefore they form a subset of the context-free languages (type-2 langages). The difference is in the way __how__ the parsing of these lexical constructs is done. The lexical analysis (scanning) can be performed more grammar-related or more scanner-related. Latter one is the use of regular expressions. It highly depends on the requirements and the designated design goal to the language, which way to chose.
+
+
+
+Also it must be mentioned, that all kinds of terminal symbols compiled with UniCC result in __one__ lexical analyzer, which is formed by a //finite state automation//. Every terminal symbol, whatever kind of terminal it belongs to, is a distinct symbol in the entire grammar. Frankly speaking, every symbol is internally handled like it would be a regular expression, altought it is defined as a character-class, keyword or a real regular expression terminal.
+The difference that UniCC gives to the terminal symbol classes is defined by their richness of regular constructs every kind of terminal allows for: Character-terminals define single character units, keywords define a static sequence of characters. Regular expression terminals finally allow for regular languages to be matched from the input. Therefore, both keywords and regular expression terminals are matched before any character terminal does, due their higher level of specialization.
+
++++ Embedded semantic code and productions +++
+
++++ Error recovery +++
+

@@ -1,0 +1,154 @@
+
++ The Standard C Parser Template +[stdcparser]
+
+++ Overview ++
+This chapter of the UniCC developer's manual targets to describe the use of the C standard parser template that is shipped with UniCC. For now, there are no other programming language templates available, except C. UniCC's own grammar parsing modules and those of several other projects having their origin at Phorward Software Technologies, the company behind UniCC, do all rely on this parser template, so its well tested, proven, and will be updated whenever bugs and/or improvements are done to it.
+
+Hopefully, within the next few years, templates for parsers in other languages will also be shipped with UniCC, making it a universal parser generator out of the box. The standard C parser template should also serve as the reference base for other parser templates. If there is an interest in [contributing #tpl_contributions] adapted parser template to make UniCC's taget language range more richer than like now, check out the respective chapter.
+
+++ Features ++
+Every parser template has some special features provided to the compiler writer, so there's no way to get around this section.
+Below is the feature set the UniCC Standard C Parser Template provides.
+
+- Platform and compiler independent, based on C standard library only
+- ANSI C89 compliant
+- Thread-safe parsing
+- Extensible Parser Control Block (pcb)
+- Automatic main-function
+- Automatic standard-includes, if no header code given
+- Build-in error recovery
+- Trace and stack trace facilities
+- Provides default parser test mode if no semantic code is given
+
+
+++ License ++
+The UniCC Standard C Parser Template is licensed under the BSD open source license. The BSD license differs from the Artistic License that is used by UniCC itself, but it is compatible with it. This decision has been done to make the use of the parser template and its derivative works (every parser generated using this template is a derivate of the original template) also possible in other combinations, including proprietary software. The entire license terms are printed on top of the C standard template file.
+
+++ Contributions ++
+Any contributions to the UniCC standard parser template are welcome. Contributions can be send to us, so we will integrate them into the distribution version of UniCC and the standard template, if they are necessary and useful for everyone.
+
+++ Use and configuration ++
+As the C standard parser template has been developed simultaneously with UniCC itself and results in UniCC's own grammar parser, it is the best integrated parser template so far.
+To use it with a parser, the top-level directive
+
+``` #!language "C" ;
+
+must be set, and the file ``C.tlt`` must be in the path directed by ``UNICC_TPLDIR``.
+
+Without any configuration, the C standard template results in parsers that are perfectly useable for prototyping, by reading character by character from stdin. Errors are printed to stderr. To integrate the parser into other execution environments, some more configuration is necessary. Configuration of the parser is performed with the use of C preprocessor directives only, which must be defined in the header-code to disable their default declarations.
+
+All symbols of the parsers which are or could become visible from outside the parser module contain a prefix value, which is configured using the [``#prefix`` directive#ref_prefix].
+
+++ The parser control block ++[pcb]
+The parser control block is a data structure (struct) which is passed to all parser-related functions in order to provide information on the current parser state and input buffering. It is always accessable within all configuration macros as well as semantic codes, and simply identified as ``pcb``.
+
+Using the ``#pcb`` directive as described above, individual members of the parser control block can be defined, which avoids the problem of using global variables; Global variables are not used by the standard C parser, which makes it entirely thread-safe.
+
+If there is the need to pass on any values or pointers to subsequent parts of the parse-tree that hold global run-time information of the parser, they should be put into the parser control block using the ``#pcb`` directive.
+
+Its also strongly recommended to put the input file or buffer pointer here if the parser's input should be read from another source than stdin. If this is the case, make sure [UNICC_GETINPUT #UNICC_GETINPUT] is defined correctly.
+
+Most of the members of the parser control block are operated internally, but some of them may also be used by the compiler writer. Their modification during runtime is NOT recommended!
+
+|| Member | Type | Content |
+| act | int | The current action to perform (shift, reduce, shift&reduce). |
+| buf | char* | Holds the current input buffer. This input buffer holds all the characters necessary to identify the current input token. |
+| bufend | char* | Pointer to the end of the input buffer, for faster data appending operations. |
+| bufsize | char* | The pointer to the last byte of the input buffer. |
+| error_count | int | Current number of errors. |
+| error_delay | int | This is set during error recovery, to reduce inherited errors. |
+| idx | int | Index of reduced production, internally use only. |
+| len | unsigned int | Holds the length of the string of the current token in the input buffer. |
+| line | unsigned int | Contains the current line number within the input file. |
+| ret | @@prefix_vtype | Last return value of reduction action or symbol to be shifted. |
+| stack | int* | The parser state stack. |
+| stacksize | unsigned int | Variable to determine the maximum stack size of both //stack// and //vstack//. |
+| sym | int | Holds the ID of the lookahead symbol which is the current token. |
+| test | @@prefix_vtype | A zero test value. |
+| tos | int* | Top of stack pointer. |
+| vstack | @@prefix_vtype* | The parser value stack. |
+| vtos | @@prefix_vtype* | Top of value stack pointer. |
+
+
+To avoid compile errors, names differing from the above ones must be chosen to add members to the parser control block structure. UniCC itself does not parse or check this, because it is a language-related problem.
+
+++ The parser invocation function ++
+The inital parser function of the C standard parser template is called ``@@prefix_parse()``, where **@@prefix** will be replaced by the prefix specified as [#prefix #ref_prefix]. If no prefix is given, the function is simply called ``_parse()``. If the parser function is called from within a function defined in the parser definition file itself, it is still possible to write ``@@prefix_parse()`` also in the semantic code. The **@@prefix** variable will be replaced with its correct content by the code generator when the code is build.
+
+Its prototype is 
+``` UNICC_STATIC int @@prefix_parse( @@prefix_pcb* pcb );
+
+The function only requests for one parameter, which is a structure of the [parser control block #pcb]. The structure must be initialized to zero, and user-defined values must be filled correctly before the parse-function is invoked. Else, the parser will come into unpredictable states and parse errors, or simply cores. It is also possible to pass a ``(@@prefix_pcb*)NULL`` to the parser invocation function. Then, the function will allocate a parser control block structure on its own, but this is only senseful in validating parsers that do not much semantic actions working on pointers of the parser control block.
+
+The parser-function returns the number of errors discovered. So if 0 is its result, everything went fine, the parse has been proven for valid syntax.
+
+++ Configuration macro reference ++
+
+This short reference should bring an overview of the provided macros and their meaning. All macros within the UniCC C Standard Template can be overridden when defined in the [``#prologue`` #ref_prologue_epilogue] semantic code area.
+
++++ UNICC_CLEARIN +++[UNICC_CLEARIN]
+Clears buffered input of the current token. This macro requires the parser control block as its parameter, and is pre-defined as
+
+``` #define UNICC_CLEARIN( pcb )   @@prefix_clear_input( pcb )
+
+so it invokes the build-in function ``_clear_input``. It can be re-defined by any desired task, but its behavior must complain with the one given by ``_clear_input`` and the lexer functions reading the input.
+
++++ UNICC_DEBUG +++[UNICC_DEBUG]
+Switches parser trace, which is done to stderr.
+If set to 0 (default), nothing will be written.
+1 is standard for state trace. 2 also enables input buffering trace, so the fetching of single characters will be traced and printed.
+
+``` #define UNICC_DEBUG 1
+
+To show stack contents, also switch on [UNICC_STACKDEBUG #UNICC_STACKDEBUG]
+
++++ UNICC_ERROR_DELAY +++[UNICC_ERROR_DELAY]
+Defines the error delay that is used to mark a parse error as successfully recovered. If there raise parse errors within this number of shifts after an inital parse error, during error recovery, no following error will be reported. UNICC_ERROR_DELAY is set to 3 shifts by default.
+
++++ UNICC_GETINPUT +++[UNICC_GETINPUT]
+Defines a macro that is called when a character is fetched for buffing in the current input. The UniCC C standard template buffers input according to the needs of the lexer. This buffering is done automatically, but it is required to provide a way how characters are read from the input. By default, ``UNICC_GETINPUT`` is defined as
+
+``` #define UNICC_GETINPUT getchar()
+
+By re-defining it, a function must be given that returns the next character and moves the input pointer one character to the next one.
+It must be assured, that no more input is returned by ``UNICC_GETINPUT`` when the end of the file has been reached (respective the null-terminator was read).
+
+One could define ``UNICC_GETINPUT`` as
+
+``` #define UNICC_GETINPUT *pcb->inputstring++
+to read from a buffered string, but this could read over the string's end, when ``UNICC_GETINPUT`` is called multiple times (which can be the case!).
+So a definition of
+``` 
+#define UNICC_GETINPUT *( *pcb->inputstring ? pcb->inputstring : pcb->inputstring++ )
+```
+would be more adequate and causes no unwanted effects.
+
++++ UNICC_MAIN +++
+``UNICC_MAIN`` controls if the parser features its automatic main function. This feature enables to rapidly prototype a grammar and immediatelly test its result. The main function calls the parser in an endless loop and allows.
+
+By default, if no semantic code is specified by [``#epilogue`` #ref_prologue_epilogue], UNICC_MAIN will be configured to 1, so a main function is generated. If an epilogue is given, it is defined automatically to 0 when no previous definition is done. To specifiy an epilogue and switch the parser's build-in main function on
+
+``` #define UNICC_MAIN 1
+
+must be done previously.
+
++++ UNICC_MALLOCSTEP +++
+Defines the increment size of units allocated in one row in every allocation task. This is done to minimize the amount of malloc/realloc calls, so reallocation of memory is only done when the next step of this number is reached. This macro fits to the reallocation of the input-buffering and stacks. It is configured to 128 by default, so for example 128 bytes for input buffering or 128 elements of the value stack elements in an array.
+
++++ UNICC_OUTOFMEM +++
+Is a macro that is called when a malloc/realloc call fails. It can be replaced with a product-related error function call or similar. Its default definition fprintf's a "Memory error" to stderr and exits the program with error code 1.
+
++++ UNICC_PARSE_ERROR +++
+This macros is invoked on a parse error. It requires the parser control block as its parameter, and is pre-defined with an error text written to stderr.
+Using 
+
++++ UNICC_REDUCE, UNICC_SHIFT +++
+Internal use only, may not be changed or redefined.
+
++++ UNICC_STACKDEBUG +++
+
+
++++ UNICC_STATIC +++
+
+A define that holds the keyword ``static`` by default. It can be configured to be empty or anything else, just in case static data should be made accessable outside the parser module. The parser invocation function is always not declared to be UNICC_STATIC.
+

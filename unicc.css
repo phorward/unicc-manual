@@ -1,0 +1,44 @@
+html, body, table
+{
+	font-family: Helvetica, Consolas, sans-serif;
+	font-size: 12pt;
+}
+
+a
+{
+	text-decoration: none;
+}
+
+a, a:link, a:visited
+{
+	color: #0066CC;
+	padding: 2px;
+}
+
+a:hover
+{
+	color: #FF9933;
+}
+
+li
+{
+	padding-bottom: 8px;
+}
+
+h1
+{
+	font-size: 20pt;
+	margin: 0;
+}
+
+h2
+{
+	font-size: 12pt;
+	padding: 0;
+}
+
+div.image
+{
+	text-align: center;
+	font-weight: bold;
+}
