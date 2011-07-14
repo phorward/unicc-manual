@@ -2,21 +2,29 @@
 + Reference guide +
 
 ++ Overview ++
-In general, a //UniCC parser definition file// is a UTF-8 formatted textfile containing definitions for //terminal symbols//, //nonterminal symbols// and //productions// that describe a grammar for a type-3 language of Chomskys hierarchy of languages.
 
-For the configuration of symbol-, task-, generation- and augmentation-related features, a parser definition file in most cases also contains several configuration directives, or simply called //directives//. There are also a few directives defined as //top-level// that must be given on top of the file before any other directive or grammar construction is done.
+The UniCC parser generator is a software-program that compiles augmented parser definitions into program-modules of a higher programming language or into a structured, not further targetted parser description file.
 
+A parser definition analyzed by UniCC is a ASCII (UTF-8) formatted textfile that generally contains definitions for //terminal symbols//, //nonterminal symbols// and //productions// to describe a context-free grammar. These definitions are expressed in a Backus-Naur-Form-styled notation.
+
+In most cases, a parser definition also contains several configuration directives, or simply called //directives//. They are used for the configuration of symbol-, task-, generation- and augmentation-related features. There are also a few directives that must be defined before any directive or grammar construction is done, because they influence general settings that cannot be changed later on. These directives are called //top-level directives//.
+ 
 Additionally, a parser definition file can contain operational programming code that is revised by UniCC and inserted into appropriate positions within the resulting program module. These code fragments have the purpose to fit a particular need within the parsing process. Code blocks can be specified to various parser directives, to productions and some special terminal definitions.
 
-Due the target-language independency of the UniCC parser generator and its parser definition language, a parser definition file can also contain information that is refered as //optional augmentation//. These additional informations canbe associated with various grammatical objects of the grammar, or defined globally to the grammar. Such kind of augmentation is handled similar like directives, but don't have any special meaning for UniCC, nor they don't influence anything of the general parser generation process. Use of this feature relies in subsequent, from UniCC detached tasks which perform subsequent operations on the output of UniCC and the use this additional information for specialized parser generation purposes.
+Due the target-language independency of the UniCC parser generator and its parser definition language, a parser definition file can also contain additional information called //tags//. These tags can be defined globally or associated with various grammatical objects. Use of this feature is in the interest of subsequent, from UniCC detached tasks which perform operations on the output of UniCC and the use this additional information for various purposes or results.
 
-++ Command-line options ++[ref_commandline_parameters]
+++ Installation ++
+
+TODO
+
+++ Invocation and command-line options ++[ref_commandline_parameters]
+
 UniCC primarily provides a command-line interface to invoke the parser generation process.
 The general calling convention of the UniCC parser generator is
 
 ``` unicc OPTIONS filename.par
 
-This command-line interface supports various, combineable options to invoke, modify and specialize the parser generation process, or to trigger further tasks.
+This command-line interface supports various, combinable options to invoke, modify and specialize the parser generation process, or to trigger further tasks.
 
 || Option | Long option name | Description |
 | -all | --all-warnings | Runs UniCC to print all warnings that come up with the grammar. UniCC normaly supresses some warning messages that raise up during the parse table constructions according to their importance. |
@@ -35,35 +43,35 @@ This command-line interface supports various, combineable options to invoke, mod
 
 TABLE:ref_command_line_options:UniCC command-line options.
 
-Any debug-, trace- and processing-options are always printing to error stream, whereas output code will be printed to stdout.
+Any debug-, trace- and processing-options are always printing to standard error (stderr), whereas output code will be printed to standard output (stdout).
 
 ++ Code generators ++[ref_codegen]
 
 ''' IMAGE:generators.png:An overview about the UniCC code-generators
 
-UniCC can not only be seen as a parser generator to turn a parser definition into a piece of program code to implement this parser. It is also a parser generator that can be used as the base for different ("any") kinds of parser analyzation, code generation and optimization issues. This is the reason why UniCC comes with two integrated code-generators: One code generator that builds program-modules expressed in a particular programming language, and one code generator to build an independent parser description file that describes the compiled form of the grammar and a transparent representation of the output parser.
+UniCC can not only be seen as a parser generator to compile a parser definition into a piece of program code to implement this parser. It is also a parser generator that can be used as the base for different ("any") kinds of parser analyzation, code generation and optimization issues. This is the reason why UniCC comes with two integrated code-generators: One code generator that builds program-modules expressed in a particular programming language, and one code generator to build an independent parser description file that describes the compiled form of the grammar and a transparent representation of the output parser.
 The output of the first code-generator can directly be fed to a compiler, whereas the output of latter code-generator can be analyzed by any type of other program with a specialized purpose.
 
 +++ The program-module generator +++[ref_codegen_progmod]
-The //program-module generator// is the default code generator that is used by UniCC if nothing else is explicitly specified. It is used to build a parser-module in a specific implementation programming language. Thanks to its template-based approach, this code-generator is not bound to one target programming language. All target-language-related code is read from tags defined in a parser template file, which must follow a static structure that is pretended by the program-module generator in order to construct the output code.
+The //program-module generator// is the default code generator that is used by UniCC if nothing else is explicitly specified. It is used to build a parser-module in a specific high-level programming language. Thanks to its template-based approach, this code-generator is not targetted to one specific programming language. All target-language-related code is read from tags defined in a parser template file, which must follow a static structure that is pretended by the program-module generator in order to construct the output code.
 
-The standard C parser template provided with UniCC is a parser template file of such kind. It gives UniCC the ability to build parsers written in the C programming language which can be compiled after generation without any further modification. If more parser templates will exist somewhere in the future, UniCC will also be capable to build program-modules for parsers written in other programming languages, like C++, C#, Java, Pascal, or anything else.
+The standard C parser template provided with UniCC is a parser template of such kind. It gives UniCC the ability to build parsers written in the C programming language which can be compiled after generation without any further modification. If more parser templates will exist somewhere in the future, UniCC will also be capable to generate program-modules for parsers written in other programming languages, like C++, C#, Java, Pascal, Fortran or anything else.
 
 Given the very simple grammar
 %!include: ``reference/simple.par``
 
 UniCC constructs a C program that consists of more than 900 TODO!! lines of code using the program-module generator in combination with the standard C parser template.
-This source file can directly be passed to a standard C/C++ compiler like //gcc// or //Visual C++//, without any further modification.
+This output source can directly be passed to a standard C/C++ compiler like //gcc// without any further modification.
 
 This is the output program module:
 %!include: ``reference/simple.c``
 And here is the related header-file, in case of the [UniCC standard C parser template#stdcparser]:
 %!include: ``reference/simple.h``
 
-+++ The parser description file generator +++[ref_codegen_descfile]
-The //parser description file generator// outputs an XML-based representation of the generated parser. This parser definition file contains the LALR(1) parse tables, tables for the lexical analyzer, conditioned semantic code, additional augmentations, the original parser definition source and any warning or error messages produced by UniCC during the parser construction process. Third-party programs then can work on this output to generate individual parser code or code-parts, directly interpret, analyze, modify or represent the compiled parser for any desired purpose.
++++ The parser description generator +++[ref_codegen_descfile]
+The //parser description generator// outputs an XML-based representation of the generated parser. This parser description file contains the LALR(1) parse tables, tables for the lexical analyzer, conditioned semantic code, a structured listing of all symbols and productions with all of its tagged information, the original parser definition source and any warning or error messages produced by UniCC during the parser construction process. Third-party programs can work on this information to generate individual parser code or code-parts, directly interpret, analyze, modify, represent or rewrite the compiled parser for any desired purpose.
 
-To trigger the parser description file generator, UniCC must be run with the //-x// command-line option. 
+To trigger the parser description generator, UniCC must be run with the //-x// command-line option. 
 
 With the very simple grammar from above,
 %!include: ``reference/simple.par``
@@ -74,19 +82,21 @@ UniCC causes to build a grammar definition file like this when using the parser 
 ++ Parser construction modes ++[ref_construction_modes]
 UniCC is a flexible parser generator that can handle two different methods to construct its parsers and their lexical analyzators.
 
-The first method is called the //(whitespace) sensitive parser construction mode//. It directly works on the input stream characters as lookahead, with an lexical analyzer to detect terminal symbols that is constructed in context to every parser state.
+The first and default method is called the //(whitespace) sensitive parser construction mode//. This construction mode is a speciality of UniCC, and gives a maximum of flexibility to implement parsers for nearly any type of context-free language. UniCC analyzes and rewrites the grammar according to several rules influencing whitespace and lexeme detection and separation.
 
-The second, most simpler method is called the //(whitespace) insensitive parser construction mode//. It uses always one single lexical analyzer that identifies terminal symbols. The difference to the sensitive mode is, that lesser states are produced, because the grammar is not rewritten, and that whitespace is directly absorbed within the lexical analysis. Overlapping character-classes can not be used in this mode.
+The second, most simpler method is called the //(whitespace) insensitive parser construction mode//. It uses always one single lexical analyzer that identifies terminal symbols. The difference to the sensitive mode is, that lesser states are produced, because the grammar is not rewritten, and that whitespace is directly absorbed within the lexical analysis. Overlapping character-classes can not be used in this mode. This construction mode can be compared to most other parser generators like the one used by the combination of //lex// and //yacc//.
 
-UniCC uses the sensitive grammar construction mode by default. It depends on the requirements of the grammar which construction mode should be used. The specialities on the two construction methods are described below. The construction mode can be changed with the ``#!mode`` top-level directive, as described below.
+It depends on the requirements of the grammar which construction mode should be used. The specialities on the two construction methods are described below. The construction mode can be changed with the [``#!mode``#ref_mode] top-level directive.
 
 +++ Sensitive mode +++
 
-The sensitive parser construction mode gives a maximum of flexibility, and is the default setting. The most common characteristic of this construction mode is, that UniCC entirely rewrites the grammar according to whitespace and lexeme rules, to make whitespace explicitly possible situations. Overlapping character terminals are made unique and split up into nonterminals, to make this parsing approach possible. Due to the technical implementation, HERE I WAS.
+The whitespace sensitive parser construction mode gives a maximum of flexibility on whitespace and lexeme construction and their behavior, and is used by default. It is a UniCC-speciality that was never provided by an other parser generator before in this way.
 
+The most common characteristic of this construction mode is, that UniCC entirely rewrites the grammar according to whitespace and lexeme definitions, to make whitespace only valid in selected situations. The definition of whitespace is not limited to one terminal symbol anymore in this mode. The symbol defining whitespace can be a nonterminal described as part of the context-free grammar itself without any limitations. An optional call to this nonterminal is added behind every terminal symbol and in front of the goal symbol during the grammar revision. To disallow whitespace in particular constructs, some nonterminals can be defined as lexemes. They are covered as terminal symbols during grammar revision in order to the whitespace-matching, but can also consist of any context-free grammar.
 
-for example string terminals are only valid in specifc places, and act as ordinary identifiers elsewhere. 
-Some grammars that use this mode may cause a high number of states and many different lexical analyzers, nearly one entire analyzer per state. But it enables the ultimative maximum of flexibility ever provided by a LALR(1) parsed grammar.
+The advantage of this construction mode is, that whitespace and lexemes can be expressed in a context-free grammar rather than as regular strings matched by the lexical analyzer. The lexical analysis apparently becomes part of the parser with all its possibilites, but the grammar is expressed as whitespace would be handled apart from it. Additionally, the true lexical analyzer can be optionally used to parse the atomic terminals, as part of lexemes or on its own.
+
+To make this parsing approach possible, overlapping character terminals are made unique and split up into nonterminals. A lexical analyzer is constructed individually for every LALR state, to only match symbols that are valid in the sensitive context of the given state. Some grammars that use this mode may cause a high number of states and many different lexical analyzers. But it enables the ultimative maximum of flexibility ever provided by a LALR(1) parsed grammar.
 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
@@ -569,14 +579,14 @@ Directives follow nearly the same syntactic rules than any other definition in U
 
 Because the directive names are build-in and constant, some of them even contain blanks. The syntax of the parameter-part depends on the directive itself. The various directives are explained in detail in the following sections, besides their behavior in the different parsing modes.
 
-+++ #!mode +++
++++ #!mode +++[ref_mode]
 The ``#!mode`` top-level directive defines the parser construction mode UniCC should follow. Only the values ``sensitive`` and ``insensitive`` are allowed as parameters. This mode selection influences the general way how UniCC constructs or rewrites (if necessary!) the grammar, and must be specified before any other directive or grammar construct.
 
 ``` !#mode sensitive;
 
 More about the parser construction modes UniCC provides is explained in a [separate chapter #ref_construction_modes].
 
-+++ #!language +++
++++ #!language +++[ref_language]
 The ``#!language`` top-level directive specifies the implementation language to which the parser should be compiled in which language its semantics are written in. It may only be defined once on top of a grammar before any other directive (except other top-level directives) or language construct follows.
 
 ``` #!language "C" ;

@@ -2,7 +2,8 @@
 + Constructing parsers with UniCC +
 
 ++ What does 'parsing' mean? ++
-Parsing is required in many situations of a programmer's everyday business. Information is fed to a program and must be analyzed, sometimes with a more or less logical structure. Information can be a data dump in a character separated file, the command-line parameters of a program, a stream of data in various formattings, an XML-file or another type of file with a logical, meaningful structure, and input syntax - maybe even a program source code written in a programming language.
+
+Parsing is required in many situations of a software developers everyday business. Information is fed to a program and must be analyzed, sometimes with a more or less logical structure. Information can be a data dump in a character separated file, the command-line parameters of a program, a stream of data in various formattings, an XML-file or another type of file with a logical, meaningful structure, and input syntax - maybe even a program source code written in a programming language.
 
 This syntax can be analyzed and verified for correctness using a special type of program task: A parser! This parser is used to analyze a sequence of input data and produces a logical interpretation of this data according to an underlying grammar, which describes the data's valid syntax - rules that express this data in its logical way. If the syntax a parser follows is not met, the information is useless and cannot be processed by subsequent tasks which depend on the interpreted representation which is analyzed by the parser.
 
@@ -11,6 +12,7 @@ Every compiler, as the most obvious example, has a parser for the language it co
 The UniCC parser generator supports the programmer dealing with any type of parsing issue in two important steps: A new (or existing) language can quickly be prototyped and tested. This prototype then can be used to implement the parser that constructs an abstract syntax tree out of the given input, which is in turn used for the further processing of this fetched information.
 
 ++ Defining grammars ++
+
 The ways of how data is analyzed, their syntax rules, can be defined using a so called //grammar// - the grammar of the language the parser accepts. Every kind of computer language - even simple text matching patterns - can be defined in some kind of grammar.
 
 Grammars for computer languages, so called //context-free languages//, are expressed in a special notation, which is called the //Backus-Naur-Form//, or shortened just //BNF//. It was invented in 1959 by John Backus and Peter Naur in the course of the ALGOL programming language.
@@ -21,7 +23,7 @@ Grammars expressed in Backus-Naur-Form exists of three fundamental elements: The
 
 - **Nonterminal symbols**, or simply called //nonterminals//, can be seen as "variables" or "function calls" within a grammar, although they aren't. They reference to one or a bunch of the so called //productions//, which means that each production is always associated with one (and only one!) nonterminal; but one nonterminal may exist of several productions.
 
-- Finally, the **productions**, sometimes even called //grammar rules// or just //rules//, describe the syntax - or let's better say: a syntactical part of the grammar - which can be replaced by the specific nonterminal each production is associated with. This syntactical description is done by defining a sequence in which terminals and nonterminals may occur to form a valid sentence. This includes, that a nonterminal can reference itself recursively in its own productions, which is a very important aspect of grammar theories in non-regular languages.
+- **Productions**, sometimes even called //grammar rules// or just //rules//, finally describe the syntax. Its better to say, that productions define a syntactical part of the grammar - which can be replaced by the specific nonterminal each production is associated with. This syntactical description is done by defining a sequence in which terminals and nonterminals may occur to form a valid sentence. This includes, that a nonterminal can reference itself recursively in its own productions, which is a very important aspect in non-regular languages.
 
 
 Let's see an example to get more familiar with these new terms. We want to define a language that allows for the detection of integer numbers. We have one terminal, which is a character-class that exists of a digit from "0" to "9". This means, that the characters 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9 are our valid characters forming this specific terminal, and we generalize them by defining a character-class by saying ``'0-9'``. Characters and character-classes are enclosed by single quotation marks to identify them as terminals.
@@ -120,6 +122,7 @@ The parse tree of the input string "August 17, 2008" using this grammar will be
 IMAGE:parsetree_date.png:Parse tree derived from the input "August 17, 2008"
 
 ++ Grammar modularity ++
+
 Grammars are modular. They can simply be extended and rewritten, by re-using already defined grammatical constructs as part of other grammatical constructs. Due the build-up, that one nonterminal can be derived from one or multiple productions, grammars are defined in a modular structure, where existing elements can be replaced or enhanced without rewriting the whole grammar.
 
 This will be demonstrated by the next example: What about extending the appointment assistant to even accept other date formats, e. g. the format ``<Day>.<Month>.<Year>`` and ``<Month>/<Day>/<Year>``?
@@ -727,7 +730,7 @@ So let's move on!
 
 +++ Regular expression terminals +++
 
-For a maximum of flexibility in the task of the lexical analysis, UniCC also features terminal symbols that are made up by regular expressions. Regular expressions describe string patterns in a regular languages (type-3 languages) of the Chomsky hierarchy of languages, and therefore they form a subset of the context-free languages (type-2 langauges).
+For a maximum of flexibility in the task of the lexical analysis, UniCC also features terminal symbols that are made up by regular expressions. Regular expressions describe string patterns in regular languages (type-3 languages) of the Chomsky hierarchy of languages, and therefore they form a subset of the context-free languages (type-2 langauges).
 
 The use of regular expression terminals depends on the grammar designer's choice. BLABLA
 
