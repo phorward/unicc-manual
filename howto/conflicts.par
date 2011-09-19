@@ -1,0 +1,21 @@
+//Some grammar-related directives
+#whitespaces    ' \t';
+#lexeme         integer;
+
+//Defining the grammar
+calculator$     -> expression
+                ;
+
+expression      -> expression '+' expression
+                | expression '-' expression
+                | expression '*' expression
+                | expression '/' expression
+                | '(' expression ')'
+                | integer
+                ;
+
+integer         -> '0-9'
+                | integer '0-9'
+                ;
+
+//End of definition

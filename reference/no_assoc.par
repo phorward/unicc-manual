@@ -1,13 +1,5 @@
 #!mode      insensitive;
 
-#nonassoc   '=';
-
-#left       '+' '-';
-#left       '*' '/';
-
-#right      '!';
-#right      '^';
-
 @integer    '0-9'+
             ;
 

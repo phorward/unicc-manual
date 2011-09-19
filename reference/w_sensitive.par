@@ -1,0 +1,7 @@
+#!mode sensitive;
+#whitespaces whitespace ;
+
+@COMMENT '/' !'/'+ '/' ;
+
+start$ -> "Hello" "World";
+whitespace -> ' ' | '\t' | @COMMENT;

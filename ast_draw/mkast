@@ -1,0 +1,24 @@
+#!/bin/sh
+set -x
+
+if [ "$1" = "" ]
+then
+	echo "usage: $0 filename.png ast-definition"
+	exit 1
+fi
+
+filename=$1
+shift
+
+gendir=`dirname $0`
+
+svg_filename="$filename.svg"
+png_filename="$filename.png"
+png_conv_filename="$filename.trim.png"
+
+$gendir/astexpr $* >$svg_filename
+java -jar $gendir/batik-1.7/batik-rasterizer.jar -w 3000 -h 1000 -onload $svg_filename >/dev/null
+convert -trim $png_filename $png_conv_filename
+#rm -f $png_filename
+mv $png_conv_filename $png_filename
+#rm -f $svg_filename

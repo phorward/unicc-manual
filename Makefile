@@ -13,8 +13,7 @@ UNICC_SRC	=	$(UNICC_MAIN) \
 				book.html \
 				unicc.css
 
-UNICC_IMG	=	howto/*.png \
-				reference/*.png
+UNICC_IMG	=	reference/*.png
 
 UNICC_PDF	=	output/pdf/unicc.pdf
 UNICC_PDF_H	=	output/pdf/unicc.pdf.html
@@ -23,7 +22,8 @@ UNICC_HTML	=	output/html/unicc.html
 
 UNICC_TXT	=	output/text/unicc.txt
 
-all: $(UNICC_HTML) $(UNICC_PDF) $(UNICC_TXT)
+#all: $(UNICC_HTML) $(UNICC_PDF) $(UNICC_TXT)
+all: $(UNICC_PDF)
 
 clean:
 	rm -f $(UNICC_HTML)

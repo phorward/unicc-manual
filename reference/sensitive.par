@@ -1,0 +1,24 @@
+#!mode      sensitive;
+
+#left       '+' '-';
+#left       '*' '/';
+
+#whitespaces whitespace;
+
+whitespace	-> ' \t\n'
+			;
+
+#lexeme		integer;
+integer		->	'0-9'+
+			;
+
+start$      -> expr*
+            ;
+
+expr        ->  expr '+' expr
+            |  expr '-' expr
+            |  expr '*' expr
+            |  expr '/' expr
+            |  '(' expr ')'
+            |  integer
+            ;

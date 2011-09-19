@@ -1,26 +1,20 @@
 #!mode      insensitive;
 
-#nonassoc   '=';
-
 #left       '+' '-';
 #left       '*' '/';
 
-#right      '!';
-#right      '^';
+#whitespaces ' \t\n';
 
-@integer    '0-9'+
+@integer	'0-9'+
+			;
+
+start$      -> expr*
             ;
 
-start$      -> expr* ';'
-            ;
-
-expr        -> expr '=' expr
-            |  expr '+' expr
+expr        ->  expr '+' expr
             |  expr '-' expr
             |  expr '*' expr
             |  expr '/' expr
-            |  expr '^' expr
-            |  '!' expr
             |  '(' expr ')'
             |  @integer
             ;

@@ -1,0 +1,13 @@
+#!mode      insensitive;
+
+#left       '+' ;
+
+@integer    '0-9'+
+            ;
+
+start$      -> expr* ';'
+            ;
+
+expr        ->  expr '+' expr
+            |  @integer
+            ;

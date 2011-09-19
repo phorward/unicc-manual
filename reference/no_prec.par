@@ -1,0 +1,13 @@
+#left			'+' '-' ;
+#left			'*' '/' ;
+
+@integer        '0-9'
+                ;
+
+expression$     ->      expression '+' expression
+                |       expression '-' expression
+                |       expression '*' expression
+                |       expression '/' expression
+                |       '-' expression
+                |       @integer
+                ;

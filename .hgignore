@@ -1,0 +1,14 @@
+syntax: glob
+ast_draw/batik-1.7
+output
+latex
+old
+test
+
+reference/anomaly.out
+reference/lexeme.out
+reference/no_lexeme.out
+reference/simple.c
+reference/simple.h
+reference/simple.xml
+reference/w_sensitive.out

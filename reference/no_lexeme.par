@@ -1,0 +1,9 @@
+#whitespaces ' ' ;
+
+start$ -> "print" value ;
+
+value -> ident | integer ;
+
+ident -> 'A-Za-z_' ident | 'A-Za-z_' ;
+
+integer -> '0-9' integer | '0-9' ;

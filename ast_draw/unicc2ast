@@ -1,0 +1,245 @@
+#!/bin/sh
+exec 1>&2
+#set -x
+
+if [ $# -lt 3 ]
+then
+	echo "Usage: $0 Parser-Filename Expression Output-Filename"
+	exit 1
+fi
+
+parser=$1
+expr=$2
+outfile=$3 
+opts=$4
+workdir=`dirname $0`
+curdir=`dirname $outfile`
+tempfile=$curdir/Utmp
+
+#Compile the Parser using UniCC
+echo -n "Generating parser from $parser..."
+unicc -b $tempfile $parser
+if [ $? -ne 0 ]
+then
+	echo "Call to unicc caused an error!"
+	exit 1
+fi
+echo "Done"
+
+#Compile the resuluting program
+echo -n "Compiling parser..."
+cc -I$curdir -DUNICC_DEBUG=0 -DUNICC_SYNTAXTREE=1 -DUNICC_MAIN=0 -DUNICC_STATIC= -o $outfile.x $tempfile.c $workdir/astmain.c 2>/dev/null
+
+if [ $? -ne 0 ]
+then
+	echo "Call to cc caused an error!"
+	exit 1
+fi
+echo "Done"
+
+rm -f $tempfile.c $tempfile.h
+
+echo -n "Writing SVG header..."
+cat <<ENDL >$outfile.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SVG Tree Drawer
+Copyright (C) 2004 Weston Ruter
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will core useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" onload="init()">
+<title>Tree</title>
+<style type="text/css">
+
+g text {
+	text-anchor:middle;
+	font-family:'Lucida Console Unicode', Arial, Helvetica, Serif;
+	font-size:20px;
+}
+
+g line {
+	stroke:black;
+}
+
+			</style>
+<script type="text/ecmascript">
+
+var fontSize = 20;
+var wordSpacing = 20; //wordSpacing/2 == text padding
+var marginLeft = 10;
+var marginTop = 0;
+var width = 0;   //read only
+var height = 0;  //read only
+var branchHeight = fontSize;
+var branchPaddingTop = fontSize/4;
+var branchPaddingBottom = 0;
+
+
+window.onerror = function(message, url, line){
+	alert("Javascript error: " + message + "\n" + url + "\nOn line: " + line + "\nReport error to: weston@linguiste.org");
+	return false;
+}
+
+var rootNode;
+function init(){
+	var gElements = document.getElementsByTagName('g');
+	rootNode = gElements.item(0);
+	drawTree();
+}
+
+
+//positions all the nodes in a tree structure
+var buffer = '';
+function drawTree(){ 
+	try {
+		r_drawTree(rootNode, null, false, marginLeft, marginTop + fontSize, 0);
+	}
+	catch(error){
+		alert(error + "\nReport error to: weston@linguiste.org\n\n" + dump(error));
+	}
+}
+function dump(obj){
+	var buffer = '';
+	for(key in obj){
+		buffer += key + ' = ' + obj[key] + "\n";
+	}
+	return buffer;
+} 
+function r_drawTree(containerNode, parentLabel, isEmptyParent, shiftLeft, shiftTop, parentWidth){//returns the width of node's children
+	var isEmpty = false;
+	var isParent = (containerNode.getElementsByTagName('g').length ? true : false);
+	var childrenWidth = 0;
+	var childrenLabels = Array();
+	var nodeLabel;
+	var nodeBranch;
+	var nodeExtendBranch;
+	var nodeLabelWidth;
+	var leafY;
+	
+	//get and handle children ============================
+	for(var i = 0; i &lt; containerNode.childNodes.length; i++){
+		if(containerNode.childNodes.item(i).nodeName == 'text'){
+			nodeLabel = containerNode.childNodes.item(i);
+			
+			//determine the width of the label
+			if(!nodeLabel.firstChild || !nodeLabel.firstChild.nodeValue || nodeLabel.firstChild.nodeValue.match(/^\s*$/) ){
+				nodeLabelWidth = wordSpacing;
+				isEmpty = true;
+			}
+			else {
+				nodeLabelWidth = wordSpacing + nodeLabel.getComputedTextLength();
+				isEmpty = false;
+			}
+			if(nodeLabelWidth &lt; parentWidth)
+				nodeLabelWidth = parentWidth;
+		}
+		//connecting branch 
+		else if(containerNode.childNodes.item(i).nodeName == "line"){
+			nodeBranch = containerNode.childNodes.item(i);
+		}
+		//children nodes
+		else if(containerNode.childNodes.item(i).nodeName == "g"){
+			var returned = r_drawTree(containerNode.childNodes.item(i), nodeLabel, isEmpty, shiftLeft + childrenWidth, shiftTop + (isEmpty ? branchHeight : branchHeight + fontSize), nodeLabelWidth);
+			childrenLabels.push(returned[0]);
+			childrenWidth += returned[1];
+		}
+	}
+	
+	//draw label, children, and branches ==================	
+	if(!childrenWidth) //there are no children; this is the branch end
+		childrenWidth = nodeLabelWidth;
+	if(nodeLabel == null)
+		throw Error("Error: Every child must have a label (every &lt;g&gt; must contain a &lt;text&gt;, even if it is empty). Revise your XSLT stylesheet.");
+
+	//position label
+	var thisY = shiftTop;
+	var thisX;
+	if(childrenLabels.length){
+		var firstChild = parseFloat(childrenLabels[0].label.getAttribute('x'));
+		var lastChild = parseFloat(childrenLabels[childrenLabels.length-1].label.getAttribute('x'));
+		thisX = firstChild + (lastChild - firstChild)/2;
+	}
+	else
+		thisX = shiftLeft + childrenWidth/2;
+	if(thisY &gt; height) 
+		height = thisY;
+	if(shiftLeft + childrenWidth &gt; width) 
+		width = shiftLeft + childrenWidth;
+	nodeLabel.setAttribute('y', thisY + 'px');
+	nodeLabel.setAttribute('x', thisX + 'px');
+	
+	//connect branches from child labels to parent label
+	leafY = thisY;
+	for(var i = 0; i &lt; childrenLabels.length; i++){
+		childrenLabels[i].branch.setAttribute('x1', thisX + 'px');
+		childrenLabels[i].branch.setAttribute('y1', (thisY + (isEmpty ? -fontSize : branchPaddingTop)) + 'px');
+	}
+
+	//below root: anchor one end of the branch to the label
+	if(containerNode != rootNode){
+		if(nodeBranch){
+			nodeBranch.setAttribute('x2', nodeLabel.getAttribute('x'));
+			nodeBranch.setAttribute('y2', (parseFloat(nodeLabel.getAttribute('y')) - fontSize - branchPaddingBottom) + 'px');
+		}
+	}
+	//else if(nodeBranch) //hide it if it was accidentally included in the source code
+	//	nodeBranch.style.display = 'none';
+	return Array({label:nodeLabel, branch:nodeBranch}, childrenWidth);
+}
+
+			</script>
+ENDL
+echo "Done"
+
+#Generate the Code using the Parser
+echo -n "Calling parser to build syntax tree..."
+echo -n "$expr" | ./$outfile.x $opts | sed -e "s/&/&amp;/g" >>$outfile.xml
+
+if [ $? -ne 0 ]
+then
+	echo "Calling $outfile.x caused an error, $?"
+	exit 1
+fi
+
+rm -f $outfile.x
+echo "Done"
+
+echo "</svg>" >>$outfile.xml
+
+echo -n "Rasterizing syntax tree to png file..."
+#Ok, now the file should be written, convert it using SVG rasterizer
+java -jar $workdir/batik-1.7/batik-rasterizer.jar -w 3000 -h 1000 -onload $outfile.xml >/dev/null
+if [ $? -ne 0 ]
+then
+	echo "Calling rasterizer failed, $?"
+	exit 1
+fi
+rm -f $outfile.xml
+echo "Done"
+
+echo -n "Triming image..."
+convert -trim $outfile.png ${outfile}_conv.png
+if [ $? -ne 0 ]
+then
+	echo "Calling convert failed, $?"
+	exit 1
+fi
+echo "Done"
+
+rm -f $outfile.png
+mv ${outfile}_conv.png $outfile.png
+
+echo "Creating $outfile.png completed!"
