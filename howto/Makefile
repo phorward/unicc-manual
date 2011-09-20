@@ -7,7 +7,7 @@ clean:
 
 unicc.out: dates.par
 	echo "$$ unicc -v -s dates.par" >$@
-	unicc -v -s dates.par 2>>$@
+	unicc -v -s dates.par >>$@
 	echo "$$ " >>$@
 	rm -f dates.c dates.h
 

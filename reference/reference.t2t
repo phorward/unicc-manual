@@ -17,9 +17,9 @@ Due the target-language independency of the UniCC parser generator and its parse
 
 To install a binary distribution package of the UniCC LALR(1) Parser Generator on a local computer or server system, the binary package first needs to be unpacked with an related decompression program (.tar.gz-files under Linux/Unix, .zip-files under Windows) to any desired installation directory.
 
-Under POSIX-like systems, this can be done within
+Under POSIX-conform operating systems, this can be done within
 
-``` tar xvfz unicc-<version>-tar.gz
+``` tar xvfz unicc-<version>.tar.gz
 
 TODO
 
@@ -245,7 +245,7 @@ example$ -> "PRINT" expr
          */
          ;
 ```
-It must be noted, that this commenting style is only possible within the grammar code itself. Comments in semantic code blocks must be expressed in the commenting possibilities of the respective target programming language that is used. These comments will also be copied into the resulting parser program-module.
+It must be annotated, that this commenting style is only possible within the grammar code itself. Comments in semantic code blocks must be expressed in the commenting style of the respective target programming language that is used. These comments will also be copied into the resulting parser program-module.
 
 ++ Escape sequences ++[ref_escape_sequences]
 UniCC supports ANSI-C-styled escape-sequences within any string or value that is used in the grammar or any directive.
@@ -945,13 +945,13 @@ as production definition, the correct syntax tree will be constructed for //-2*3
 
 GENAST#reference/prec.par#-2*3##Correct syntax tree of "-2*3", using a production predecence declaration.
 
-The ``#precedence``-directive has to be put between the production and the reduction code, so 
+The ``#precedence``-directive has to be put right beind the production and its reduction code, so 
 
-``` '-' expression            #precedence '*'     [* @@ = -@2; *]
+``` '-' expression        [* @@ = -@2; *]    #precedence '*'
 
 could be a valid reduction code submit.
 
-+++ #whitespaces +++
++++ #whitespaces +++[ref_whitespaces]
 The ``#whitespaces`` directives defines symbols to be handled as whitespace, which means they are allowed everywhere between terminals and simply ignored. In programming languages, comments, blanks, tabs and in some languages even line breaks are handled as whitespace.
 
 ``#whitespaces`` is one of the most influencing UniCC directives, and works different in both of the two parser construction modes.
@@ -967,14 +967,14 @@ yields in a revised grammar UniCC outputs as
 
 %!include: ``reference/w_sensitive.out``
 
-which introduces new virtual nonterminals ``(whitespace)``, ``(whitespace)+``, ``(whitespace)*``, ``Hello'`` and ``start'``.
+which introduces new virtual nonterminals ``&whitespace``, ``&whitespace+``, ``&whitespace*``, ``Hello'`` and ``start'``.
 
 But it uses a fully-fledged nonterminal ``whitespace`` which could possibly exist of very flexible, grammatical constructions. The behavior of terminal symbols within the revision can also be influenced by the directives ``#lexeme``, ``#fixate`` and ``#lexeme separation``.
 
-Whitespace becomes part of the grammar, but its existence is hidden from the grammar developer - there is no obvious indicator if whitespace handling had been done, this can only be indicated on demand.
+Whitespace becomes part of the grammar, but its existence is hidden from the semantic actions of the grammar developer - there is no obvious indicator if whitespace handling had been done, this can only be indicated on demand.
 
 ++++ #whitespaces in insensitive mode ++++
-In the [insensitive parser construction mode #ref_construction_modes], the ``#whitespaces`` directive only accepts terminal symbols. Trying to specifiy a nonterminal at ``#whitespaces`` results in an error, because by the parser consumed whitespace can't be handled here. The grammar is not rewritten as in sensitive mode.
+In the [insensitive parser construction mode #ref_construction_modes], the ``#whitespaces`` directive only accepts terminal symbols. Trying to specifiy a nonterminal at ``#whitespaces`` results in an error, because whitespace consumed by the parser can't be handled here. The grammar is not rewritten as in sensitive mode.
 
 All specified terminal symbols are flagged as whitespace, and are simply ignored when read by the resuling lexical analyzer. The grammar is not rewritten, but the grammar developer is limited to only use character-classes, keywords and regular expressions as whitespaces symbols, without a flexible grammar beyond.
 
@@ -1055,12 +1055,23 @@ More about terminal anomalies can be found in the section [terminal anomalies #r
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 
-++ Tagging ++
+++ Special symbols ++[ref_special_symbols]
+UniCC grammars may contain special terminal and nonterminal symbols under various circumstances. These special symbols begin with an ampersand ``&``, and cannot be expressed in the grammar itself, except the symbol ``&error``. Their meaning and usage is listed in the following table below.
+
+|| Special symbol | Type | Usage |
+| &eof | terminal | Specifies the end-of-file symbol. This special symbol exists in every grammar, and will be automatically appended to the goal-symbol. The end-of-file symbol itself is determined by the parser, but is not bound to a special character sequence or value. In the UniCC Standard C Parser Template, the end-of-file symbol can be dynamically set to fit to the particular input. |
+| &error | terminal | Specifies the error resynchonization symbol. This symbol is used to resynchronize the parser after getting scrambled by a parse error. The chapter [error recovery#ref_error_recovery] covers the use and further meaning of the error resynchonitation terminal. |
+| &whitespace, &whitespace*, &whitespace+ | nonterminal | This group of nonterminals are only inserted in sensitive mode grammars that make use of the ``#whitespaces`` directive. Calls to this symbol are added to appropriate positions relating the lexeme configuration of the grammar. More about this topic can be read in chapter about the #[whitespaces#ref_whitespaces]-directive. |
 
 
+TABLE##Special symbols in UniCC parsers.
+
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+
+++ Error recovery ++[ref_error_recovery]
 
 
-++ TODO ++
-#parser control block
-Optional augmentation
-Resolving conflicts
+%++ Tagging ++
+%The tagging feature, also called optional augmentation, is a feature in UniCC that is not clearly specified yet, but maybe becomes important in future versions of UniCC. Tagging is the possibility to tag grammatical elements like symbols, productions and the grammar itself with additional information that could be used by subsequent analysis or code generation tasks. This feature is only interesting for the XML-based Parser Description Generator for now, because it adds these tags to appropriate positions in the XML-output, to be validated by subs

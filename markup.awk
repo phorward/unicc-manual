@@ -99,7 +99,7 @@ BEGIN		{	FS="#"
 			
 /TABLE#/	{
 				print "<center>"
-				print "Table " tab_count ": " $3 " [TAB_" $2 "]\n"
+				print "Table " tab_count ": " $3 "\n"
 				print "</center>"
 
 				tab_count++
