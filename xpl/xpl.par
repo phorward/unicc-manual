@@ -1,6 +1,6 @@
 //Meta information
 #parser             "XPL";
-#description        "eXample Programming Language (Draft)";
+#description        "eXample Programming Language";
 #copyright          "In the public domain, 2011";
 #version            "0.1";
 #prefix             "xpl";

@@ -1,3 +1,10 @@
+#ifndef XPL_H
+#define XPL_H
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 /* Virtual machine values */
 typedef enum
 {
@@ -94,3 +101,8 @@ typedef struct
 
 /* Some general defines */
 #define XPL_MALLOCSTEP						256
+
+/* Import function prototypes */
+#include "xpl.proto.h"
+
+#endif

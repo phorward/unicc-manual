@@ -566,7 +566,7 @@ Now that we had learned to know how to implement simple expressions using UniCC,
 
 The plain grammar of the language is described below. We intermix already known constructs like lexemes here with some new features that had not been covered yet.
 
-%!include: ``howto/xpl_draft1.par``
+%!include: ``xpl/xpl_draft.par``
 
 The first, new feature used here is the definition block
 

@@ -65,7 +65,7 @@ xpl_value* xpl_value_dup( xpl_value* val )
 	memcpy( dup, val, sizeof( xpl_value ) );
 	
 	if( dup->type == XPL_STRINGVAL )
-		dup->val.s = xpl_strdup( dup->val.s );
+		dup->value.s = xpl_strdup( dup->value.s );
 		
 	return dup;
 }
@@ -84,7 +84,7 @@ void xpl_value_set_float( xpl_value* val, float f )
 	val->value.f = f;
 }
 
-void xpl_value_set_string( xpl_value* val, char* str )
+void xpl_value_set_string( xpl_value* val, char* s )
 {
 	xpl_value_reset( val );
 	val->type = XPL_STRINGVAL;

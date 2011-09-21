@@ -6,7 +6,7 @@ int xpl_get_variable( xpl_program* prog, char* name )
 	int		i;
 	
 	/* A function name with the same identifier may not exist! */
-	if( xpl_program_get_function( prog, name ) > -1 )
+	if( xpl_get_function( name ) > -1 )
 		return -1;
 	
 	/* Try to find variable index */	
@@ -43,7 +43,7 @@ int xpl_get_literal( xpl_program* prog, xpl_value* val )
 	return prog->literals_cnt++;
 }
 
-int xpl_emit( xpl_cmd op, int param )
+int xpl_emit( xpl_program* prog, xpl_op op, int param )
 {
 	if( ( prog->program_cnt % XPL_MALLOCSTEP ) == 0 )
 	{
