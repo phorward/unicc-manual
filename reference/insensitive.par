@@ -5,8 +5,8 @@
 
 #whitespaces ' \t\n';
 
-@integer	'0-9'+
-			;
+@integer    '0-9'+
+            ;
 
 start$      -> expr*
             ;

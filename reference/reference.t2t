@@ -203,7 +203,7 @@ As an example, then following grammar is given.
 
 %!include: ``reference/sensitive.par``
 
-``whitespace`` is configured as whitespace nonterminal here, ``integer`` is a lexem that is triggered as a coherent lexical unit, where not whitespace is allowed within. Using this grammar to parse the input string //18 * 2//, the following syntax tree will be constructed. The nonterminals ``(whitespace)*``, ``(whitespace)+`` and ``(whitespace)`` are automatically inserted by UniCC. Also the symbol ``\t-\n #``, likewise a generated nonternimal symbol, has been inserted by UniCC during character-class separation. Grammars modified by UniCC are heavier to read, but they gain this unique features in flexibility.
+``whitespace`` is configured as whitespace nonterminal here, ``integer`` is a lexem that is triggered as a coherent lexical unit, where not whitespace is allowed within. Using this grammar to parse the input string //18 * 2//, the following syntax tree will be constructed. The nonterminals ``&whitespace*``, ``&whitespace+`` and ``&whitespace`` are automatically inserted by UniCC. Also the symbol ``\t-\n #``, likewise a generated nonternimal symbol, has been inserted by UniCC during character-class separation. Grammars modified by UniCC are heavier to read, but they gain this unique features in flexibility.
 
 GENAST#reference/sensitive.par#18 * 2##Syntax tree of the string "18 * 2" using a sensitively constructed parser.
 
@@ -334,7 +334,7 @@ The regular-expression itself is defined by sequences of the following, already 
 | ``'...'`` or ``!'...'`` | Specifies a character, character-class or negated character-class. |
 | ``"..."`` | Specifies a static string. |
 | ``.`` | Specifies a character-class standing for "any character". Using this construct causes the terminal to be configured as "non-greedy".
-| ``(`` and ``)`` | Parantheses to build sub-expressions, equal to [embedded productions#ref_embedded_productions]. |
+| ``(`` and ``)`` | Parantheses to build sub-expressions, equal to [embedded productions #ref_embedded_productions]. |
 | ``|`` | The alternative operator to define multiple expressions at one expression level. |
 | ``*`` | Kleene closure (none or several of previous expression) modifier. |
 | ``+`` | Positive closure (one or several of previous expression) modifier. |
@@ -632,7 +632,7 @@ TABLE#ref_production_macros#Semantic macros to be used within reduction actions.
 The reduction value (also refered as the //left-hand side value//) can be accessed with the macro ``@@``.
 
 ```
-boolean$ -> "true"	[* @@ = 1; *]
+boolean$ -> "true"  [* @@ = 1; *]
          |  "false" [* @@ = 0; *]
          ;
 ```
@@ -969,9 +969,9 @@ yields in a revised grammar UniCC outputs as
 
 which introduces new virtual nonterminals ``&whitespace``, ``&whitespace+``, ``&whitespace*``, ``Hello'`` and ``start'``.
 
-But it uses a fully-fledged nonterminal ``whitespace`` which could possibly exist of very flexible, grammatical constructions. The behavior of terminal symbols within the revision can also be influenced by the directives ``#lexeme``, ``#fixate`` and ``#lexeme separation``.
+But it uses a fully-fledged nonterminal ``whitespace`` which could possibly exist of very flexible, grammatical constructions. The behavior of terminal symbols within the revision can also be influenced by the directives [``#lexeme`` #ref_lexeme], [``#fixate`` #ref_fixate] and [``#lexeme separation`` #ref_lexeme_separation].
 
-Whitespace becomes part of the grammar, but its existence is hidden from the semantic actions of the grammar developer - there is no obvious indicator if whitespace handling had been done, this can only be indicated on demand.
+Whitespace becomes part of the grammar, but its existence is hidden from the semantic actions of the grammar developer. There is no obvious indicator if whitespace handling has been done, this can only be indicated on demand.
 
 ++++ #whitespaces in insensitive mode ++++
 In the [insensitive parser construction mode #ref_construction_modes], the ``#whitespaces`` directive only accepts terminal symbols. Trying to specifiy a nonterminal at ``#whitespaces`` results in an error, because whitespace consumed by the parser can't be handled here. The grammar is not rewritten as in sensitive mode.
@@ -1060,8 +1060,8 @@ UniCC grammars may contain special terminal and nonterminal symbols under variou
 
 || Special symbol | Type | Usage |
 | &eof | terminal | Specifies the end-of-file symbol. This special symbol exists in every grammar, and will be automatically appended to the goal-symbol. The end-of-file symbol itself is determined by the parser, but is not bound to a special character sequence or value. In the UniCC Standard C Parser Template, the end-of-file symbol can be dynamically set to fit to the particular input. |
-| &error | terminal | Specifies the error resynchonization symbol. This symbol is used to resynchronize the parser after getting scrambled by a parse error. The chapter [error recovery#ref_error_recovery] covers the use and further meaning of the error resynchonitation terminal. |
-| &whitespace, &whitespace*, &whitespace+ | nonterminal | This group of nonterminals are only inserted in sensitive mode grammars that make use of the ``#whitespaces`` directive. Calls to this symbol are added to appropriate positions relating the lexeme configuration of the grammar. More about this topic can be read in chapter about the #[whitespaces#ref_whitespaces]-directive. |
+| &error | terminal | Specifies the error resynchonization symbol. This symbol is used to resynchronize the parser after getting scrambled by a parse error. The chapter [error recovery #ref_error_recovery] covers the use and further meaning of the error resynchonitation terminal. |
+| &whitespace, &whitespace*, &whitespace+ | nonterminal | This group of nonterminals are only inserted in sensitive mode grammars that make use of the ``#whitespaces`` directive. Calls to this symbol are added to appropriate positions relating the lexeme configuration of the grammar. More about this topic can be read in chapter about the [``#whitespaces`` directive #ref_whitespaces]. |
 
 
 TABLE##Special symbols in UniCC parsers.
@@ -1072,6 +1072,15 @@ TABLE##Special symbols in UniCC parsers.
 
 ++ Error recovery ++[ref_error_recovery]
 
+Requirements to modern parsers and compilers expect, that a parse error on wrong input don't causes a final stop of the parser or compiler. As many errors as possible should be reported to the user before a correction of the input and a re-compilation process is invoked. UniCC parsers normally stop on invalid input, respective a parse error. To get a parse error resynchronized and continue parsing, the special symbol ``&error`` can be used within the grammar.
+
+%!include: ``reference/error.par``
+
+Error resynchronization means that the error is handled by the grammar and its semantic actions rather than the parser. In the above example, the parser will, in case of a parse error, try to pop as many items off the parse stack until it finds the error resynchronization token, ``&error``. This is shifted then, and the parser comes into a new, valid state that is coverey by the grammar, so the production with the error state takes place. The parse error had been recovered, respective it is not a parse error anymore. By modifiying the actions in the semantic action of a error state, error messages can still be forced and errors counted, as it is done in above example. But the parser continues, and will output correct values on wrong input, e.g. "2*5+x".
+
+%!include: ``reference/error.out``
+
+``&error`` can be used on several positions, so it is also possible to report errors with it or to silently fix them and let the parser continue. It must be mentioned, that the way how parse errors and the error synchronization token is handled relies on the used target language parser template, and is not a direct feature of the UniCC Parser Generator itself.
 
 %++ Tagging ++
 %The tagging feature, also called optional augmentation, is a feature in UniCC that is not clearly specified yet, but maybe becomes important in future versions of UniCC. Tagging is the possibility to tag grammatical elements like symbols, productions and the grammar itself with additional information that could be used by subsequent analysis or code generation tasks. This feature is only interesting for the XML-based Parser Description Generator for now, because it adds these tags to appropriate positions in the XML-output, to be validated by subs

@@ -5,12 +5,12 @@
 
 #whitespaces whitespace;
 
-whitespace	-> ' \t\n'
-			;
+whitespace  -> ' \t\n'
+            ;
 
-#lexeme		integer;
-integer		->	'0-9'+
-			;
+#lexeme     integer;
+integer     ->  '0-9'+
+            ;
 
 start$      -> expr*
             ;

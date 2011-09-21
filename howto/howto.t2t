@@ -61,7 +61,7 @@ FIGURE#Construction of parse tree from the string ``321``
 
 From this parse-process and the structure, how the input string is absorbed by the parser, the following visualized recursion tree is constructed.
 
-AST#"integer'" [ integer [ integer [ integer [ 3 ] 2 ] 1 ] ]#Parse tree derived from the input '321'
+AST#"integer'" [ integer [ integer [ integer [ 3 ] 2 ] 1 ] ]#Parse tree derived from the input "321" (simplyfied)
 
 This structure is called the //parse tree// of the input, where the input is broken down into its grammatical structure created by the parser. Due the left-recursion of our simple grammar, the tree grows left-leaning, because the leftmost, recursive call to nonterminal //integer// results in a new branch each level. As you can see, all leafs of the parse tree are terminal symbols.
 It is also possible to write right-leaning trees, but in the LALR parse algorithm, right-recursive grammars require much more parse stack usage than leftmost ones while the parser analyzes the input. Parser stack usage should always be kept low, and this is the case in leftmost grammars.
@@ -117,7 +117,7 @@ Next to ``date``, nonterminal ``month`` defines all month names in its productio
 Finally, we use the same nonterminal, which is ``integer``, for day- and year-number.
 The parse tree of the input string "August 17, 2008" using this grammar will be
 
-AST#"date'" [ date [ month [ August ] integer [ integer [ 1 ] 7 ] "," integer [ integer [ integer [ integer [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree derived from the input 'August 17, 2008'
+AST#"date'" [ date [ month [ August ] integer [ integer [ 1 ] 7 ] "," integer [ integer [ integer [ integer [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree derived from the input 'August 17, 2008' (simplyfied)
 
 ++ Grammar modularity ++
 
@@ -334,7 +334,7 @@ That's everything required for a simple date-format compiler, parsing an input d
 
 In comparison to the grammar-draft from above, this augmented version contains programmed actions, which define what the parser should do on the different grammatical elements during the parse, and how values are passed trough the parse tree. The following, visualized parse tree shows how the input-string ``August 17, 2008`` is parsed, including the semantic values stored into every node, which is an instance of a nonterminal symbol.
 
-AST#"date'" [ "date" [ month:8 [ August ] integer:17 [ integer [ 1 ] 7 ] "," integer:2008 [ integer:200 [ integer:20 [ integer:2 [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree with augmentation.
+AST#"date'" [ "date" [ month:8 [ August ] integer:17 [ integer [ 1 ] 7 ] "," integer:2008 [ integer:200 [ integer:20 [ integer:2 [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree with augmentation (simplyfied).
 
 Every code-segment, which is enclosed between ``[*`` and ``*]``, is executed when the parser successfully matches a production. This is why the semantic-code invoked on a rule's reduction is even called as the //reduction action// in LR and LALR-parsers.
 
@@ -541,7 +541,7 @@ This is caused due the ambiguity of the grammar, which comes up in the nontermin
 AST#expression [ expression [ expression [ integer [ 1 ] ] + expression [ integer [ 2 ] ] ] + expression [ integer [ 3 ] ] ]
 AST#expression [ expression [ integer [ 1 ] ] + expression [ expression [ integer [ 2 ] ] + expression [ integer [ 3 ] ] ] ]
 CENTER
-FIGURE#Two different parse trees are yielding in ambigous grammars.
+FIGURE#Two different parse trees are yielding in ambigous grammars (simplyfied).
 /CENTER
 
 For these cases, precedence and associativity assignments to terminals can be used to define the correct way of how UniCC should handle these conflicts.
@@ -552,7 +552,7 @@ But what about multiplication and division? When we assign the same, left-bounde
 
 When this secondary precedence and associativity assignment is done, the grammar will behave the correct way, even for expressions like //1+2/3+4+5*6-7// - which will then correctly be parsed as //(((1+(2/3))+4)+(5*6))-7//.
 
-AST#e [ e [ e [ e [ e [ e [ int [ 1 ] ] ] [ + ] [ e [ e [ int [ 2 ] ] ] [ / ] [ e [ int [ 3 ] ] ] ] ] [ + ] [ e [ int [ 4 ] ] ] ] [ + ] [ e [ e [ int [ 5 ] ] ] [ \\* ] [ e [ int [ 6 ] ] ] ] ] [ - ] [ e [ int [ 7 ] ] ] ]#The unambigous parse tree of '1+2/3+4+5*6-7'. Nonterminal names had been shortened.
+AST#e [ e [ e [ e [ e [ e [ int [ 1 ] ] ] [ + ] [ e [ e [ int [ 2 ] ] ] [ / ] [ e [ int [ 3 ] ] ] ] ] [ + ] [ e [ int [ 4 ] ] ] ] [ + ] [ e [ e [ int [ 5 ] ] ] [ \\* ] [ e [ int [ 6 ] ] ] ] ] [ - ] [ e [ int [ 7 ] ] ] ]#The unambigous parse tree of "1+2/3+4+5*6-7" (simplyfied). Symbol names had been shortened.
 
 Adding this precedence directives to above grammar, we'll get its unambiguous pendant.
 
@@ -562,61 +562,41 @@ This will parse and calculate the correct values, including all precedence relat
 
 ++ Implementing a programming language ++
 
-Now that we had learned to know how to implement simple expressions using UniCC, it's time to implement some kind of real programming language. The language should be called "eXample Programming Language", shortened "XPL", and is a C-styled language. We first don't care about how to execute this programming language, it first is only a draft for a syntax describing the language. We then add more and more features to turn this grammar into a compiler that builds code for a simple virtual machine executing this code.
+Now that we had learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called "eXample Programming Language", shortened "XPL", and is a C-styled language. We first don't care about how to execute this programming language, first it is only a draft for a syntax describing the language. We then add more and more features to turn this grammar into a compiler that builds code for a simple virtual machine executing this code.
 
+The plain grammar of the language is described below. We intermix already known constructs like lexemes here with some new features that had not been covered yet.
 
+%!include: ``howto/xpl_draft1.par``
 
-
-
-
-
-+++ A little more language construction +++
-
-Now that we have a working parser for an expression calculator, we can do some pretty extensions on it, which helps us continuing on implementing a real programming language.
-So lets introduce simple variables, assignments and value input/output commands.
-
-%!include: ``howto/basic.par``
-
-This implements a very simple, BASIC-styled language interpreter from the calculator. Until we don't use any branch-related language constructs like IF, GOTO or iterations, the "program" fed to this interpreter can be interpreted immediatelly as it comes in.
-
-An example code to run input and run in this interpreter is
+The first, new feature used here is the definition block
 
 ```
-let a = 20
-input b
-print a * b
-a = a * b - 13
-print a
+//Regular expressions
+@string             '"' !'"'* '"'
+                    ;
+
+@identifier         'A-Za-z_' 'A-Za-z0-9_'*
+                    ;
 ```
 
-Maybe you recognized some new grammar definition-related elements within this grammar. First, there is a new parser configuration directive, ``#case insensitive strings``, at the top, which directs UniCC to handle string terminals case-insentive. By default, ``#case insensitive strings`` is switched ``off``.
+This definition introduces two terminal symbols ``@string`` and ``@identifier`` that base on [regular expressions #http://en.wikipedia.org/wiki/Regular_expression]. Regular expressions provide a way means for matching strings of text, like individual characters, words, sentences, or patterns of characters. They are expressed in a formal language that describes the sequence and way in which characters or character-ranges may appear, their repeating or optional existence. The first of the above regular expressions describe a terminal ``@string``, that begins with a double quotation mark ``'"'``, a sequence of zero or multiple characters except a quotation mark (``!'"'*``), and a closing double quotation mark ``'"'``. The second regular expression describes a terminal ``@identifier`` which is made of at least one character that may be in the upper- and lower-case letters or underscore (``'A-Za-z_``), and zero or multiple characters that are made up of upper-/lower-case letters, digits or underscores. This regular expression pattern matches for strings like ``a``, ``Hello``, ``_test`` or even ``i22``, but not for ``22`` on its own, which should be interpretered as integer number by our programming language. More about the use of regular expressions is covered in the [UniCC reference guide #ref_terminal_regex].
 
-We already used string terminals for the month names in our date grammar example, some sections above. Here, the newly introduced string terminals are the keywords ``PRINT``, ``INPUT`` and ``LET``, at which ``LET`` is optionally required trough the use of an optional virtual production modifier **?**. By enabling the ``#case insensitive strings`` directive, all string terminals are recognized in any order, so the input tokens ``print``, ``PRINT``, ``Print`` and ``PrInT`` match to the same terminal symbol. The ``#case insensitive strings`` directive is a global setting for all string terminals; To mix case-insentive with case-sensitive string patterns, you have to use terminals based on regular expression, which will be disussed in the next chapter.
+The second new feature that is used here but now covered yet is the production
+                    
+``` '-' expression              #precedence '*'
 
-Also, we use another new parser configuration directive, this is ``#prologue``. It defines a semantic code action to be inserted into the target parser module __before__ any other parser-related definitions and functions.  Equivalently, defining ``#epilogue`` will insert code at the bottom of the resulting parser. If ``#epilogue`` is used with the C standard parser template, no automatic main() function will be generated by default. In such a case, you can define the **UNICC_MAIN** preprocessor directive to turn it on - or implement your own, encapsulated call of the parser.  
-At least, the nonterminal symbol ``variable`` defined on the bottom uses a different semantic datatype, an //int*// (pointer to integer). If a nonterminal defines another datatype, UniCC introduces this data type to be alternatively handled on the internally used value stack. Defining another data type is performed by enclosing the datatype identifier ``<`` and ``>``, as in
+This sets up a higher precdecence level to the production to overwrite its default precedence that is associated with the ``-``-operator to the precedence of the ``*``-operator. This configuration is done to allow for unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result. Setting this production's precedence to the level of multiply (or higher), it is parsed the correct way as //(-2)*4//.
 
-```
-variable<int*>  -> 'a-z':name  [* @@ = &variables[ @name - 'a' ]; *]
-                ;
-```
-
-Wherever nonterminal ``variable`` is called from, the semantic value for each ``variable`` item on the right-hand side will automatically be of the type associated with this nonterminal, so one can simply dereference the pointer and say
+The last new feature used in this grammar is the nonterminal definition
 
 ```
-expression      -> variable  [* @@ = *@variable; *]
-                ;
+variable
+function            ->      @identifier
+                    ;
 ```
 
-without another type specification for the first item of this production, ``variable`` is a pointer of int here, and can be used as a pointer.
+This definition associates one production with two nonterminals, ``variable`` and ``function``. This construct allows to determine the final type of the nonterminal at runtime, by using UniCC's feature of [semantic nonterminal determination #ref_semantic_nonterminal_determination]. This feature allows to first check with our semantic code if an identifier is the name of a function or the name of a variable, and then return the correct gramatical symbol. This feature could be seen as a dynamic change of way how the grammar is parsed at the parser's runtime.
 
-The technical implementation of how this data type integration is handled relies on the used parser template or output code generator. The C standard template delivered with UniCC uses a union structure. This structure is entirely constructed and handled by the UniCC program module generator and the standard C parser template, so the grammar developer has not to deal with its definiton.
-
-++ Implementing a compiler ++
-
-In this chapter, we're going to implement a true compiler using UniCC. This compiler is implemented using UniCC, and compiles into some kind of data structure that can be passed to a recursive function working as interpreter.
+Now that we have our first draft of XPL, it's time to provide an execution method.
 
 
-
-
-The fictional language is called XPL, standing for "eXample Programming Language". It is a C-styled 

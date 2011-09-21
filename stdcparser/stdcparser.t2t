@@ -106,7 +106,7 @@ The following example shows how to use the macros.
 ```
 
 +++ Semantic terminal selections +++
-The feature of [semantic terminal determination#ref_semantic_terminal_determination] is turned off by default within the UniCC Standard C Parser Template, because it may be the source for memory leaks in the sensitive parser mode. It can be switched on by setting the define ``UNICC_SEMANTIC_TERM_SEL`` to 1. It is strongly recommended to use the feature of [semantically determined nonterminals#ref_semantic_nonterminal_determination] instead.
+The feature of [semantic terminal determination #ref_semantic_terminal_determination] is turned off by default within the UniCC Standard C Parser Template, because it may be the source for memory leaks in the sensitive parser mode. It can be switched on by setting the define ``UNICC_SEMANTIC_TERM_SEL`` to 1. It is strongly recommended to use the feature of [semantically determined nonterminals #ref_semantic_nonterminal_determination] instead.
 
 If the feature of semantically determined terminal recognition is turned on, semantic actions may be run multiple times in some cases, to correctly identify the current input in combination with semantically determined terminal selection actions. For these special cases, code blocks that allocate memory for token return should be expressed in blocks of
 
