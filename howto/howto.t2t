@@ -560,11 +560,32 @@ Adding this precedence directives to above grammar, we'll get its unambiguous pe
 
 This will parse and calculate the correct values, including all precedence relations.
 
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+
 ++ Implementing a programming language ++
 
-Now that we had learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called "eXample Programming Language", shortened "XPL", and is a C-styled language. We first don't care about how to execute this programming language, first it is only a draft for a syntax describing the language. We then add more and more features to turn this grammar into a compiler that builds code for a simple virtual machine executing this code.
+Now that we had learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called "eXample Programming Language", shortened "XPL", and is a C-styled language. We first don't care about how to execute this programming language, first it is only a draft for a syntax describing the it.
 
-The plain grammar of the language is described below. We intermix already known constructs like lexemes here with some new features that had not been covered yet.
+The language should match the following requirements:
+
+- A typeless language
+- Arithmetic and conditional expressions
+- Support of integer, floating point and string values
+- Simple control structures (conditionals, iterations)
+- Variable assignments
+- Nested calls to build-in functions with variable arguments
+- These functions should provide simple data manipulation routines and input/output facilities
+
+
+A simple example for XPL's syntax shall be the 99-bottles-of-beer programming example.
+
+%!include: ``xpl/99bottles.prg``
+
++++ Drafting the Grammar +++
+
+The plain grammar of the language is described below. We intermix already known grammar constructs like lexemes here with some new features that had not been covered yet.
 
 %!include: ``xpl/xpl_draft.par``
 
@@ -595,8 +616,318 @@ function            ->      @identifier
                     ;
 ```
 
-This definition associates one production with two nonterminals, ``variable`` and ``function``. This construct allows to determine the final type of the nonterminal at runtime, by using UniCC's feature of [semantic nonterminal determination #ref_semantic_nonterminal_determination]. This feature allows to first check with our semantic code if an identifier is the name of a function or the name of a variable, and then return the correct gramatical symbol. This feature could be seen as a dynamic change of way how the grammar is parsed at the parser's runtime.
+This definition associates one production with two nonterminals, ``variable`` and ``function``. This construct allows to determine the final type of the nonterminal at runtime, by using UniCC's feature of [semantic nonterminal determination #ref_semantic_nonterminal_determination]. This feature allows to first check with our semantic code if an identifier is the name of a function or the name of a variable, and then return the correct gramatical symbol. This feature could be seen as a dynamic change of the way how the grammar is parsed at the parser's runtime.
 
-Now that we have our first draft of XPL, it's time to provide an execution method.
+When compiling this grammar, you will be concerned by a shift-reduce conflict warning.
 
+```
+unicc: warning: state 81: Shift-reduce conflict on lookahead: "else"
+    (22) statement -> if' (' expression )' statement .      { &eof "if" "while" '{' ';' '-' '(' '.' @string @identifier '0-9' '}' "else" }
+    (23) statement -> if' (' expression )' statement .else' statement
+```
+
+This problem is called "dangling else", and occurs in many programming languages. The nature of this problem can be obtained from the following pseudo-code examples.
+
+```
+if( expression )
+	statement;
+else
+	statement;
+```
+The above syntax is clear and not ambigous. But what happens when we want to submit
+```
+if( expression )
+	if( expression )
+		statement;
+else
+	statement;
+```
+Now, the "else" is visually part of the first "if", but the parser would take it as the "else" part of the second "if". Both ways could be valid. UniCC notices this situation, that the grammar is ambigous with this syntax, so a warning is printed. By the way, this problem also exists in C itself, but also other languages like Java. The solution is to put the second "if" into a new statement block, and everything will be fine.
+```
+if( expression )
+{
+	if( expression )
+		statement;
+}
+else
+	statement;
+```
+
+Except of this warning, the draft version of the XPL parser already runs very well in the UniCC Standard C Parser Template's test mode for some simple expressions. Only function calls don't work, because the semantic determined nonterminal selection is not implemented yet, and the parser always detects a variable, and throws a parse error when the opening bracket for the function's parameters could not be consumed (because a variable followed by an opening bracket is not valid).
+
++++ The Virtual Machine +++
+
+The topic of intermediate code generation performed by a compiler to build a binary program or directly run it is that huge and complex, that it can't be covered in this manual or even in huger compiler textbooks. You only have to know, that every compiler creates some kind of intermediate representation of its input. In most cases some kind of more less abstract tree structure (Abstract Syntax Tree) representing semantics and nesting, but there are also compilers that compile into an intermediate language that can be used for further optimization or platform-dependent code generation. Also both methods are used in many of todays' compiler implementations.
+
+An Abstract Syntax Tree is the representation of a parse tree where atomic syntactical elements are hidden, and only the semantic information (e.g. a number from code, a variable address or a node defining a conditional statement) and its nested structure is clearly defined. Such a AST-representation could already be used for direct interpretation. In C, this abstact syntax tree could be expressed as a huge union data structure providing several structures for every language element, e.g. one structure describing a value, one structure describing an assignment, one structure describing an IF-construct and so on. The result is a tree structure build of many nodes, links and leafs that can be easily interpretered by a recursively executed virtual machine. Althought this method is very simple to implement, it still requires a lot of coding efforts, and saving this tree to a file is not possible without the use of some nested structuring. The benefit of this method is, that no backpatching is required, because the structure is a logical tree.
+
+The generation of intermediate code could also be done from an Abstract Syntax Tree, but it can also directly be done out of the parser (in simple languages). Intermediate code, in turn, can be established on various paradigms. 3-address-code, for example, is very useful to generate optimized code for register-machines. 1-address-code can be used for stack-based machines, for example the Java Virtual Machine.
+
+This is also the approach we want to implement with XPL. We define a virtual execution machine for a 1-address-code machine, a stack-based virtual machine. All the source code presented in the next sections is not covered in detail, but it is required to establish a working base to merge the parser part (respectively forming the XPL compiler) with a method the run the compiled programs. All source code printed here can also be found in the [appendix #appendix1] or as file archive on the [Phorward Software website  http://unicc.phorward-software.com].
+
+++++ xpl_value: A dynamic value object ++++
+
+The stack-elements are described in a structure called ``xpl_value``, defined in ``xpl.h``.
+
+```
+/* Virtual machine values */
+typedef enum
+{
+    XPL_NULLVAL,                            /* Nothing/Undefined */
+    XPL_INTEGERVAL,                         /* Integer type */
+    XPL_FLOATVAL,                           /* Float type */
+    XPL_STRINGVAL                           /* String type */
+} xpl_datatype;
+
+typedef struct
+{
+    xpl_datatype    type;                   /* Value type */
+    
+    union
+    {
+        int         i;
+        float       f;
+        char*       s;
+    } value;                                /* Value storage union */
+    
+    char*           strval;                 /* Temporary string value
+                                                representation pointer */
+} xpl_value;
+```
+
+To work with these value objects, a functions library is implemented in ``xpl.value.c``.
+
+%!include: ``xpl/xpl.value.c``
+
+++++ Defining a code set ++++
+
+The internal programming language for our virtual machine consists of an opcode, defining the operation to be performed, and an integer parameter that is only used by some operations as index reference. The following table describes the opcodes, their meaning and the use of the parameter.
+
+|| Opcode | Operation | Parameter |
+| NOP | Does nothing. | - |
+| CAL | Call a build-in function. Expects the number of arguments as first integer item on the stack, then the arguments. Arguments will be dropped off the stack after the function was called, and the function's return value is pushed. | Function-Index |
+| LIT | Load a literal value. Literal values are hold as ``xpl_value``-objects within a ``xpl_program`` structure. For the literal load, the literal value is duplicated and pushed onto the stack. | Literal-Index |
+| LOD | Load a variable content. Variables are hold in a ``xpl_runtime`` structure during runtime. For the variable load, the variable's ``xpl_value``-object is duplicated and pushed onto the stack. | Variable-Index |
+| STO | Stores the value on top of the stack into a variable. The variable's old value will be deleted. | Variable-Index |
+| DUP | Duplicates current top of stack value and pushes it. | - |
+| DRP | Drop current top of stack value and clear its memory. | - |
+| JMP | Change instruction pointer, jump to address. | Code-Address |
+| JPC | Conditionally change instruction pointer if value of top of stack is false. Jump to address if false. The top if stack item will be dropped. | Code-Address |
+| EQU | Check for equality of next two stack operands, pushes integer 1 = equal, 0 = not-equal | - |
+| NEQ | Check for non-equality of next two stack operands, pushes integer 1 = non-equal, 0 = equal | - |
+| LOT | Take two operands off the stack, check if left operand is lower than right operand, pushes integer 1 = lower, 0 = greater or equal | - |
+| LEQ | Take two operands off the stack, check if left operand is lower or equal than right operand, pushes integer 1 = lower or equal, 0 = greater | - |
+| GRT | Take two operands off the stack, check if left operand is greater than right operand, pushes integer 1 = greater, 0 = lower or equal | - |
+| GEQ | Take two operands off the stack, check if left operand is grater or equal than right operand, pushes integer 1 = greater or equal, 0 = lower | - |
+| ADD | Take two operands off the stack, perform addition and push result onto the stack. In case of string-operands, perform string-conversion of both operands, concatenate and push the concatenated string onto the stack. | - |
+| SUB | Take two operands off the stack, perform substraction and push the result onto the stack. Strings will be converted to integer. | - |
+| MUL | Take two operands off the stack, perform mulitplication and push the result onto the stack. Strings will be converted to integer. | - |
+| DIV | Take two operands off the stack, perform division and push the result onto the stack. Strings will be converted to integer. | - |
+
+
+TABLE##The virtual machine opcodes in XPL.
+
+Defining this in C as enum ``xpl_op`` and structure ``xpl_cmd``.
+
+```
+/* Virtual machine opcodes */
+typedef enum
+{
+    XPL_NOP,                                /* No operation */
+
+    XPL_CAL,                                /* Call function */
+    XPL_LIT,                                /* Load literal value */
+    XPL_LOD,                                /* Load value from variable */
+    XPL_STO,                                /* Store value into variable */
+    XPL_DUP,                                /* Duplicate stack item */
+    XPL_DRP,                                /* Drop stack item */
+    XPL_JMP,                                /* Jump to address */
+    XPL_JPC,                                /* Jump to address if false */
+
+    XPL_EQU,                                /* Check for equal */
+    XPL_NEQ,                                /* Check for not-equal */
+    XPL_LOT,                                /* Check for lower-than */
+    XPL_LEQ,                                /* Check for lower-equal */
+    XPL_GRT,                                /* Check for greater-than */
+    XPL_GEQ,                                /* Check for greater-equal */
+
+    XPL_ADD,                                /* Add or join two values */
+    XPL_SUB,                                /* Substract two values */
+    XPL_MUL,                                /* Multiply two values */
+    XPL_DIV                                 /* Divide two values */
+} xpl_op;
+
+/* Command description */
+typedef struct
+{
+    xpl_op      op;
+    int         param;
+} xpl_cmd;
+```
+
+++++ xpl_program: Representation of a compiled XPL program ++++
+
+To provide a data representation of a compiled XPL program, we require a structure holding a symbol table for variables, the used literals and the program code. All information in this structure should remain untouched during program runtime.
+
+```
+/* Program structure */
+typedef struct
+{
+    xpl_cmd*    program;                    /* Virtual machine program */
+    int         program_cnt;                /* Numer of elements in program */
+
+    xpl_value** literals;                   /* Array of literal objects */
+    int         literals_cnt;               /* Number of elements in literals */
+
+    char**      variables;                  /* The variable symbol table. The
+                                                index of the variable name
+                                                represents the address in the
+                                                variables-member of the
+                                                runtime data structure.
+                                            */
+    int         variables_cnt;              /* Number of elements
+                                                in variables */
+
+} xpl_program;
+```
+
+To build-up the program structure, we also require some modification functions in ``xpl.program.c`` and a function ``xpl_emit()`` to "write" the virtual machine code.
+
+%!include: ``xpl/xpl.program.c``
+
+And for debug purposes, we want to get a visible representation of the compiled program. This can be done with a program dump function, which is implemented in ``xpl.debug.c``.
+
+%!include: ``xpl/xpl.debug.c``
+
+++++ xpl_fn: Integrating some useful functions ++++
+
+The build-in functions in XPL are also described in one structure, ``xpl_fn``. This structure holds the name of the function as it can be called from an XPL program, the minimum and maximum count of parameters, and finally a C-function callback-pointer, requiring for functions that follow the prototype declaration
+
+``` xpl_value* function( int argc, xpl_value** argv );
+
+All build-in functions, some service functions and an array holding the functions as a symbol table is stated in ``xpl.functions.c``.
+
+%!include: ``xpl/xpl.functions.c``
+
+++++ xpl_runtime: The runtime data structure ++++
+
+This implementation of an XPL compiler and interpreter distinguishes between static data describing the compiled XPL program, and dynamic data that is only required at program runtime.
+The compiler creates and modifies the ``xpl_program``-object, the interpreter only reads the ``xpl_program``-object and works on a ``xpl_runtime``-object containing the variable data and stack.
+
+```
+/* Runtime structure */
+typedef struct
+{
+    xpl_value** variables;                  /* Array of objects representing
+                                                the variable values. The
+                                                number of objects is in
+                                                the corresponding xpl_program
+                                                structure in the member
+                                                variables_cnt
+                                            */
+
+    xpl_value** stack;                      /* Array representing the value
+                                                stack */
+    int         stack_cnt;                  /* Defines the top-of-stack, and
+                                                the numbers of elements
+                                                resisting.
+                                            */
+    
+    xpl_cmd*    ip;                         /* Instruction Pointer to the 
+                                                currently executed code
+                                                address.
+                                            */
+} xpl_runtime;
+```
+
+++++ Implementing the virtual machine ++++
+
+Finally, the virtual machine is implemented into ``xpl.run.c`` as function ``xpl_run()``.
+
+%!include: ``xpl/xpl.run.c``
+
++++ Implementing the Compiler +++
+
+Now both modules, the XPL runtime environment and the parser need to convence. The parser must be extended to work as a compiler, the code must be executed when the program successfully has been compiled.
+
+To turn the parser into a compiler, semantic actions need to be inserted to appropiate positions to generate the machine code for our virtual machine along the parse process now.
+The easiest part of this implementation is the nonterminal ``expression``. The productions of this nonterminal only require some code generation to push values onto the stack and perform operations and comparisons. The function call, which is part of nonterminal ``expression``, first pushes and evaluates all parameter values onto the stack, then pushes the number of parameters to be taken by the CAL operation to find out how many parameters shall be used for the function call, and to clear them later on. Semantic checking if the function call provides too less or too many parameters must also be checked here by the function ``xpl_check_function_parameters()``.
+
+The more difficult part is the nonterminal ``statement``. This nonterminal requires the backpatching of addresses and code generation within the productions. The best example for this is the statement "while". The XPL-compiler should compile a while-statement
+
+``` while( i > 0 ) i = i - 1;
+
+into a virtual machine code
+
+```
+ 000: LOD 0 => i
+ 001: LIT 0 (0)
+ 002: GRT 
+ 003: JPC 011
+ 004: LOD 0 => i
+ 005: LIT 1 (1)
+ 006: SUB 
+ 007: DUP 
+ 008: STO 0 => i
+ 009: DRP 
+ 010: JMP 000
+ 011: NOP
+```
+
+The first operations from address 000 to adress 003 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack. The JPC instructrion now checks this value, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a machine language.
+
+Our compiler can only emit code sequencially, and looking at the production for statement "while",
+
+``` statement -> "while" '(' expression ')' statement
+
+the code for the JPC-call must be inserted already after the expression is parsed. Here, the technique of backpatching takes place, along with another feature of UniCC, the [anonymous nonterminals #ref_anonymous_nonterminals]. Anonymous nonterminals provide a way to insert embedded grammar structures right in place into an existing production, including semantic actions. We are able to insert anonymous nonterminals to perform semantic code generation within an unfinished production.
+
+Exemplary this is done with a syntax like here
+
+``` statement -> "while" '(' expression ')' ( [* generate jpc code *] ) statement [* backpatch the jpc-call *] ;
+
+The anonymous nonterminal right after the closing bracked generates a JPC operation with an empty address, and returns the address as semantic value. Then the following nonterminal ``statement`` is parsed, and finally the production of the statement "while" will be reduced. In the reduction code, we know the final address where the JPC-operation should jump to, so we now can backpatch its parameter with the correct address. To finally generate the JMP-call at the bottom of the loop right behind the last statement code was executed, we also have to remember the last program memory address before the code for statement "while" was generated. Another anonymous nonterminal helps out, and we get this exemplary version of the backpatching construct.
+
+```
+statement -> "while" ( [* stack up current program address *] ) '(' expression ')'
+                 ( [* generate jpc code *] ) statement
+                      [* generate jmp to stacked begin address,
+                         backpatch the jpc-call *] ;
+```
+The implemented version of this theory will be this one.
+```
+statement   ->  "while" 
+
+                (
+                    [*
+                        @@ = pcb->prog->program_cnt; 
+                    *]
+                ):begin
+
+                    '(' expression ')' 
+                    
+                (
+                    [*
+                        @@ = xpl_emit( pcb->prog, XPL_JPC, 0 ); 
+                    *]
+                ):jpc
+                    
+                    statement
+                    
+                [*
+                    @@ = xpl_emit( pcb->prog, XPL_JMP, @begin );
+                    pcb->prog->program[ @jpc ].param =
+                        pcb->prog->program_cnt;
+                *]
+            ;
+
+```
+
+Anonymous nonterminals also have their disadvantages. They represent individual symbols that are only used in one position, but can be made up of a fully-fledged nonterminal definition with multiple productions and a return value. This is also the reason why the "if...else" statement is implemented a different way in the final XPL implementation. Trying to get the drafted version with two productions for "if" with "else" and "if" without "else" driven this way will fail, because the insertion of anonymous nonterminals into the existing productions removes the ambiguity of the grammar, and causes the wrong production to be reduced. This problem could also be used with the assistance of anonymous nonterminals, by simply adding an optional "else" part to the "if" statement, yielding in one production.
+
+Please note, that this change has its origin in the way how we want to produce our code only. In other compiler implementations this could be solved much better than here, so the drafted grammar could also be used without anonymous nonterminals.
+
+The final version of our grammar turning it into an XPL compiler is this one.
+
+%!include: ``xpl/xpl.par``
 

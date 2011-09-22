@@ -1,10 +1,20 @@
 #ifndef XPL_PROTO_H
 #define XPL_PROTO_H
 
+/* xpl.debug.c */
+void xpl_dump( xpl_program* prog, xpl_runtime* rt );
+
 /* xpl.functions.c */
 int xpl_get_function( char* name );
 xpl_value* XPL_print( int argc, xpl_value** argv );
+xpl_value* XPL_prompt( int argc, xpl_value** argv );
+xpl_value* XPL_exit( int argc, xpl_value** argv );
+xpl_value* XPL_integer( int argc, xpl_value** argv );
+xpl_value* XPL_float( int argc, xpl_value** argv );
+xpl_value* XPL_string( int argc, xpl_value** argv );
 
+/* xpl.parser.c */
+int xpl_compile( xpl_program* prog, FILE* input );
 
 /* xpl.program.c */
 int xpl_get_variable( xpl_program* prog, char* name );
@@ -18,7 +28,7 @@ void xpl_run( xpl_program* prog );
 /* xpl.util.c */
 char* xpl_malloc( char* oldptr, int size );
 char* xpl_strdup( char* str );
-void xpl_free( char* ptr );
+char* xpl_free( char* ptr );
 
 /* xpl.value.c */
 xpl_value* xpl_value_create( void );

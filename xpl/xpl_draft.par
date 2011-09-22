@@ -57,18 +57,14 @@ whitespace          ->      ' \r\n\t'+
                     ;
 
 //Goal symbol
-program$            ->      statements?
-                    ;
-
-statements          ->      statements statement
-                    |       statement
+program$            ->      statement*
                     ;
 
 statement           ->      "if" '(' expression ')' statement
                     |       "if" '(' expression ')' statement
                                 "else" statement
                     |       "while" '(' expression ')' statement
-                    |       '{' statements '}'
+                    |       '{' statement* '}'
                     |       expression ';'
                     |       ';'
                     ;

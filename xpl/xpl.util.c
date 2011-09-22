@@ -33,10 +33,11 @@ char* xpl_strdup( char* str )
 	return nstr;
 }
 
-void xpl_free( char* ptr )
+char* xpl_free( char* ptr )
 {
 	if( !ptr )
-		return;
+		return (char*)NULL;
 		
 	free( ptr );
+	return (char*)NULL;
 }
