@@ -3,4 +3,5 @@
 %!include: howto/howto.t2t
 %!include: reference/reference.t2t
 %!include: stdcparser/stdcparser.t2t
+%!include: appendix1/appendix1.t2t
 

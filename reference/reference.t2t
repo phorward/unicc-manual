@@ -17,26 +17,35 @@ Due the target-language independency of the UniCC parser generator and its parse
 
 To install a binary distribution package of the UniCC LALR(1) Parser Generator on a local computer or server system, the binary package first needs to be unpacked with an related decompression program (.tar.gz-files under Linux/Unix, .zip-files under Windows) to any desired installation directory.
 
-Under POSIX-conform operating systems, this can be done within
+There are four installation packages for download available on the Phorward Software Technologies website.
+
+- UniCC for Linux, x86 binary release
+- UniCC for Linux, x64 binary release
+- UniCC for Windows, x86 binary release
+- UniCC for Windows, x64 binary release
+
+
+Because UniCC is an open source software project, it can also be [compiled from its source #ref_compile_from_source] for any POSIX-conforming operating system platform using gcc, or with some corrections, any other ANSI C compiler supporting C99 standard, with the miss of some features (Unicode related) also with C89 standard. Compiling from source under Windows systems is also possible using the free Microsoft Visual C++ Express Edition.
+
 
 ``` tar xvfz unicc-<version>.tar.gz
 
 TODO
 
 
-++ Building UniCC from source ++
+++ Building UniCC from source ++[ref_compile_from_source]
 
-To build UniCC from its source code, some further tasks are required. The UniCC LALR(1) Parser Generator is a product that was entirely established and developed on top of the Phorward Foundation Libraries. The Phorward Foundation Libraries are forming the development environment of Phorward Software Technologies, and provide a platform-independent build-environment, toolchain and library toolkit for C and C++ programs that are used by several projects created by Phorward Software Technologies.
+To build UniCC from its source code, some further tasks are required. The UniCC LALR(1) Parser Generator is a product that was entirely established and developed on top of the [Phorward Foundation Libraries http://phorward.phorward-software.com]. The Phorward Foundation Libraries are a collection of libraries, utility programs and shell scripts to provide a platform-independent development environment and build system for C programs. The main purpose of this project is to serve as a build-environment and consistent basic toolkit for various software projects having their origin at Phorward Software Technologies. Especially the platform-independent approach and many of the useful tools, libraries and functions provided by the Phorward Foundation Libraries make the entire package suitable for many C programmers, beyond Phorward project development only.
 
-The Phorward Foundation Libraries are released under the BSD License, and can be compiled under several Unix-like systems (using gcc under Linux, BSD, Solaris) as well as Windows (using Microsoft Visual C++ Express Edition and with the assistance of a Unix-like shell emulation, e.g. Msys). Instructions on system requirements and how to setup the Phorward Foundation Libraries can be found in the related README file.
+The Phorward Foundation Libraries are released under the BSD License, and can be compiled under POSIX-like systems (with gcc under Linux, BSD, Solaris) as well as Windows (using Microsoft Visual C++ Express Edition and with the assistance of a Unix-like shell emulation environment, like [Msys http://www.mingw.org/wiki/MSYS]). Instructions on system requirements and how to setup the Phorward Foundation Libraries can be found in the related README file and on the [Phorward Software website http://phorward.phorward-software.com].
 
-The Phorward Foundation Libraries, the UniCC LALR(1) Parser Generator and the UniCC Standard C Parser Template are developed using the Mercurial SCM as version control system, so this method will also be used in the examples here. Using this method to obtain the source code always guarantees that the latest sources (including inofficial and experimental features) are used, but the Mercurial SCM also allows to check-out any commit of the UniCC sources after fetching them once. There are source code packages of UniCC as snapshots for all release versions also. They are extracted using a related archiving program (gunzip, tar), but the procedure of building UniCC from source remains the same as described here.
+The Phorward Foundation Libraries, the UniCC LALR(1) Parser Generator and the UniCC Standard C Parser Template are developed using the [Mercurial SCM http://mercurial.selenic.com/] as version control system, so this method will also be used in the examples here. Using this method will always guarantee that the latest sources (including inofficial and experimental features) are used, but Mercurial also allows to check-out any commit of the UniCC sources after fetching them once. There are source code packages of UniCC as snapshots for all release versions also. They are extracted using a related archiving program (gunzip, tar), but the procedure of building UniCC from source remains the same as described here.
 
-First of all, checking out (or extracting) the Phorward Foundation Libraries sources is required. This can be done with Mercurial by typing
+First of all, checking out (or extracting) the Phorward Foundation Libraries is required. This can be done after installing Mercurial by typing
 
 ``` hg clone http://phorward.hg.sourceforge.net:8000/hgroot/phorward/phorward
 
-on a console. Setting up the Phorward Foundation Libraries for Unix-like systems or Windows is then done by typing
+in a console. Setting up the Phorward Foundation Libraries for Unix-like systems or Windows is then done by typing
 
 ```
 cd phorward
@@ -52,24 +61,25 @@ By typing
 
 ``` s
 
-then, the shell will change to the source directory, where the UniCC sources are now checked out within
+then, the shell will change to the source directory, where the UniCC sources and utilities can now be checked out with the commands
 
 ```
 hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/unicc
 hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/Cparser
+hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/xpl
 ```
 
 Now, the creation of some files is required to setup the environment for UniCC's own bootstrap.
-The following comamnds will create a permanent user-defined environment script that is applied the next time the Phorward Foundation Libraries environment is settled up, and also updates the current environment to get the variable UNICC_TPLDIR known.
+The following commands will create a permanent user-defined environment script that is applied the next time the Phorward Foundation Libraries environment is set up, and also updates the current environment to get the variable UNICC_TPLDIR known.
 
 ```
 echo "export UNICC_TPLDIR=$PHOME/src/Cparser" >>$PHOME/etc/userenv
 chmod +x $PHOME/etc/userenv
 . $PHOME/etc/userenv
 ```
-After this, a new project folder build order needs to be set using
+After this, a new project folder build order needs to be specified using
 
-``` echo "pbasis pregex pstring min_lalr1 Cparser unicc" >makeall-seq
+``` echo "pbasis pregex pstring min_lalr1 Cparser unicc xpl" >makeall-seq
 
 This will create an extended build-sequence for the makeall script, which is
 part of the Phorward Foundation Libraries.
@@ -83,7 +93,7 @@ After successfull compilation, typing
 
 ``` unicc
 
-will invoke the UniCC LALR(1) Parser Generator. The executable is put into $PHOME/run, and can be copied anywhere else if desired. The UniCC Standard C Parser Template will be created in $PHOME/src/Cparser/C.tlt, and can also be moved or linked elswhere.
+will invoke the UniCC LALR(1) Parser Generator. The executable is put into $PHOME/run, and can be copied anywhere else if desired. The UniCC Standard C Parser Template will be created in $PHOME/src/Cparser/C.tlt, and can also be moved or linked elsewhere.
 
 ++ Invocation and command-line options ++[ref_commandline_parameters]
 
@@ -120,7 +130,9 @@ Errors and warnings are printed to STDERR, any other kind of output to STDOUT.
 %-------------------------------------------------------------------------------
 ++ Code generators ++[ref_codegen]
 
+CENTER
 ''' IMAGE#generators.png#An overview about the UniCC code-generators
+/CENTER
 
 UniCC can not only be seen as a parser generator to compile a parser definition into a piece of program code to implement this parser. It is also a parser generator that can be used as the base for different ("any") kinds of parser analyzation, code generation and optimization issues. This is the reason why UniCC comes with two integrated code-generators: One code generator that builds program-modules expressed in a particular programming language, and one code generator to build an independent parser description file that describes the compiled form of the grammar and a transparent representation of the output parser.
 The output of the first code-generator can directly be fed to a compiler, whereas the output of latter code-generator can be analyzed by any type of other program with a specialized purpose.
@@ -402,12 +414,7 @@ Some examples in C:
 @string<char*>   '"' !'"'* '"'
 
     [*
-		int len = (int)( @< - @> ) + 1;
-
-        if( !( @@ = (char*)malloc( len * sizeof( char ) ) ) )
-            OUT_OF_MEMORY;
-
-        sprintf( @@, "%.*s", len, @> );
+       @@ = @>;
     *]
     ;
 ```
@@ -476,10 +483,8 @@ Given the example, that an empty string and a nonempty string shall be matched a
 @string empty_string <char*>   '"' !'"'* '"'
 
     [*
-        int len = (int)( @< - @> );
-
         /* Select symbol! */		
-        if( len > 2 )
+        if( strlen( @> ) > 2 )
             @!symbol:string;
         else
             @!symbol:empty_string;
@@ -490,10 +495,7 @@ Given the example, that an empty string and a nonempty string shall be matched a
     semantic terminal determination with dynamic memory allocation)
 */
 #if UNICC_ON_SHIFT
-        if( !( @@ = (char*)malloc( ( len + 1 ) * sizeof( char ) ) ) )
-            OUT_OF_MEMORY;
-
-        sprintf( @@, "%.*s", len + 1, @> );
+        @@ = strdup( @> );
 #endif
     *]
     ;
@@ -725,7 +727,7 @@ Virtual productions have one disadvantage: Their expanding content can't be augm
 
 ++++ Anonymous nonterminals ++++[ref_anonymous_nonterminals]
 There are several situations where the grammar developer requires to create a new nonterminal that is only used once to build-up a desired grammatical construct. Other situations require the creation of a nonterminal with only one empty production just to perform semantic tasks within another production __before__ this production is reduced.
-For this special kind of situtation, UniCC provides the feature of //anonymous nonterminals//, which can be defined right in place where they are required. An anonymous nonterminal is stated on a right-hand side by surrounding its productions with brackets ``(`` and ``)``. The nonterminal has no naming or alias, an automatically generated name will be assigned by UniCC. Within the brackets, there is the ordinary way of defining productions, separated by the already-known ``|``-separator (pipe). A data-type preceding the brackets allows to define a data-type for the anonymous nonterminal.
+For this special kind of situation, UniCC provides the feature of //anonymous nonterminals//, which can be defined right in place where they are required. An anonymous nonterminal is stated on a right-hand side by surrounding its productions with brackets ``(`` and ``)``. The nonterminal has no naming or alias, an automatically generated name will be assigned by UniCC. Within the brackets, there is the ordinary way of defining productions, separated by the already-known ``|``-separator (pipe). A data-type preceding the brackets allows to define a data-type for the anonymous nonterminal.
 
 ```
 var_type     -> <BOOLEAN>(
@@ -846,7 +848,7 @@ example$    -> @int ; //here, the default action will be used!
 
 ``#default action`` and ``#default epsilon action`` can only be defined once, subsequent calls will produce a warning and are ignored.
 
-The ``#default value type`` directives allows to define a default value type that is used for every symbol if no individual value type is specified. The parser templates for the standard UniCC code generator, and maybe subsequent code generators working on the XML output of UniCC may provide their own default value types. This directive allows to override this default by explicitly specifying a value type triggered as default.
+The ``#default value type`` directives allows to define a default value type that is used for every symbol if no individual value type is specified. The parser templates for the standard UniCC code generator, and maybe subsequent code generators working on the XML output of UniCC may provide their own default value types. This directive allows to overide this default by explicitly specifying a value type triggered as default.
 
 ``` #default value type	<float> ;
 
@@ -1056,9 +1058,10 @@ More about terminal anomalies can be found in the section [terminal anomalies #r
 %-------------------------------------------------------------------------------
 
 ++ Special symbols ++[ref_special_symbols]
-UniCC grammars may contain special terminal and nonterminal symbols under various circumstances. These special symbols begin with an ampersand ``&``, and cannot be expressed in the grammar itself, except the symbol ``&error``. Their meaning and usage is listed in the following table below.
+UniCC grammars may contain some special terminal and nonterminal symbols under various circumstances. These special symbols begin with an ampersand ``&``, and cannot be expressed in the grammar itself, except the symbol ``&error``. Their meaning and usage is listed in the following table below.
 
 || Special symbol | Type | Usage |
+| &embedded_<num> | nonterminal | Anonymous nonterminals get this name with a consecutive number. |
 | &eof | terminal | Specifies the end-of-file symbol. This special symbol exists in every grammar, and will be automatically appended to the goal-symbol. The end-of-file symbol itself is determined by the parser, but is not bound to a special character sequence or value. In the UniCC Standard C Parser Template, the end-of-file symbol can be dynamically set to fit to the particular input. |
 | &error | terminal | Specifies the error resynchonization symbol. This symbol is used to resynchronize the parser after getting scrambled by a parse error. The chapter [error recovery #ref_error_recovery] covers the use and further meaning of the error resynchonitation terminal. |
 | &whitespace, &whitespace*, &whitespace+ | nonterminal | This group of nonterminals are only inserted in sensitive mode grammars that make use of the ``#whitespaces`` directive. Calls to this symbol are added to appropriate positions relating the lexeme configuration of the grammar. More about this topic can be read in chapter about the [``#whitespaces`` directive #ref_whitespaces]. |
@@ -1076,7 +1079,7 @@ Requirements to modern parsers and compilers expect, that a parse error on wrong
 
 %!include: ``reference/error.par``
 
-Error resynchronization means that the error is handled by the grammar and its semantic actions rather than the parser. In the above example, the parser will, in case of a parse error, try to pop as many items off the parse stack until it finds the error resynchronization token, ``&error``. This is shifted then, and the parser comes into a new, valid state that is coverey by the grammar, so the production with the error state takes place. The parse error had been recovered, respective it is not a parse error anymore. By modifiying the actions in the semantic action of a error state, error messages can still be forced and errors counted, as it is done in above example. But the parser continues, and will output correct values on wrong input, e.g. "2*5+x".
+Error resynchronization means that the error is handled by the grammar and its semantic actions rather than the parser. In the above example, the parser will, in case of a parse error, try to pop as many items off the parse stack until it finds the error resynchronization token, ``&error``. This is shifted then, and the parser comes into a new, valid state that is covered by the grammar, so the production with the error state takes place. The parse error had been recovered, respective it is not a parse error anymore. By modifiying the actions in the semantic action of a error state, error messages can still be forced and errors counted, as it is done in above example. But the parser continues, and will output correct values on wrong input, e.g. "2*5+x".
 
 %!include: ``reference/error.out``
 

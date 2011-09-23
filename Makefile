@@ -8,6 +8,7 @@ UNICC_SRC	=	$(UNICC_MAIN) \
 				howto/howto.t2t \
 				reference/reference.t2t \
 				stdcparser/stdcparser.t2t \
+				appendix1/appendix1.t2t \
 				Makefile \
 				markup.awk \
 				book.html \

@@ -255,36 +255,42 @@ In case of the standard C parser template delivered with UniCC, above call will 
 
 Building, compiling and playing a little bit around with the parser looks like this.
 
-TODO:
 ```
 $ unicc -w dates.par
 $ cc -o dates dates.c
-$ ./dates
+$ ./dates -el
+
 ok
 August 24, 2010 "An important meeting!"
 
 ok
-23.5.2011 "Birthday of Mr. X"
+23.5.2011 "Birthday of Mr. X"     
 
 ok
-"Holidays!" 24.7.    
-line 1: unexpected character '
-'
+"Holidays!" 24.7.
+line 1: syntax error on token '&eof'
+
 ok
 29.10.2010 Hello
-line 1: unexpected character 'H'
+line 1: syntax error on token 'H'
+
 ok
-line 1: unexpected character 'e'
+line 1: syntax error on token 'e'
+
 ok
-line 1: unexpected character 'l'
+line 1: syntax error on token 'l'
+
 ok
-line 1: unexpected character 'l'
+line 1: syntax error on token 'l'
+
 ok
-line 1: unexpected character 'o'
+line 1: syntax error on token 'o'
+
 ok
-line 1: unexpected character '
-'
+line 1: syntax error on token '&eof'
+
 ok
+
 ```
 
 ++ Writing compilers ++
@@ -583,6 +589,14 @@ A simple example for XPL's syntax shall be the 99-bottles-of-beer programming ex
 
 %!include: ``xpl/99bottles.prg``
 
+All the source code presented in this section is not covered in detail, but it is a working example for a programming language implemented entirely with the UniCC LALR(1) Parser Generator and the UniCC Standard C Parser Template.
+
+To obtain the latest version of the XPL source code presented here, access the Mercurial source repository using
+
+``` hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/xpl
+
+The source code printed here can also be found in the [appendix #appendix1] or as a downloadable file archive on the [Phorward Software website  http://unicc.phorward-software.com].
+
 +++ Drafting the Grammar +++
 
 The plain grammar of the language is described below. We intermix already known grammar constructs like lexemes here with some new features that had not been covered yet.
@@ -663,7 +677,7 @@ An Abstract Syntax Tree is the representation of a parse tree where atomic synta
 
 The generation of intermediate code could also be done from an Abstract Syntax Tree, but it can also directly be done out of the parser (in simple languages). Intermediate code, in turn, can be established on various paradigms. 3-address-code, for example, is very useful to generate optimized code for register-machines. 1-address-code can be used for stack-based machines, for example the Java Virtual Machine.
 
-This is also the approach we want to implement with XPL. We define a virtual execution machine for a 1-address-code machine, a stack-based virtual machine. All the source code presented in the next sections is not covered in detail, but it is required to establish a working base to merge the parser part (respectively forming the XPL compiler) with a method the run the compiled programs. All source code printed here can also be found in the [appendix #appendix1] or as file archive on the [Phorward Software website  http://unicc.phorward-software.com].
+This is also the approach we want to implement with XPL. We define a virtual execution machine for a 1-address-code machine, a stack-based virtual machine.
 
 ++++ xpl_value: A dynamic value object ++++
 
@@ -884,7 +898,11 @@ the code for the JPC-call must be inserted already after the expression is parse
 
 Exemplary this is done with a syntax like here
 
-``` statement -> "while" '(' expression ')' ( [* generate jpc code *] ) statement [* backpatch the jpc-call *] ;
+```
+statement -> "while" '(' expression ')'
+                  ( [* generate jpc code *] ) statement
+                       [* backpatch the jpc-call *] ;
+```
 
 The anonymous nonterminal right after the closing bracked generates a JPC operation with an empty address, and returns the address as semantic value. Then the following nonterminal ``statement`` is parsed, and finally the production of the statement "while" will be reduced. In the reduction code, we know the final address where the JPC-operation should jump to, so we now can backpatch its parameter with the correct address. To finally generate the JMP-call at the bottom of the loop right behind the last statement code was executed, we also have to remember the last program memory address before the code for statement "while" was generated. Another anonymous nonterminal helps out, and we get this exemplary version of the backpatching construct.
 
