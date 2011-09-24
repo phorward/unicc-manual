@@ -108,7 +108,7 @@ This command-line interface supports various, combinable options to invoke, modi
 | -a | --all-warnings | Runs UniCC to print all warnings that come up with the grammar. UniCC normaly supresses some warning messages that raise up during the parse table constructions according to their importance. |
 | -b //name// | --basename //name// | Defines the specified basename //name// to be used for the output file(s) instead of the one derived by the ``#prefix`` directive or by the name of the input filename. This basename is used for all output files if the provided parser template causes the construction of multiple files. |
 | -G | --grammar | Dumps an overview of the finally constructred grammar to stderr, right before the parse-tables are generated. |
-| -h | --help | Prints a short overview about the command-line options and exists. |
+| -h | --help | Prints a short overview about the command-line options and exits. |
 | -V | --version | Prints copyright and version information and exists. |
 | -n | --no-opt | Disables state optimization; By default, the resulting LALR(1) parse states are optimized during table construction by introducing a special SHIFT_REDUCE action which combines a shift and reduction, which is possible when the last symbol of a production is shifted. Standard LALR(1) parsers only support SHIFT or REDUCE, not both operations at the same time. When this option is used, UniCC produces about 20-30% more LALR(1) states. |
 | -P | --production | Dumps an overview about the finally produced productions and their semantic actions. |
@@ -815,18 +815,18 @@ If UniCC is forced to create a parser description file, the ``#language``-direct
 
 Please read more about the UniCC code generation possibilites [here#ref_codegen].
 
-+++ #case insensitive keywords +++[ref_case_insensitive_keywords]
-The ``#case insensitive keywords`` directive switches keywords to be case-insensitive or not. The directive can be called multiple times. Each time it is called (and switched!) subsequent keyword-terminal definitions are threatened according to the currently configured state.
++++ #case insensitive strings +++[ref_case_insensitive_strings]
+The ``#case insensitive strings`` directive switches string-based terminals to be case-insensitive or not. The directive can be called multiple times. Each time it is called and switched, subsequent string-based terminal symbol definitions are threatened according to the current case-order configuration state.
 
-The ``#case insensitive keywords`` directive allows for one parameter, which is of type boolean and accepts ``on`` and ``off``.
+The ``#case insensitive strings`` directive allows for one parameter, which is of type boolean and accepts ``on`` and ``off``.
 
 ```
-//All subsequent keyword definitions are case-insensitive!
-#case insensitive keywords on;
+//All subsequent strings are case-insensitive!
+#case insensitive strings on;
 
-example$ -> "hello" | test; //This keyword can be written in any case order!
+example$ -> "hello" | test; //This string can be written in any case order!
 
-#case insensitive keywords off;
+#case insensitive strings off;
 
 test -> "world"; //This one must be in lower case order!
 ```
@@ -978,7 +978,7 @@ Whitespace becomes part of the grammar, but its existence is hidden from the sem
 ++++ #whitespaces in insensitive mode ++++
 In the [insensitive parser construction mode #ref_construction_modes], the ``#whitespaces`` directive only accepts terminal symbols. Trying to specifiy a nonterminal at ``#whitespaces`` results in an error, because whitespace consumed by the parser can't be handled here. The grammar is not rewritten as in sensitive mode.
 
-All specified terminal symbols are flagged as whitespace, and are simply ignored when read by the resuling lexical analyzer. The grammar is not rewritten, but the grammar developer is limited to only use character-classes, keywords and regular expressions as whitespaces symbols, without a flexible grammar beyond.
+All specified terminal symbols are flagged as whitespace, and are simply ignored when read by the resuling lexical analyzer. The grammar is not rewritten, but the grammar developer is limited to only use character-classes, strings and regular expressions as whitespaces symbols, without a flexible grammar beyond.
 
 Resulting grammars result in much lesser states and will be parsed faster.
 

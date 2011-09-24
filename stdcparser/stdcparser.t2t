@@ -1,7 +1,7 @@
 
 + The Standard C Parser Template, C.tlt +[stdcparser]
 
-This manual relates to the UniCC Standard C Parser Template, version 0.15.14, and higher.
+This manual relates to the UniCC Standard C Parser Template, version 1.0, and higher.
 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
@@ -249,7 +249,6 @@ The parse stack exists of elements of type ``@@prefix_tok``. Every element conta
 ```
 typedef struct
 {
-    int                 id;
     @@prefix_vtype      value;
 
     @@prefix_syminfo*   symbol;
@@ -540,13 +539,26 @@ Clears buffered input of the current token. This macro requires the parser contr
 so it invokes the build-in function ``_clear_input``. It can be re-defined by any desired task, but its behavior must complain with the one given by ``_clear_input`` and the lexer functions reading the input.
 
 +++ UNICC_DEBUG +++[UNICC_DEBUG]
-Switches parser trace, which is done to stderr.
-If set to 0 (default), nothing will be written.
-1 is standard for state trace. 2 also enables input buffering trace, so the fetching of single characters will be traced and printed.
+Switches parser trace, which is written to stderr. The following table gives information about the trace levels to be set by defining UNICC_DEBUG to a desired debug level depth.
+
+|| UNICC_DEBUG level depth | Description |
+| 0 | No debug (default) |
+| 1 | Enables parser and error recovery debugging |
+| 2 | Additionally, enables debugging for the lexical analyzer |
+| 3 | Additionally, enables debugging for the input buffering |
+| 4 | Additionally, enables debugging for single character fetching (only in UTF-8 mode) |
+
+
+TABLE##UniCC Standard C Parser Template debug levels.
+
+Enable debug mode by defining
 
 ``` #define UNICC_DEBUG 1
 
-To show stack contents, also switch on [UNICC_STACKDEBUG #UNICC_STACKDEBUG]
+To show stack contents, also switch on [UNICC_STACKDEBUG #UNICC_STACKDEBUG].
+Here is an example for a debug mode level 1 session with [stack debug enabled #UNICC_STACKDEBUG].
+
+%!include: ``stdcparser/debug.out``
 
 +++ UNICC_ERROR_DELAY +++[UNICC_ERROR_DELAY]
 Defines the error delay that is used to mark a parse error as successfully recovered. If there raise parse errors within this number of shifts after an inital parse error, during error recovery, no following error will be reported. UNICC_ERROR_DELAY is set to 3 shifts by default.
@@ -575,7 +587,7 @@ So a definition of
 ```
 would be more adequate and causes no unwanted effects.
 
-Check out the function [@@prefix_utf8_getchar()#_utf8_getchar] if UTF-8 input processing should be provided.
+Check out the function [@@prefix_utf8_getchar()#_utf8_getchar] if UTF-8 input processing shall be used.
 
 +++ UNICC_MAIN +++
 ``UNICC_MAIN`` controls if the parser features its automatic main function. This feature enables to rapidly prototype a grammar and immediatelly test its result. The main function calls the parser in an endless loop and allows.

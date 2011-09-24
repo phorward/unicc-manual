@@ -38,7 +38,7 @@ backup:
 $(UNICC_PDF): $(UNICC_PDF_H)
 	htmldoc -t pdf14 --book --linkstyle plain --linkcolor 000030 \
 		--header .t. --no-title --duplex --browserwidth 1024 \
-			--no-jpeg -f $@.tmp $(UNICC_PDF_H)
+			--toclevels 4 --no-jpeg -f $@.tmp $(UNICC_PDF_H)
 	pdftk book/front.pdf $@.tmp book/back.pdf cat output $@
 	rm -f $@.tmp
 
