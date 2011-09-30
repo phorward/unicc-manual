@@ -19,19 +19,30 @@ To install a binary distribution package of the UniCC LALR(1) Parser Generator o
 
 There are four installation packages for download available on the Phorward Software Technologies website.
 
-- UniCC for Linux, x86 binary release
-- UniCC for Linux, x64 binary release
-- UniCC for Windows, x86 binary release
-- UniCC for Windows, x64 binary release
+- UniCC for Linux Kernel 2.6.27 and higher, x86 binary release (unicc-1.0rc1_x86-linux.tar.gz)
+- UniCC for Linux Kernel 2.6.27 and higher, x86-64 binary release (unicc-1.0rc1_x86_64-linux.tar.gz)
+- UniCC for 32-Bit Windows, x86 binary release (unicc-1.0rc1_x86-win.zip)
+- UniCC for 64-Bit Windows, x86-64 binary release (unicc-1.0rc1_x86_64-win.zip)
 
 
-Because UniCC is an open source software project, it can also be [compiled from its source #ref_compile_from_source] for any POSIX-conforming operating system platform using gcc, or with some corrections, any other ANSI C compiler supporting C99 standard, with the miss of some features (Unicode related) also with C89 standard. Compiling from source under Windows systems is also possible using the free Microsoft Visual C++ Express Edition.
+After extracting the archive of the given platform's binary package, a directory containing the program file, UniCC Standard C Parser Template and several files is made available.
+The root directory contains the LICENSE and README files, as well as an environment setup script for Linux (setenv) and Windows (setenv.bat). This script can be called from a shell or command-prompt to setup the current environment for the use with UniCC.
 
+In Linux, invocation is done with
 
-``` tar xvfz unicc-<version>.tar.gz
+```. ./setenv
 
-TODO
+Under Windows, invocation is simply done with
 
+``` setenv.bat
+
+After calling the environment setup script, the variable **PATH** is extended to the UniCC binary directory, and the variable **UNICC_TPLDIR** directs to the //tlt// directory, containing the target language templates. If there will be more target language templates available in future, they can be integrated by simply copying the .tlt-files into this directory. Also, development of own or modified target language templates can be done here.
+
+//doc// contains the UniCC User's Manual (this file!) as PDF document and //unicc.man//, the README as Unix-style manpage file.
+//samples// contains some example grammars, and will also grow in future.
+
+To make UniCC permanently available on a specific system, set and extend the apropriate variables in the system's configuration.
+On Linux, this can be done in the system file ///etc/profile//, under Windows in the system settings dialog for environment variables.
 
 ++ Building UniCC from source ++[ref_compile_from_source]
 
@@ -73,7 +84,8 @@ Now, the creation of some files is required to setup the environment for UniCC's
 The following commands will create a permanent user-defined environment script that is applied the next time the Phorward Foundation Libraries environment is set up, and also updates the current environment to get the variable UNICC_TPLDIR known.
 
 ```
-echo "export UNICC_TPLDIR=$PHOME/src/Cparser" >>$PHOME/etc/userenv
+test ! -x "$PHOME/etc/userenv" && echo '#!/bin/sh' >$PHOME/etc/userenv
+echo 'export UNICC_TPLDIR=$PHOME/src/Cparser' >>$PHOME/etc/userenv
 chmod +x $PHOME/etc/userenv
 . $PHOME/etc/userenv
 ```
@@ -93,7 +105,7 @@ After successfull compilation, typing
 
 ``` unicc
 
-will invoke the UniCC LALR(1) Parser Generator. The executable is put into $PHOME/run, and can be copied anywhere else if desired. The UniCC Standard C Parser Template will be created in $PHOME/src/Cparser/C.tlt, and can also be moved or linked elsewhere.
+will invoke the UniCC LALR(1) Parser Generator. The executable is put into $PHOME/run, and can be copied anywhere else if desired. The UniCC Standard C Parser Template will be build in //$PHOME/src/Cparser/C.tlt//, and can be moved or linked elsewhere.
 
 ++ Invocation and command-line options ++[ref_commandline_parameters]
 
@@ -112,13 +124,13 @@ This command-line interface supports various, combinable options to invoke, modi
 | -V | --version | Prints copyright and version information and exists. |
 | -n | --no-opt | Disables state optimization; By default, the resulting LALR(1) parse states are optimized during table construction by introducing a special SHIFT_REDUCE action which combines a shift and reduction, which is possible when the last symbol of a production is shifted. Standard LALR(1) parsers only support SHIFT or REDUCE, not both operations at the same time. When this option is used, UniCC produces about 20-30% more LALR(1) states. |
 | -P | --production | Dumps an overview about the finally produced productions and their semantic actions. |
-| -s | --stats | Prints a statistics message to stderr when parser generation has entirely finished. |
+| -s | --stats | Prints a statistics message to stderr when parser generation has entirely been finished. |
 | -S | --states | Dumps the generated LALR(1) states that had been generated during the parse table generation process. |
 | -T | --symbols | Dumps an overview of all used symbols. |
 | -v | --verbose | Prints process messages about the specific tasks during parser generation process. |
 | -w | --warnings | Print relevant warnings. |
-| -x | --xml | Triggers UniCC to run the [parser definition file generator #ref_codegen_descfile] additionally to the program module generator. The parser description file generator generator outputs an XML-based parser representation of the generated parse tables, which can be used by third-party code generators or grammar analsys and debugging tools. |
-| -X | --XML | Triggers UniCC to only run the [parser definition file generator #ref_codegen_descfile] without running the program-module generator. |
+| -x | --xml | Triggers UniCC to run the [parser description file generator #ref_codegen_descfile] additionally to the program module generator. The parser description file generator outputs an XML-based parser representation of the generated parse tables, which can be used by third-party code generators or grammar analsys and debugging tools. |
+| -X | --XML | Triggers UniCC to only run the [parser description file generator #ref_codegen_descfile] without running the program-module generator. |
 
 
 TABLE#ref_command_line_options#The UniCC command-line interface options.
