@@ -15,22 +15,21 @@ Due the target-language independency of the UniCC parser generator and its parse
 
 ++ Installation ++
 
-To install a binary distribution package of the UniCC LALR(1) Parser Generator on a local computer or server system, the binary package first needs to be unpacked with an related decompression program (.tar.gz-files under Linux/Unix, .zip-files under Windows) to any desired installation directory.
+There are four installation packages for download available on the Phorward Software Technologies website, currently only targetting the Linux and Windows platform in both a 32-Bit and a 64-Bit x86 CPU.
 
-There are four installation packages for download available on the Phorward Software Technologies website.
-
-- UniCC for Linux Kernel 2.6.27 and higher, x86 binary release (unicc-1.0rc1_x86-linux.tar.gz)
-- UniCC for Linux Kernel 2.6.27 and higher, x86-64 binary release (unicc-1.0rc1_x86_64-linux.tar.gz)
-- UniCC for 32-Bit Windows, x86 binary release (unicc-1.0rc1_x86-win.zip)
-- UniCC for 64-Bit Windows, x86-64 binary release (unicc-1.0rc1_x86_64-win.zip)
+- UniCC for Linux, Kernel 2.6.27 and higher, x86 (unicc-1.0rc1_x86-linux.tar.gz)
+- UniCC for Linux, Kernel 2.6.27 and higher, x86-64 (unicc-1.0rc1_x86_64-linux.tar.gz)
+- UniCC for Windows, 32-Bit, x86 (unicc-1.0rc1_x86-win.zip)
+- UniCC for Windows, 64-Bit, x86-64 (unicc-1.0rc1_x86_64-win.zip)
 
 
-After extracting the archive of the given platform's binary package, a directory containing the program file, UniCC Standard C Parser Template and several files is made available.
+After extracting the archive of the given platform's binary package, a directory containing the UniCC binary executable, the UniCC Standard C Parser Template (C.tlt) and several files is made available. The directory can be extracted to any desired location, but this demands on the use.
+
 The root directory contains the LICENSE and README files, as well as an environment setup script for Linux (setenv) and Windows (setenv.bat). This script can be called from a shell or command-prompt to setup the current environment for the use with UniCC.
 
-In Linux, invocation is done with
+On Linux, the invocation is done with
 
-```. ./setenv
+``` . ./setenv
 
 Under Windows, invocation is simply done with
 
@@ -41,7 +40,7 @@ After calling the environment setup script, the variable **PATH** is extended to
 //doc// contains the UniCC User's Manual (this file!) as PDF document and //unicc.man//, the README as Unix-style manpage file.
 //samples// contains some example grammars, and will also grow in future.
 
-To make UniCC permanently available on a specific system, set and extend the apropriate variables in the system's configuration.
+To make UniCC permanently available on a specific system, the apropriate variables need to be set in the system's configuration.
 On Linux, this can be done in the system file ///etc/profile//, under Windows in the system settings dialog for environment variables.
 
 ++ Building UniCC from source ++[ref_compile_from_source]
@@ -98,14 +97,23 @@ part of the Phorward Foundation Libraries.
 
 Finally, typing
 
-``` make
+``` makeall
 
 will compile all dependencies and UniCC.
 After successfull compilation, typing
 
 ``` unicc
 
-will invoke the UniCC LALR(1) Parser Generator. The executable is put into $PHOME/run, and can be copied anywhere else if desired. The UniCC Standard C Parser Template will be build in //$PHOME/src/Cparser/C.tlt//, and can be moved or linked elsewhere.
+will invoke the UniCC LALR(1) Parser Generator. The executable is put into //$PHOME/run//, and can be copied anywhere else if desired. The UniCC Standard C Parser Template will be build in //$PHOME/src/Cparser/C.tlt//, and can be moved or linked elsewhere.
+
+The README file and UniCC manpage can be constructed with
+
+``` make doc
+
+in the UniCC directory, with the use of the [txt2tags http://www.txt2tags.org] software (needs to be installed).
+Building a function reference documentation of the Phorward Foundation Libraries can be generated to //$PHOME/doc// by running
+
+``` makeall doc
 
 ++ Invocation and command-line options ++[ref_commandline_parameters]
 
