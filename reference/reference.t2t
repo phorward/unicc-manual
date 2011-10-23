@@ -151,7 +151,7 @@ Errors and warnings are printed to STDERR, any other kind of output to STDOUT.
 ++ Code generators ++[ref_codegen]
 
 CENTER
-''' IMAGE#generators.png#An overview about the UniCC code-generators
+''' IMAGE#generators.png#An overview about the UniCC code-generators.
 /CENTER
 
 UniCC can not only be seen as a parser generator to compile a parser definition into a piece of program code to implement this parser. It is also a parser generator that can be used as the base for different ("any") kinds of parser analyzation, code generation and optimization issues. This is the reason why UniCC comes with two integrated code-generators: One code generator that builds program-modules expressed in a particular programming language, and one code generator to build an independent parser description file that describes the compiled form of the grammar and a transparent representation of the output parser.
@@ -492,9 +492,9 @@ Would scan up the way in the second, greedy case. ``#greedy`` and ``#non-greedy`
 Switchting terminals to be greedy or non-greedy may cause entirely different parse trees and results, so that the use of this tool should only be done carefully.
 
 +++++ Semantic terminal determination +++++[ref_semantic_terminal_determination]
-UniCC supports a possibility to perform semantic terminal determination in lexical semantic actions. This possibility is well implemented and tested, but has some caveats to know about when used in the sensitive parser construction mode in combination with programming languages that don't have an automatic memory management (e.g. C). It is more secure to use the method of [semantic nonterminal determination#ref_semantic_nonterminal_determination] as described below, which has no disadvantages according to the lexical way. So this topic is only shortly discussed here, and it is advised to use the nonterminal way of semantic terminal determination.
+UniCC supports a possibility to perform semantic terminal determination in lexical semantic actions. This possibility is well implemented and tested, but has some caveats to know about when used in the sensitive parser construction mode in combination with programming languages that don't have an automatic memory management (like C). It is more secure to use the method of [semantic nonterminal determination #ref_semantic_nonterminal_determination] as described below, which has no disadvantages according to the lexical way. So this topic is only shortly discussed here, and it is advised to use the nonterminal way of semantic terminal determination.
 
-In some cases, there are terminal symbols that are build-up from the same input sequence, but require some more semantic checks to definitely decide which symbol they define. There are also cases, where the lexical value of a token has a special meaning to the grammar, e.g. a function name referenced in a compiler's symbol table. For such cases, UniCC features semantic symbol determinations within the lexical analyzer. All symbols that match to a given regular expression are unioned with one expression. Then, the semantic action code can perform checking tasks and set the matched symbol to one of the associated symbols. The association is done with the macro ``@!symbol:<name>``, where name defines the symbol to be returned.
+In some cases, there are terminal symbols that are build-up from the same input sequence, but require some more semantic checks to definitely decide which symbol matches. There are also cases, where the lexical value of a token has a special meaning to the grammar, e.g. a function name referenced in a compiler's symbol table. For such cases, UniCC features semantic symbol determinations within the lexical analyzer. All symbols that match to a given regular expression are unioned with one expression. Then, the semantic action code can perform checking tasks and set the matched symbol to one of the associated symbols. The association is done with the macro ``@!symbol:<name>``, where name defines the symbol to be returned.
 
 Given the example, that an empty string and a nonempty string shall be matched as single symbols, this can be handled with a semantic symbol selection.
 
@@ -522,7 +522,7 @@ Given the example, that an empty string and a nonempty string shall be matched a
 ```
 
 ++++ Terminal anomalies ++++[ref_terminal_anomalies]
-When using the [whitespace sensitive parser construction mode#ref_sensitive_mode], terminals could be broken down to grammatical constructs parsing lexemes. This sometimes raises a problem that is known as a terminal anomaly. This terminal anomly can occur between regular expression-based terminals (these are terminal symbols, that are based on strings or regular expressions) and grammar constructs build on character-classes that may consume the same input than the regular expression-based terminal does. In such a situation, the parser may run into a conflict that matches both the content of a lexeme that is build of the same characters as a valid regular expression-based terminal does.
+When using the [whitespace sensitive parser construction mode #ref_sensitive_mode], terminals could be broken down to grammatical constructs parsing lexemes. This sometimes raises a problem that is known as a terminal anomaly. This terminal anomly can occur between regular expression-based terminals (these are terminal symbols, that are based on strings or regular expressions) and grammar constructs build on character-classes that may consume the same input sequence like the regular expression-based terminal does. In such a situation, the parser may run into an ambiguitiy conflict that matches both the content of a lexeme that is build of the same characters as the valid regular expression-based terminal does.
 
 The following example defines a grammar that generates this kind of conflict.
 
@@ -532,7 +532,7 @@ If this is compiled with ``unicc -w``, the following warnings are raising up.
 
 %!include: ``reference/anomaly.out``
 
-UniCC detects these conflicts by testing suspicious nonterminals against all regular expression-based terminals. These messages declare, that the input for //ELSE// and //ENDIF// is both recognized by the nonterminal ``ident`` and their relating string terminals, defining them as keywords. Due to UniCCs build-in terminal precdence leveling, the string terminals will always take a higher precedence than the character-class terminals, but maybe the grammar developer gets an unwanted parser as result. This warning helps to fix this issue.
+UniCC detects these conflicts by testing suspicious nonterminals against all regular expression-based terminals. These messages declare, that the input for //ELSE// and //ENDIF// is both recognized by the nonterminal ``ident`` and their relating string terminals, defining them as keywords. Due to UniCCs build-in terminal precedence leveling, the string terminals will always take a higher precedence than the character-class terminals, but maybe the grammar developer gets an unwanted parse result. This warning helps to detect and fix this issue.
 
 To avoid this warning, the ``#reserve terminals`` directive shall be used. It disables terminal anomaly detection and always assumes that regular expression terminals take precedence over any lexemes.
 
@@ -543,9 +543,9 @@ Terminal anomalies do not raise up in insensitive mode parsers.
 %-------------------------------------------------------------------------------
 
 +++ Nonterminal symbols +++
-Nonterminal symbols (nonterminals) can be seen as "grammar variables". They always cause a branch to a subsequent grammatical structure within the parse tree, and represent nodes to other nonterminals (which are nodes as usual) or terminals (which are the leafs).
+Nonterminal symbols (nonterminals) can be seen as "grammar variables". They always cause a branch to a subsequent grammatical structure within the parse tree, and represent nodes to other nonterminals, which are nodes as usual, or terminals, which are leafs of the tree.
 
-Nonterminals contain one or more //productions//. They form sequences of terminal and nonterminal symbols, that describe the syntax to which the defined nonterminal can be expanded to. Everytime a nonterminal is appears within a production, all its specific rules are valid and possible in this situation.
+Nonterminals contain one or more //productions//. Productions form sequences of terminal and nonterminal symbols, describing the syntax to which the defined nonterminal can be expanded to. Everytime a nonterminal appears within a production, all its specific rules are valid and possible at the particular situation in the sequence.
 
 Both the nonterminal symbol and its productions are described as a grammar definition block, and follow a variant of the Backus-Naur-Form meta language to describe context-free languages.
 
@@ -574,14 +574,14 @@ empty -> ; //A nonterminal with an empty production.
 A nonterminal definition can also be split into several grammar definition blocks; everytime the nonterminal appears on the left-hand side, all the defined productions are associated to it.
 
 ++++ The goal-symbol ++++
-A special case of nonterminal is the //goal-symbol//. This symbol is the root of the entire parse tree, and must exist in every grammar. When the goal-symbol is finally reduced, the parse tree is completed and input tested for validity. The goal-symbol is defined by appending a dollar-sign ``$`` to the nonterminal to be the goal-symbol on the left-hand side, like below with
+A special case is the //goal-symbol//. This nonterminal symbol defines the root of the parse tree, and must exist in every grammar. When the goal-symbol is finally reduced, the parse tree is completed and input was successfully tested for correctness. The goal-symbol is defined by appending a dollar-sign ``$`` to the nonterminal to be the goal-symbol on the left-hand side, like below with
 
 ``` example$ -> hello empty world ;
 
-There's only one goal symbol allowed per grammar. Multiple goal symbol definitions throw an error, so that no parser will be constructed.
+Only one goal symbol is allowed per grammar. Multiple goal symbol definitions throw an error, and no parser will be constructed.
 
 ++++ Semantic nonterminal determination ++++[ref_semantic_nonterminal_determination]
-There may be cases, where the distinct determination of a nonterminal requires more semantic checks to define a symbol's correct meaning. This can be the case if a grammar allows for function and variable names that are made up of character sequences. There may be a construct within the grammar to recognize the identifier, e.g. a regular expression terminal ``@ident``. But there is no  possibility on the grammar definition level to clearly define wether a parsed identifier refers to a function name or to a variable name. For this case, UniCC supports semantic nonterminal determinations. The semantic code block triggers some kind of selection task, for example a symbol table call, to find out if the addressed identifier is the name of a variable or a function. Then, the semantic code selects the kind of nonterminal to chose.
+There may be cases, where the distinct determination of a nonterminal requires more semantic checks to define a symbol's correct meaning. This can be the case if a grammar allows for function and variable names that are made up of character sequences. There may be a construct within the grammar to recognize the identifier, e.g. a regular expression terminal ``@ident``. But there is no  possibility on the grammar definition level to clearly define wether a parsed identifier refers to a function name or to a variable name. For this case, UniCC supports semantic nonterminal determinations. The semantic code block triggers some kind of selection task, for example a symbol table call, to find out if the addressed identifier is the name of a variable or a function. Then, the semantic code selects the kind of nonterminal to be used in the parser. The feature of semantic nonterminal determination allows to perform a dynamic manipulation of the parser within semantic actions.
 
 This mechanism is done by declaring a production with multiple left-hand sides. The first specified left-hand side will always be used as default. The semantic selection is specified in the reduction code using a special macro ``@!symbol:<name>``, where ``<name>`` refers to the name of the left-hand side symbol to be set.
 
@@ -608,7 +608,7 @@ function	    -> @ident	[*
                 ;
 ```
 
-A similar mechanism can also be implemented within the use of [lexical analyzer terminal determination#ref_semantic_terminal_determination], but is not advised. Refer the topic to get more information about related caveats.
+A similar mechanism can also be implemented within the use of [lexical analyzer terminal determination #ref_semantic_terminal_determination], but is not advised. Refer the topic to get more information about related caveats.
 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
@@ -636,7 +636,7 @@ A production may also exist of no symbol sequence. These productions are called 
 ``` nonterm -> hello | ;
 
 ++++ Semantic actions ++++
-The reduction of a production means, that a new node in the parse-tree is constructed. The terminal symbols within the production's rule will become leafs, where the nonterminal symbols become nodes to subsequent, already reduced rules. Every symbol within the parse tree can be augmented with user-defined data.
+The reduction of a production means, that a new node in the parse-tree is constructed. The terminal symbols within the production's rule will become leafs, where the nonterminal symbols become nodes to subsequent, previously reduced rules. Every symbol within the parse tree can be augmented with user-defined data.
 
 For example, a terminal symbol ``@integer`` may hold the integer value of the analyzed integer number. When a production is defined as ``@integer '+' @integer``, and matches the current sequence handle, a reduction is caused. Right before this is done, there are three symbols on the stack: An integer number, the operator **+**, and another integer number. Because every symbol within the parse tree can be augmented with a value, the semantic value behind this sequence can be calculated right when the parse tree is constructed. This means: The programmer is able to put individual code to every production, which can pass values to the newly constructed node and to upperlying productions.
 

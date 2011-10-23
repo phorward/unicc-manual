@@ -24,7 +24,7 @@ UNICC_HTML	=	output/html/unicc.html
 UNICC_TXT	=	output/text/unicc.txt
 
 #all: $(UNICC_HTML) $(UNICC_PDF) $(UNICC_TXT)
-all: $(UNICC_PDF)
+all: $(UNICC_PDF) $(UNICC_TXT)
 
 clean:
 	rm -f $(UNICC_HTML)

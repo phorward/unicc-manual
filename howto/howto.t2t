@@ -572,7 +572,7 @@ This will parse and calculate the correct values, including all precedence relat
 
 ++ Implementing a programming language ++
 
-Now that we had learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called "eXample Programming Language", shortened "XPL", and is a C-styled language. We first don't care about how to execute this programming language, first it is only a draft for a syntax describing the it.
+Now that we have learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called //eXample Programming Language//, shortened //XPL//, and is a C-styled language.
 
 The language should match the following requirements:
 
@@ -585,13 +585,13 @@ The language should match the following requirements:
 - These functions should provide simple data manipulation routines and input/output facilities
 
 
-A simple example for XPL's syntax shall be the 99-bottles-of-beer programming example.
+We first don't care about how to execute this programming language, first it is only a draft for a syntax describing the language's grammar. A simple example to rudely define the syntax of XPL shall be the 99-bottles-of-beer programming example.
 
 %!include: ``xpl/99bottles.prg``
 
-All the source code presented in this section is not covered in detail, but it is a working example for a programming language implemented entirely with the UniCC LALR(1) Parser Generator and the UniCC Standard C Parser Template.
++++ Source code downloads +++
 
-To obtain the latest version of the XPL source code presented here, access the Mercurial source repository using
+All the source code presented in the following sections section is not covered in detail, but it is a working example for a programming language implemented entirely with the UniCC LALR(1) Parser Generator and the UniCC Standard C Parser Template. To obtain the latest version of the XPL source code presented here, access the Mercurial source repository using
 
 ``` hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/xpl
 
@@ -602,6 +602,8 @@ The source code printed here can also be found in the [appendix #appendix1] or a
 The plain grammar of the language is described below. We intermix already known grammar constructs like lexemes here with some new features that had not been covered yet.
 
 %!include: ``xpl/xpl_draft.par``
+
+++++ Terminals based on regular expressions ++++
 
 The first, new feature used here is the definition block
 
@@ -614,13 +616,19 @@ The first, new feature used here is the definition block
                     ;
 ```
 
-This definition introduces two terminal symbols ``@string`` and ``@identifier`` that base on [regular expressions #http://en.wikipedia.org/wiki/Regular_expression]. Regular expressions provide a way means for matching strings of text, like individual characters, words, sentences, or patterns of characters. They are expressed in a formal language that describes the sequence and way in which characters or character-ranges may appear, their repeating or optional existence. The first of the above regular expressions describe a terminal ``@string``, that begins with a double quotation mark ``'"'``, a sequence of zero or multiple characters except a quotation mark (``!'"'*``), and a closing double quotation mark ``'"'``. The second regular expression describes a terminal ``@identifier`` which is made of at least one character that may be in the upper- and lower-case letters or underscore (``'A-Za-z_``), and zero or multiple characters that are made up of upper-/lower-case letters, digits or underscores. This regular expression pattern matches for strings like ``a``, ``Hello``, ``_test`` or even ``i22``, but not for ``22`` on its own, which should be interpretered as integer number by our programming language. More about the use of regular expressions is covered in the [UniCC reference guide #ref_terminal_regex].
+This definition introduces two terminal symbols, ``@string`` and ``@identifier``. These terminal symbols are made of regular expressions. Regular expressions are some kind of formal language to describe a way in which characters or character-classes, words and sentences may appear in the input to match the corresponding terminal symbol and give this string sequence a semantic meaning. All terminal symbols in UniCC are some kind of regular expressions; The already known character-classes and strings. These terminals can be defined where they are used, but regular expressions may be defined that complex and powerful, that they require their own definition block.
 
-The second new feature that is used here but now covered yet is the production
+The first of the above regular expressions describe a terminal ``@string``, that begins with a double quotation mark ``'"'``, a sequence of zero or multiple characters except a quotation mark (``!'"'*``), and a closing double quotation mark ``'"'``. The second regular expression describes a terminal ``@identifier`` which is made of at least one character that may be in the upper- and lower-case letters or underscore (``'A-Za-z_``), and zero or multiple characters that are made up of upper-/lower-case letters, digits or underscores. This regular expression pattern matches for strings like ``a``, ``Hello``, ``_test`` or even ``i22``, but not for ``22`` on its own, which should be interpretered as integer number by our programming language. More about the use of regular expressions and their making up is covered in the [UniCC reference guide #ref_terminal_regex].
+
+++++ Overwriting production precedence ++++
+
+The second new feature that is used here but has not covered yet is the production
                     
 ``` '-' expression              #precedence '*'
 
-This sets up a higher precdecence level to the production to overwrite its default precedence that is associated with the ``-``-operator to the precedence of the ``*``-operator. This configuration is done to allow for unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result. Setting this production's precedence to the level of multiply (or higher), it is parsed the correct way as //(-2)*4//.
+This special ``#precedence`` directive sets a higher precdecence level to the production to overwrite its default precedence that is associated with the ``-``-operator to the precedence of the ``*``-operator. This configuration is done to allow for unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result, because ``-`` is below ``*`` in the operator precedence order. Setting this production's precedence to the level of multiply (or higher), it is parsed the correct way as //(-2)*4//.
+
+++++ Multiple left-hand sides ++++
 
 The last new feature used in this grammar is the nonterminal definition
 
@@ -632,6 +640,8 @@ function            ->      @identifier
 
 This definition associates one production with two nonterminals, ``variable`` and ``function``. This construct allows to determine the final type of the nonterminal at runtime, by using UniCC's feature of [semantic nonterminal determination #ref_semantic_nonterminal_determination]. This feature allows to first check with our semantic code if an identifier is the name of a function or the name of a variable, and then return the correct gramatical symbol. This feature could be seen as a dynamic change of the way how the grammar is parsed at the parser's runtime.
 
+++++ The "dangling else" problem ++++
+
 When compiling this grammar, you will be concerned by a shift-reduce conflict warning.
 
 ```
@@ -640,7 +650,8 @@ unicc: warning: state 81: Shift-reduce conflict on lookahead: "else"
     (23) statement -> if' (' expression )' statement .else' statement
 ```
 
-This problem is called "dangling else", and occurs in many programming languages. The nature of this problem can be obtained from the following pseudo-code examples.
+This problem is called "dangling else", and occurs in many LALR-/LR-based programming language grammars.
+The nature of this problem can be obtained from the following pseudo-code examples.
 
 ```
 if( expression )
@@ -862,9 +873,8 @@ Finally, the virtual machine is implemented into ``xpl.run.c`` as function ``xpl
 
 +++ Implementing the Compiler +++
 
-Now both modules, the XPL runtime environment and the parser need to convence. The parser must be extended to work as a compiler, the code must be executed when the program successfully has been compiled.
+Now both modules, the XPL runtime environment and the parser need to convence. The parser must be extended to work as a compiler, the code must be executed when the program successfully has been compiled. To turn the parser into a compiler, semantic actions need to be inserted to appropiate positions to generate the machine code for our virtual machine along the parse process now.
 
-To turn the parser into a compiler, semantic actions need to be inserted to appropiate positions to generate the machine code for our virtual machine along the parse process now.
 The easiest part of this implementation is the nonterminal ``expression``. The productions of this nonterminal only require some code generation to push values onto the stack and perform operations and comparisons. The function call, which is part of nonterminal ``expression``, first pushes and evaluates all parameter values onto the stack, then pushes the number of parameters to be taken by the CAL operation to find out how many parameters shall be used for the function call, and to clear them later on. Semantic checking if the function call provides too less or too many parameters must also be checked here by the function ``xpl_check_function_parameters()``.
 
 The more difficult part is the nonterminal ``statement``. This nonterminal requires the backpatching of addresses and code generation within the productions. The best example for this is the statement "while". The XPL-compiler should compile a while-statement
@@ -888,15 +898,15 @@ into a virtual machine code
  011: NOP
 ```
 
-The first operations from address 000 to adress 003 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack. The JPC instructrion now checks this value, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a machine language.
+The first operations from address 000 to adress 003 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack. The JPC instruction now checks this value, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a machine language.
 
 Our compiler can only emit code sequencially, and looking at the production for statement "while",
 
 ``` statement -> "while" '(' expression ')' statement
 
-the code for the JPC-call must be inserted already after the expression is parsed. Here, the technique of backpatching takes place, along with another feature of UniCC, the [anonymous nonterminals #ref_anonymous_nonterminals]. Anonymous nonterminals provide a way to insert embedded grammar structures right in place into an existing production, including semantic actions. We are able to insert anonymous nonterminals to perform semantic code generation within an unfinished production.
+the code for the JPC-call must be inserted already after the expression is parsed. Here, the technique of backpatching is applied in combination with another feature of UniCC, the [anonymous nonterminals #ref_anonymous_nonterminals]. Anonymous nonterminals provide a way to insert embedded grammar structures right in place into an existing production, including semantic actions. We are able to insert anonymous nonterminals to perform semantic code generation within an unfinished production.
 
-Exemplary this is done with a syntax like here
+Exemplary this is done with the following syntax
 
 ```
 statement -> "while" '(' expression ')'
@@ -904,7 +914,20 @@ statement -> "while" '(' expression ')'
                        [* backpatch the jpc-call *] ;
 ```
 
-The anonymous nonterminal right after the closing bracked generates a JPC operation with an empty address, and returns the address as semantic value. Then the following nonterminal ``statement`` is parsed, and finally the production of the statement "while" will be reduced. In the reduction code, we know the final address where the JPC-operation should jump to, so we now can backpatch its parameter with the correct address. To finally generate the JMP-call at the bottom of the loop right behind the last statement code was executed, we also have to remember the last program memory address before the code for statement "while" was generated. Another anonymous nonterminal helps out, and we get this exemplary version of the backpatching construct.
+which is the same as we add a normal nonterminal and use it only once.
+
+```
+ANONYMOUS -> [* generate jpc code *] ;
+
+statement -> "while" '(' expression ')'
+                  ANONYMOUS statement
+                       [* backpatch the jpc-call *] ;
+```
+
+Anonymous nonterminals make it possible to define the entire nonterminal (with all its productions) on the right-hand side of another nonterminal, avoiding the creation of a special extra nonterminal to fullfill one special task, like it is the case here.
+
+Our anonymous nonterminal right after the closing bracked of the header of the **while** statement generates a JPC operation with an empty address, and returns its own operation address as semantic value. Then the following nonterminal ``statement`` is parsed, and finally the production of the statement **while** will be reduced.
+In the reduction code, we then know the final address where the JPC-operation should jump to, so we now can backpatch its parameter with the correct address. To finally generate the JMP-call at the bottom of the loop right behind the last statement code was executed, we also have to remember the last program memory address before the code for statement **while** was generated. Another anonymous nonterminal helps out, and we get the following exemplary version of the backpatching construct.
 
 ```
 statement -> "while" ( [* stack up current program address *] ) '(' expression ')'
@@ -912,7 +935,9 @@ statement -> "while" ( [* stack up current program address *] ) '(' expression '
                       [* generate jmp to stacked begin address,
                          backpatch the jpc-call *] ;
 ```
-The implemented version of this theory will be this one.
+
+The implemented version of this theory is this one, and may look a little bit confusing when used the first time.
+
 ```
 statement   ->  "while" 
 
@@ -941,7 +966,7 @@ statement   ->  "while"
 
 ```
 
-Anonymous nonterminals also have their disadvantages. They represent individual symbols that are only used in one position, but can be made up of a fully-fledged nonterminal definition with multiple productions and a return value. This is also the reason why the "if...else" statement is implemented a different way in the final XPL implementation. Trying to get the drafted version with two productions for "if" with "else" and "if" without "else" driven this way will fail, because the insertion of anonymous nonterminals into the existing productions removes the ambiguity of the grammar, and causes the wrong production to be reduced. This problem could also be used with the assistance of anonymous nonterminals, by simply adding an optional "else" part to the "if" statement, yielding in one production.
+But anonymous nonterminals also have their disadvantages. They represent individual symbols that are only used in one position, but can be made up of a fully-fledged nonterminal definition with multiple productions and a return value. This is also the reason why the **if...else** statement is implemented a different way in the final XPL implementation. Trying to get the drafted version with two productions for **if** with **else** and **if** without **else** driven this way will fail, because the insertion of anonymous nonterminals into the existing productions removes the ambiguity of the grammar, and causes the wrong production to be reduced. This problem could also be resolved with the assistance of anonymous nonterminals, by simply adding an optional "else" part to the **if** statement, yielding in one production for the entire **if** and **if...else** construct.
 
 Please note, that this change has its origin in the way how we want to produce our code only. In other compiler implementations this could be solved much better than here, so the drafted grammar could also be used without anonymous nonterminals.
 
