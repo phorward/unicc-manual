@@ -90,7 +90,7 @@ chmod +x $PHOME/etc/userenv
 ```
 After this, a new project folder build order needs to be specified using
 
-``` echo "pbasis pregex pstring min_lalr1 Cparser unicc xpl" >makeall-seq
+``` echo "phorward min_lalr1 Cparser unicc xpl" >makeall-seq
 
 This will create an extended build-sequence for the makeall script, which is
 part of the Phorward Foundation Libraries.
@@ -106,11 +106,11 @@ After successfull compilation, typing
 
 will invoke the UniCC LALR(1) Parser Generator. The executable is put into //$PHOME/run//, and can be copied anywhere else if desired. The UniCC Standard C Parser Template will be build in //$PHOME/src/Cparser/C.tlt//, and can be moved or linked elsewhere.
 
-The README file and UniCC manpage can be constructed with
+The README file and UniCC manpage can be generated with
 
 ``` make doc
 
-in the UniCC directory, with the use of the [txt2tags http://www.txt2tags.org] software (needs to be installed).
+in the UniCC directory, with the use of the [txt2tags http://www.txt2tags.org] software (it needs to be installed and in the PATH).
 Building a function reference documentation of the Phorward Foundation Libraries can be generated to //$PHOME/doc// by running
 
 ``` makeall doc
@@ -209,6 +209,8 @@ is compiled into the following XML structure
 ```
 
 which can be easily converted into another representation.
+
+The entire document type definition (DTD) of the UniCC Parser Description Files is printed in the [appendix 2 #appendix2] of this manual.
 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
@@ -322,7 +324,7 @@ Any other type of definition is invalid, and will result in a parse error.
 Grammars are expressed using rules that describe in which way symbols may appear. The symbols within a grammar define grammatical units in form of //terminal symbols// (terminals) which immediatelly are expected in the input, and //nonterminal symbols// (nonterminals). Nonterminal symbols union one or more grammatical rules, so called //productions// into one "fictive" symbol to be inserted into other productions, or to form the goal symbol. Every symbol (both terminal and nonterminal) in UniCC is always declared by its first use. Its particular description or definition - if required - can be made elsewhere later in the grammar. Symbols without a definition will be reported by UniCC, and maybe stop the further compilation process of the grammar, with a request for correction.
 
 +++ Terminal symbols +++
-Terminal symbols (terminals) define a piece of raw input data that is read from the input stream. They can be defined and specified in various ways. A [single character or a set of valid characters#ref_terminal_ccl] can form a terminal, but also a [static character sequence#ref_terminal_string] or character sequences that matches to a regular (type-0) language, defined via [regular expressions#ref_terminal_regex].
+Terminal symbols (terminals) define a piece of raw input data that is read from the input stream. They can be defined and specified in various ways. A [single character or a set of valid characters #ref_terminal_ccl] can form a terminal, but also a [static character sequence #ref_terminal_string] or character sequences that matches to a regular (type-0) language, defined via [regular expressions #ref_terminal_regex].
 
 All terminal symbols are identified by an lexical analyzer. Every terminal symbol yields in a leaf within the resulting parse tree, it has no children.
 
@@ -333,9 +335,9 @@ A character-class is specified by strings enclosed in single quotation marks  ``
 
 To match only one individual character, for example an **a**, then ``'a'`` is the correct definition for such a terminal. To define all characters from ``a`` to ``f`` as valid input, ``'abcdef'`` and ``'a-f'`` as range definition is possible. To define a terminal matching the characters from ``a`` to ``z``, ``0`` to ``9`` and the ``=`` equal sign, ``'a-z0-9='`` can be specified. If the range is negative, for example ``'z-a``, its still interpretered as ``'a-z'``. To define the dash **-** itself as part of the character class, it the best to express it as first character of the character-class string, or in a place where no dash is interpreted as range definition, for example ``'-+*/'`` or ``'a-z-+'``.
 
-UniCC accepts [escape sequences#ref_escape_sequences] to define special characters and unprinable characters. UTF-8 characters are directly accepted. For example ``'\n-€'`` is a valid definition with an escape-sequence for newline and the Euro currency sign.
+UniCC accepts [escape sequences #ref_escape_sequences] to define special characters and unprinable characters. UTF-8 characters are directly accepted. For example ``'\n-€'`` is a valid definition with an escape-sequence for newline and the Euro currency sign.
 
-Character terminals can be negated using an preceding exclamation-mark. For example ``!'a-z'`` accepts all characters except the range from ``a`` to ``z`` (this will include all characters in the [UniCC character universe#ref_terminal_charuniverse], from 0x0 to 0xFFFF, except above range).
+Character terminals can be negated using an preceding exclamation-mark. For example ``!'a-z'`` accepts all characters except the range from ``a`` to ``z`` (this will include all characters in the [UniCC character universe #ref_terminal_charuniverse], from 0x0 to 0xFFFF, except above range).
 
 In the UniCC Standard C Parser Template, a character-terminal is always associated with the data-type ``int`` containing the character-code of the matched character. This value can be used in semantic actions.
 
@@ -833,7 +835,7 @@ The selected parser template describes various parts of the parser broken down t
 
 If UniCC is forced to create a parser description file, the ``#language``-directive will only be attached as attribute.
 
-Please read more about the UniCC code generation possibilites [here#ref_codegen].
+Please read more about the UniCC code generation possibilites [in the section about the UniCC code generators #ref_codegen].
 
 +++ #case insensitive strings +++[ref_case_insensitive_strings]
 The ``#case insensitive strings`` directive switches string-based terminals to be case-insensitive or not. The directive can be called multiple times. Each time it is called and switched, subsequent string-based terminal symbol definitions are threatened according to the current case-order configuration state.
@@ -1069,7 +1071,7 @@ By using ``#lexeme separation on ;``, the warnings will be supressed, and UniCC 
 The ``#fixate`` directive can only be used within the [sensitive parser construction mode #ref_construction_modes]. It supresses shift-reduce warnings that may raise up for some nonterminals caused by the grammar construction, and always prefers to shift. ``#fixate`` expects a list of nonterminal symbols to be configured as fixed.
 
 +++ #reserve terminals +++[ref_reserve_terminals]
-The ``#reserve terminals`` directive switches if [terminal anomaly detection#ref_terminal_anomalies] is performed by UniCC or not. If ``#reserve terminals`` is switched on, UniCC assumes that terminals based on regular expressions take higher precedence in all places, and does not perform terminal anomaly detection. It is a boolean directive, and can be switched ``on`` or ``off``. Calling it without boolean parameter switches ``#reserve terminals`` as ``on``.
+The ``#reserve terminals`` directive switches if [terminal anomaly detection #ref_terminal_anomalies] is performed by UniCC or not. If ``#reserve terminals`` is switched on, UniCC assumes that terminals based on regular expressions take higher precedence in all places, and does not perform terminal anomaly detection. It is a boolean directive, and can be switched ``on`` or ``off``. Calling it without boolean parameter switches ``#reserve terminals`` as ``on``.
 
 More about terminal anomalies can be found in the section [terminal anomalies #ref_terminal_anomalies]. The directive can only be used in the [sensitive parser construction mode #ref_construction_modes].
 

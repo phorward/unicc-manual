@@ -4,4 +4,5 @@
 %!include: reference/reference.t2t
 %!include: stdcparser/stdcparser.t2t
 %!include: appendix1/appendix1.t2t
+%!include: appendix2/appendix2.t2t
 
