@@ -134,8 +134,9 @@ This command-line interface supports various, combinable options to invoke, modi
 | -P | --production | Dumps an overview about the finally produced productions and their semantic actions. |
 | -s | --stats | Prints a statistics message to stderr when parser generation has entirely been finished. |
 | -S | --states | Dumps the generated LALR(1) states that had been generated during the parse table generation process. |
+| -t | --stdout | Prints all generated output to stdout instead of files. |
 | -T | --symbols | Dumps an overview of all used symbols. |
-| -v | --verbose | Prints process messages about the specific tasks during parser generation process. |
+| -v | --verbose | Prints process messages about the specific tasks during parser generation process. Also turns on ``-s``. |
 | -w | --warnings | Print relevant warnings. |
 | -x | --xml | Triggers UniCC to run the [parser description file generator #ref_codegen_descfile] additionally to the program module generator. The parser description file generator outputs an XML-based parser representation of the generated parse tables, which can be used by third-party code generators or grammar analsys and debugging tools. |
 | -X | --XML | Triggers UniCC to only run the [parser description file generator #ref_codegen_descfile] without running the program-module generator. |
@@ -372,7 +373,7 @@ The regular-expression itself is defined by sequences of the following, already 
 | ``|`` | The alternative operator to define multiple expressions at one expression level. |
 | ``*`` | Kleene closure (none or several of previous expression) modifier. |
 | ``+`` | Positive closure (one or several of previous expression) modifier. |
-| ``?`` | Optional closure (none or one or previous expression) modifier. |
+| ``?`` | Optional closure (none or one of previous expression) modifier. |
 
 
 TABLE#ref_regex_construction#Lexical symbols for regular expression construction
@@ -727,7 +728,7 @@ UniCC provides a virtual production feature, which is very useful to prototype a
 || Modifier | Meaning |
 | ``*`` | Kleene closure (none or several of previous expression) modifier |
 | ``+`` | Positive closure (one or several of previous expression) modifier |
-| ``?`` | Optional closure (none or one or previous expression) modifier |
+| ``?`` | Optional closure (none or one of previous expression) modifier |
 
 
 TABLE#ref_virtual_modifiers#Virtual production modifiers.

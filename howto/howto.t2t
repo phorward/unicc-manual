@@ -190,9 +190,9 @@ Secondary, the star is a modifying operator that causes a Kleene-closure of zero
 
 UniCC provides the following three virtual production operators, which are well-known from regular expressions.
 
-- ***** for kleene closure
-- **+** for positive
-- **?** for optional closure
+- ***** for kleene closure (multiple or none repetitions)
+- **+** for positive (one or multuple repetitions)
+- **?** for optional closure (one or none repetition)
 
 
 For the above shortcut, the contract-out version would be
@@ -245,7 +245,7 @@ If UniCC does output nothing at all, the grammar is valid, consistent and has be
 
 If UniCC reports //errors//, these must be fixed. If errors are reported, this always causes that no output (respective a parser) is generated. Errors arise if UniCC comes into a situation where a valid result is not possible to generate, or the algorithm on generating the parser is initiated with missing or incomplete data. This can be e. g. a parse error in the input, where no valid grammar can be recognized, or wrong use of left-hand side items within a productions, which avoids replacing a placeholder within executable code with a valid item access actions.
 
-Some //warnings// are normal in the daily use of UniCC. Warnings can normally be ignored, because the reference to automatically fixed grammar ambiguities or default mechanisms taking place if they where not explicitly defined. If you want to suppress all warnings, run UniCC without the ``-w`` or ``--warnings`` option. Using the ``-v`` or ``--verbose`` option in combination with ``-s`` or ``--stats``, UniCC outputs some processing informations and grammar statistics.
+Some //warnings// are normal in the daily use of UniCC. Warnings can normally be ignored, because the reference to automatically fixed grammar ambiguities or default mechanisms taking place if they where not explicitly defined. If you want to suppress all warnings, run UniCC without the ``-w`` or ``--warnings`` option. Using the ``-v`` or ``--verbose`` option, UniCC outputs some processing informations and grammar statistics.
 
 %!include: ``howto/unicc.out``
 
@@ -264,7 +264,7 @@ ok
 August 24, 2010 "An important meeting!"
 
 ok
-23.5.2011 "Birthday of Mr. X"     
+23.5.2011 "Birthday of Mr. X"
 
 ok
 "Holidays!" 24.7.
@@ -667,7 +667,7 @@ if( expression )
 else
 	statement;
 ```
-Now, the "else" is visually part of the first "if", but the parser would take it as the "else" part of the second "if". Both ways could be valid. UniCC notices this situation, that the grammar is ambigous with this syntax, so a warning is printed. By the way, this problem also exists in C itself, but also other languages like Java. The solution is to put the second "if" into a new statement block, and everything will be fine.
+Now, the **else** is visually part of the first **if**, but the parser would take it as the **else** part of the second **if**. Both ways could be valid. UniCC notices this situation, that the grammar is ambigous with this syntax, so a warning is printed. By the way, this problem also exists in C itself, but also other languages like Java. The solution is to put the second "if" into a new statement block, and everything will be fine.
 ```
 if( expression )
 {
@@ -678,17 +678,19 @@ else
 	statement;
 ```
 
-Except of this warning, the draft version of the XPL parser already runs very well in the UniCC Standard C Parser Template's test mode for some simple expressions. Only function calls don't work, because the semantic determined nonterminal selection is not implemented yet, and the parser always detects a variable, and throws a parse error when the opening bracket for the function's parameters could not be consumed (because a variable followed by an opening bracket is not valid).
+Except of this warning, the draft version of the XPL parser already runs very well in the UniCC Standard C Parser Template's test mode for some simple expressions. Only function calls don't work, because the semantically determined nonterminal selection is not implemented yet, and the parser always detects a variable, and throws a parse error when the opening bracket for the function's parameters could not be consumed (because a variable followed by an opening bracket is not valid).
 
 +++ The Virtual Machine +++
 
-The topic of intermediate code generation performed by a compiler to build a binary program or directly run it is that huge and complex, that it can't be covered in this manual or even in huger compiler textbooks. You only have to know, that every compiler creates some kind of intermediate representation of its input. In most cases some kind of more less abstract tree structure (Abstract Syntax Tree) representing semantics and nesting, but there are also compilers that compile into an intermediate language that can be used for further optimization or platform-dependent code generation. Also both methods are used in many of todays' compiler implementations.
-
+The topic of intermediate code generation performed by a compiler to build a binary program or directly run it is that huge and complex, that it can't be covered in this manual or even in huger compiler textbooks. You only have to know, that every compiler creates some kind of intermediate representation of its input. In most cases some kind of more or less abstract tree structure (Abstract Syntax Tree) representing semantics and nesting, but there are also compilers that compile into an intermediate language that can be used for further optimization or platform-dependent code generation. Also both methods are used in many of todays' compiler implementations.  
 An Abstract Syntax Tree is the representation of a parse tree where atomic syntactical elements are hidden, and only the semantic information (e.g. a number from code, a variable address or a node defining a conditional statement) and its nested structure is clearly defined. Such a AST-representation could already be used for direct interpretation. In C, this abstact syntax tree could be expressed as a huge union data structure providing several structures for every language element, e.g. one structure describing a value, one structure describing an assignment, one structure describing an IF-construct and so on. The result is a tree structure build of many nodes, links and leafs that can be easily interpretered by a recursively executed virtual machine. Althought this method is very simple to implement, it still requires a lot of coding efforts, and saving this tree to a file is not possible without the use of some nested structuring. The benefit of this method is, that no backpatching is required, because the structure is a logical tree.
 
-The generation of intermediate code could also be done from an Abstract Syntax Tree, but it can also directly be done out of the parser (in simple languages). Intermediate code, in turn, can be established on various paradigms. 3-address-code, for example, is very useful to generate optimized code for register-machines. 1-address-code can be used for stack-based machines, for example the Java Virtual Machine.
+The generation of intermediate code could also be done from an Abstract Syntax Tree, but it can also directly be done out of the parser (in simple languages). Intermediate code, in turn, can be established on various paradigms. 3-address-code, for example, is very useful to generate optimized code for register-machines. 1-address-code can be used for stack-based machines, like the Java Virtual Machine.
 
-This is also the approach we want to implement with XPL. We define a virtual execution machine for a 1-address-code machine, a stack-based virtual machine.
+This is also the approach we want to implement with XPL. We define a virtual execution machine for a 1-address-code, stack-based virtual machine.
+
+This simple virtual machine remains entirely independent from the overlying programming language, in this case our self-invented language //XPL//.
+So it can also be seen as a prototype for any other kind of language, e.g. a BASIC-dialect.
 
 ++++ xpl_value: A dynamic value object ++++
 
@@ -750,7 +752,7 @@ The internal programming language for our virtual machine consists of an opcode,
 | DIV | Take two operands off the stack, perform division and push the result onto the stack. Strings will be converted to integer. | - |
 
 
-TABLE##The virtual machine opcodes in XPL.
+TABLE##The virtual machine opcodes.
 
 Defining this in C as enum ``xpl_op`` and structure ``xpl_cmd``.
 
@@ -790,9 +792,9 @@ typedef struct
 } xpl_cmd;
 ```
 
-++++ xpl_program: Representation of a compiled XPL program ++++
+++++ xpl_program: Representation of a compiled program ++++
 
-To provide a data representation of a compiled XPL program, we require a structure holding a symbol table for variables, the used literals and the program code. All information in this structure should remain untouched during program runtime.
+To provide a data representation of a compiled program, we require a structure holding a symbol table for variables, the used literals and the program code. All information in this structure should remain untouched during program runtime.
 
 ```
 /* Program structure */
@@ -816,7 +818,7 @@ typedef struct
 } xpl_program;
 ```
 
-To build-up the program structure, we also require some modification functions in ``xpl.program.c`` and a function ``xpl_emit()`` to "write" the virtual machine code.
+To build-up the program structure, we also require some modification functions in ``xpl.program.c`` and a function ``xpl_emit()`` to emit the virtual machine code.
 
 %!include: ``xpl/xpl.program.c``
 
@@ -873,15 +875,17 @@ Finally, the virtual machine is implemented into ``xpl.run.c`` as function ``xpl
 
 +++ Implementing the Compiler +++
 
-Now both modules, the XPL runtime environment and the parser need to convence. The parser must be extended to work as a compiler, the code must be executed when the program successfully has been compiled. To turn the parser into a compiler, semantic actions need to be inserted to appropiate positions to generate the machine code for our virtual machine along the parse process now.
+Now both modules, the XPL runtime environment and the parser need to convence. The parser must be extended to work as a compiler, the code must be executed when the program successfully has been compiled. To turn the parser into a compiler, semantic actions need to be inserted to appropriate positions to generate the machine code for our virtual machine along the parse process now.
 
-The easiest part of this implementation is the nonterminal ``expression``. The productions of this nonterminal only require some code generation to push values onto the stack and perform operations and comparisons. The function call, which is part of nonterminal ``expression``, first pushes and evaluates all parameter values onto the stack, then pushes the number of parameters to be taken by the CAL operation to find out how many parameters shall be used for the function call, and to clear them later on. Semantic checking if the function call provides too less or too many parameters must also be checked here by the function ``xpl_check_function_parameters()``.
+The easiest part of this implementation is the nonterminal ``expression``. The productions of this nonterminal only require some code generation to push values onto the stack and perform operations and comparisons. The function call, which is part of nonterminal ``expression``, first pushes and evaluates all parameter values onto the stack, then pushes the number of parameters to be taken by the CAL operation to find out how many parameters shall be used for the function call, and to clear them later on. Semantic checking if the function call provides too less or too many parameters must also be done here by the function ``xpl_check_function_parameters()``.
 
-The more difficult part is the nonterminal ``statement``. This nonterminal requires the backpatching of addresses and code generation within the productions. The best example for this is the statement "while". The XPL-compiler should compile a while-statement
+The more difficult part is the nonterminal ``statement``. This nonterminal requires the backpatching of addresses and code generation within its productions. The best example for this is the statement **while**.
+
+The XPL-compiler should compile a while-statement
 
 ``` while( i > 0 ) i = i - 1;
 
-into a virtual machine code
+into a virtual machine code like this
 
 ```
  000: LOD 0 => i
@@ -898,7 +902,7 @@ into a virtual machine code
  011: NOP
 ```
 
-The first operations from address 000 to adress 003 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack. The JPC instruction now checks this value, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a machine language.
+The first operations from address 000 to adress 003 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack (0 for false, 1 for true). The JPC instruction now checks this value, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a machine language.
 
 Our compiler can only emit code sequencially, and looking at the production for statement "while",
 
@@ -974,3 +978,4 @@ The final version of our grammar turning it into an XPL compiler is this one.
 
 %!include: ``xpl/xpl.par``
 
+The entire, compileable source code of the XPL project can be found in [appendix 1 #appendix1] of this manual.

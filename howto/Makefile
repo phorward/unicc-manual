@@ -6,8 +6,8 @@ clean:
 	rm -f conflicts.out
 
 unicc.out: dates.par
-	echo "$$ unicc -v -s dates.par" >$@
-	unicc -v -s dates.par >>$@
+	echo "$$ unicc -v dates.par" >$@
+	unicc -v dates.par >>$@
 	echo "$$ " >>$@
 	rm -f dates.c dates.h
 
