@@ -1,0 +1,7 @@
+$ unicc -w error.par
+$ cc -o error error.c
+$ echo -n "2*5+x" | ./error -s
+Error: Expecting integer on line 1, column 5
+= 10
+(1 errors)
+$ 

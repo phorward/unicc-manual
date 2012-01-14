@@ -1,0 +1,98 @@
+$ unicc -w conflicts.par
+unicc: warning: state 16: Shift-reduce conflict on lookahead: '+'
+    (1) expression -> expression .+' expression 
+    (1) expression -> expression +' expression .      { &eof '+' '-' '*' '/' ')' }
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+unicc: warning: state 16: Shift-reduce conflict on lookahead: '-'
+    (1) expression -> expression .+' expression 
+    (1) expression -> expression +' expression .      { &eof '+' '-' '*' '/' ')' }
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+unicc: warning: state 16: Shift-reduce conflict on lookahead: '*'
+    (1) expression -> expression .+' expression 
+    (1) expression -> expression +' expression .      { &eof '+' '-' '*' '/' ')' }
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+unicc: warning: state 16: Shift-reduce conflict on lookahead: '/'
+    (1) expression -> expression .+' expression 
+    (1) expression -> expression +' expression .      { &eof '+' '-' '*' '/' ')' }
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+unicc: warning: state 17: Shift-reduce conflict on lookahead: '+'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (2) expression -> expression -' expression .      { &eof '+' '-' '*' '/' ')' }
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+unicc: warning: state 17: Shift-reduce conflict on lookahead: '-'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (2) expression -> expression -' expression .      { &eof '+' '-' '*' '/' ')' }
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+unicc: warning: state 17: Shift-reduce conflict on lookahead: '*'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (2) expression -> expression -' expression .      { &eof '+' '-' '*' '/' ')' }
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+unicc: warning: state 17: Shift-reduce conflict on lookahead: '/'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (2) expression -> expression -' expression .      { &eof '+' '-' '*' '/' ')' }
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+unicc: warning: state 18: Shift-reduce conflict on lookahead: '+'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (3) expression -> expression *' expression .      { &eof '+' '-' '*' '/' ')' }
+    (4) expression -> expression ./' expression 
+unicc: warning: state 18: Shift-reduce conflict on lookahead: '-'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (3) expression -> expression *' expression .      { &eof '+' '-' '*' '/' ')' }
+    (4) expression -> expression ./' expression 
+unicc: warning: state 18: Shift-reduce conflict on lookahead: '*'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (3) expression -> expression *' expression .      { &eof '+' '-' '*' '/' ')' }
+    (4) expression -> expression ./' expression 
+unicc: warning: state 18: Shift-reduce conflict on lookahead: '/'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (3) expression -> expression *' expression .      { &eof '+' '-' '*' '/' ')' }
+    (4) expression -> expression ./' expression 
+unicc: warning: state 19: Shift-reduce conflict on lookahead: '+'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+    (4) expression -> expression /' expression .      { &eof '+' '-' '*' '/' ')' }
+unicc: warning: state 19: Shift-reduce conflict on lookahead: '-'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+    (4) expression -> expression /' expression .      { &eof '+' '-' '*' '/' ')' }
+unicc: warning: state 19: Shift-reduce conflict on lookahead: '*'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+    (4) expression -> expression /' expression .      { &eof '+' '-' '*' '/' ')' }
+unicc: warning: state 19: Shift-reduce conflict on lookahead: '/'
+    (1) expression -> expression .+' expression 
+    (2) expression -> expression .-' expression 
+    (3) expression -> expression .*' expression 
+    (4) expression -> expression ./' expression 
+    (4) expression -> expression /' expression .      { &eof '+' '-' '*' '/' ')' }
+$ 

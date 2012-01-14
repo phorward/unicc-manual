@@ -1,0 +1,19 @@
+$ unicc -v dates.par
+UniCC version: 1.0
+Parsing grammar...Done
+Parser construction mode: sensitive
+Goal symbol detection...Succeeded
+Setting up single goal symbol...Done
+Rewriting grammar...Done
+Fixing precedences...Done
+Computing FIRST-sets...Done
+Validating rule integrity...Done
+Building parse tables...Done
+Terminal anomaly detection...Done
+Constructing lexical analyzer...Done
+Detecting default rules...Done
+Code generation target: C (default)
+Invoking code generator...[UniCC Standard C Template, v1.0]...Done
+
+dates.par produced 36 states (0 errors, 0 warnings), 2 files
+$ 
