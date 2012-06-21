@@ -5,115 +5,73 @@
 
 The UniCC parser generator is a software program that compiles augmented parser definitions into program-modules of a higher programming language or optionally into a structured, not further targetted parser description file.
 
-A parser definition analyzed by UniCC is an ASCII (UTF-8) formatted textfile that generally contains definitions for //terminal symbols//, //nonterminal symbols// and //productions// to describe a context-free grammar. These definitions are expressed in a Backus-Naur-Form-styled notation.
+A parser definition analyzed by UniCC is an UTF-8-ASCII formatted textfile that generally contains definitions for //terminal symbols//, //nonterminal symbols// and //productions// to describe a context-free grammar. These definitions are expressed in a Backus-Naur-Form-styled notation, but with many powerful extensions and the possibility of integrated semantic code segments.
 
 In most cases, a parser definition also contains several configuration directives, or simply called //directives//. They are used for the configuration of symbol-, task-, generation- and augmentation-related features. There are also a few directives that must be defined before any directive or grammar construction is done, because they influence general settings that cannot be changed later on. These directives are called //top-level directives//.
- 
+
 Additionally, a parser definition file can contain operational programming code that is revised by UniCC and inserted into appropriate positions within the resulting program module. These code fragments have the purpose to fit a particular need within the parsing process. Code blocks can be specified to various parser directives, to productions and some special terminal definitions.
 
 Due the target-language independency of the UniCC parser generator and its parser definition language, a parser definition file can also contain additional information called //tags//. These tags can be defined globally or associated with various grammatical objects. Use of this feature is in the interest of subsequent, from UniCC detached tasks which perform operations on the output of UniCC and the use this additional information for various purposes or results.
 
-++ Installation ++
+++ Setting up UniCC ++
 
-There are four installation packages for download available on the Phorward Software Technologies website, currently only targetting the Linux and Windows platform in both a 32-Bit and a 64-Bit x86 CPU.
+Setting up UniCC on Windows is quite simple. There is a downloadabe setup package on the offical [UniCC product website http://unicc.phorward-software.com] hostet at Phorward Software Technologies. The setup package contains both the 64-bit or 32-bit binary versions of UniCC, which can be installed as wanted. The system runs out of the box after installation. It only has to be arranged with the favorized compiler and/or IDE that is used for productive usage.
 
-- UniCC for Linux, Kernel 2.6.27 and higher, x86 (unicc-1.0rc1_x86-linux.tar.gz)
-- UniCC for Linux, Kernel 2.6.27 and higher, x86-64 (unicc-1.0rc1_x86_64-linux.tar.gz)
-- UniCC for Windows, 32-Bit, x86 (unicc-1.0rc1_x86-win.zip)
-- UniCC for Windows, 64-Bit, x86-64 (unicc-1.0rc1_x86_64-win.zip)
-
-
-After extracting the archive of the given platform's binary package, a directory containing the UniCC binary executable, the UniCC Standard C Parser Template (C.tlt) and several files is made available. The directory can be extracted to any desired location, but this demands on the use.
-
-The root directory contains the LICENSE and README files, as well as an environment setup script for Linux (setenv) and Windows (setenv.bat). This script can be called from a shell or command-prompt to setup the current environment for the use with UniCC.
-
-On Linux, the invocation is done with
-
-``` . ./setenv
-
-Under Windows, invocation is simply done with
-
-``` setenv.bat
-
-After calling the environment setup script, the variable **PATH** is extended to the UniCC binary directory, and the variable **UNICC_TPLDIR** directs to the //tlt// directory, containing the target language templates. If there will be more target language templates available in future, they can be integrated by simply copying the .tlt-files into this directory. Also, development of own or modified target language templates can be done here.
-
-//doc// contains the UniCC User's Manual (this file!) as PDF document and //unicc.man//, the README as Unix-style manpage file.
-//samples// contains some example grammars, and will also grow in future.
-
-To make UniCC permanently available on a specific system, the apropriate variables need to be set in the system's configuration.
-On Linux, this can be done in the system file ///etc/profile//, under Windows in the system settings dialog for environment variables.
+On Linux, it is recommended to follow the steps described in [the following chapter #ref_compile_from_source] and compile UniCC from source.
+Currently, there is no RPM or similar package available, but may follow soon.
 
 ++ Building UniCC from source ++[ref_compile_from_source]
 
-To build UniCC from its source code, some further tasks are required. The UniCC LALR(1) Parser Generator is a product that was entirely established and developed on top of the [Phorward Foundation Libraries http://phorward.phorward-software.com]. The Phorward Foundation Libraries are a collection of libraries, utility programs and shell scripts to provide a platform-independent development environment and build system for C programs. The main purpose of this project is to serve as a build-environment and consistent basic toolkit for various software projects having their origin at Phorward Software Technologies. Especially the platform-independent approach and many of the useful tools, libraries and functions provided by the Phorward Foundation Libraries make the entire package suitable for many C programmers, beyond Phorward project development only.
+UniCC is a product that was entirely established and developed on top of the Phorward Foundation Toolkit (to be more exactly, most parts of the Phorward Foundation Toolkit are having their origin in earlier development stages of the UniCC Parser Generator, but where moved into libraries for usage outside UniCC).
 
-The Phorward Foundation Libraries are released under the BSD License, and can be compiled under POSIX-like systems (with gcc under Linux, BSD, Solaris) as well as Windows (using Microsoft Visual C++ Express Edition and with the assistance of a Unix-like shell emulation environment, like [Msys http://www.mingw.org/wiki/MSYS]). Instructions on system requirements and how to setup the Phorward Foundation Libraries can be found in the related README file and on the [Phorward Software website http://phorward.phorward-software.com].
+The Phorward Foundation Toolkit and its library //libphorward// provide many useful functions for general purpose and extended software-development tasks, including standard data structures, a system-independent interface, extending data types and regular expression management functions, required by UniCC to construct the lexical analyzers.
 
-The Phorward Foundation Libraries, the UniCC LALR(1) Parser Generator and the UniCC Standard C Parser Template are developed using the [Mercurial SCM http://mercurial.selenic.com/] as version control system, so this method will also be used in the examples here. Using this method will always guarantee that the latest sources (including inofficial and experimental features) are used, but Mercurial also allows to check-out any commit of the UniCC sources after fetching them once. There are source code packages of UniCC as snapshots for all release versions also. They are extracted using a related archiving program (gunzip, tar), but the procedure of building UniCC from source remains the same as described here.
+The Phorward Foundation Libraries are released under the BSD License, more information can be obtained from the official product website at http://phorward.phorward-software.com.
 
-First of all, checking out (or extracting) the Phorward Foundation Libraries is required. This can be done after installing Mercurial by typing
+Before UniCC, can be built, ensure that the Phorward Foundation Toolkit is installed in its latest version.
+
+Getting the latest version is simple using the Mercurial SCM with
 
 ``` hg clone http://phorward.hg.sourceforge.net:8000/hgroot/phorward/phorward
 
-in a console. Setting up the Phorward Foundation Libraries for Unix-like systems or Windows is then done by typing
+Alternatively, download a release package of the desired version from the [Phorward Foundation Libraries product website http://phorward.phorward-software.com].
+After cloning or extracting, change into the created directory and run
 
 ```
-cd phorward
-. run/psetup
+./configure
+make
+make install
 ```
 
-and then invoking
-
-``` . ./psh
-
-to configure the environment for their use with the Phorward Foundation Libraries.
-By typing
-
-``` s
-
-then, the shell will change to the source directory, where the UniCC sources and utilities can now be checked out with the commands
+After that, clone the following repositories. They provide the UniCC Parser Generator and XPL, a demonstration of a tiny programming language implementation written with UniCC.
+These packages can also be obtained from the official [UniCC website http://unicc.phorward-software.com].
 
 ```
 hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/unicc
-hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/Cparser
 hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/xpl
 ```
 
-Now, the creation of some files is required to setup the environment for UniCC's own bootstrap.
-The following commands will create a permanent user-defined environment script that is applied the next time the Phorward Foundation Libraries environment is set up, and also updates the current environment to get the variable UNICC_TPLDIR known.
+Optionally, if hacking the UniCC Standard C Parser Template is wanted, clone
+
+``` hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/Cparser
+
+also.
+
+Change into the directory ``unicc`` and, again run
 
 ```
-test ! -x "$PHOME/etc/userenv" && echo '#!/bin/sh' >$PHOME/etc/userenv
-echo 'export UNICC_TPLDIR=$PHOME/src/Cparser' >>$PHOME/etc/userenv
-chmod +x $PHOME/etc/userenv
-. $PHOME/etc/userenv
+./configure
+make
+make install
 ```
-After this, a new project folder build order needs to be specified using
 
-``` echo "phorward min_lalr1 Cparser unicc xpl" >makeall-seq
+If the UniCC bootstrapping toolchain is wanted to be enabled, configure with
 
-This will create an extended build-sequence for the makeall script, which is
-part of the Phorward Foundation Libraries.
+``` ./configure --with-bootstrap
 
-Finally, typing
+this will bootstrap the UniCC grammar parser with multiple generation states.
 
-``` makeall
-
-will compile all dependencies and UniCC.
-After successfull compilation, typing
-
-``` unicc
-
-will invoke the UniCC LALR(1) Parser Generator. The executable is put into //$PHOME/run//, and can be copied anywhere else if desired. The UniCC Standard C Parser Template will be build in //$PHOME/src/Cparser/C.tlt//, and can be moved or linked elsewhere.
-
-The README file and UniCC manpage can be generated with
-
-``` make doc
-
-in the UniCC directory, with the use of the [txt2tags http://www.txt2tags.org] software (it needs to be installed and in the PATH).
-Building a function reference documentation of the Phorward Foundation Libraries can be generated to //$PHOME/doc// by running
-
-``` makeall doc
+After UniCC was successfully built and installed, ``xpl`` can be compiled out of the box without any configuration script.
 
 @NEWPAGE@
 
@@ -468,7 +426,7 @@ To describe the problem, the following grammar is used.
                 | "/*" .* "*/"
                 ;
 
-@int            '0-9'+      
+@int            '0-9'+
                 [* printf( "int %s\n", @> ); *]
                 ;
 
@@ -514,13 +472,13 @@ Given the example, that an empty string and a nonempty string shall be matched a
 @string empty_string <char*>   '"' !'"'* '"'
 
     [*
-        /* Select symbol! */		
+        /* Select symbol! */
         if( strlen( @> ) > 2 )
             @!symbol:string;
         else
             @!symbol:empty_string;
 
-/* 
+/*
     Run below code only when shifting, and not only at token detection.
     (this is one of the caveats in the standard C parser template when using
     semantic terminal determination with dynamic memory allocation)
@@ -770,7 +728,7 @@ var_type     -> <BOOLEAN>(
                          [* @@ = FALSE; *] ):default
 
                 @ident ';'
-                
+
                 [*
                      printf( "var: %s %s\n",
                             @default ? "default" : "", @ident );
@@ -786,8 +744,8 @@ A real-life example is this one, to stack-up a value temporarily within a right-
 procedure_def   -> "def" @ident:funcname
 
                     //Need to stack the current_depth value!
-                    <int>( 
-                    
+                    <int>(
+
                         /*
                             This is an anonymous nonterminal with an empty
                             production, to be used as "embedded semantic code".
@@ -799,7 +757,7 @@ procedure_def   -> "def" @ident:funcname
                          ):depth
 
                     '{' statements* '}'
-                  
+
                     [*
                         /*
                             This is the usual production's semantic block!
@@ -822,7 +780,7 @@ In some parser generators, this feature is called "embedded actions", but in Uni
 //Directives// are used to configure and influence various behaviors and settings of UniCC according to parsing, rewriting or constructing the grammar and its parse tables. Directives do always begin with a ``#``-symbol (hash), similar to C-preprocessor directives. A special kind of directive are the "top-level directives", which begin with the sequence ``#!``.
 
 Directives may appear anywhere in the grammar definition, except top-level directives, because they modify options and parameters of the fundamental behavior of UniCC or the grammar, which affect any subsequential directive or definition. They must be specified on top of the grammar, but their use is not required (so the default settings for these top-level directives take place).
- 
+
 Directives follow nearly the same syntactic rules than any other definition in UniCC. The synopsis is
 
 ``` #directive-name parameter1 parameter2 parameterN ;
@@ -981,7 +939,7 @@ as production definition, the correct syntax tree will be constructed for //-2*3
 
 GENAST#reference/prec.par#-2*3##Correct syntax tree of "-2*3", using a production predecence declaration.
 
-The ``#precedence``-directive has to be put right beind the production and its reduction code, so 
+The ``#precedence``-directive has to be put right beind the production and its reduction code, so
 
 ``` '-' expression        [* @@ = -@2; *]    #precedence '*'
 
@@ -1069,11 +1027,11 @@ Feeding this to UniCC and with warning reporting switched on, this causes a shif
 
 ```
 unicc: warning: state 9: Shift-reduce conflict on lookahead: 'A-Z_a-z'
-    (5) ident -> 'A-Z_a-z' .ident 
+    (5) ident -> 'A-Z_a-z' .ident
     (6) ident -> 'A-Z_a-z' .      { ' ' '\n' 'A-Z_a-z' '0-9' }
 
 unicc: warning: state 10: Shift-reduce conflict on lookahead: '0-9'
-    (7) integer -> '0-9' .integer 
+    (7) integer -> '0-9' .integer
     (8) integer -> '0-9' .      { ' ' '\n' 'A-Z_a-z' '0-9' }
 ```
 
