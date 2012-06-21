@@ -25,8 +25,8 @@ Below is the feature set the UniCC Standard C Parser Template provides.
 - Well tested, feature proven, used by UniCC's own grammar parser
 - Platform and C-compiler independent, based on the C standard library only
 - ANSI C89 and C99 compliant
-- Thread-safe, parsers can recursively be called using an extendible Parser Control Block (pcb)
-- Wide-character and UTF-8 Unicode input support
+- Thread-safe, parsers can recursively be called using an extendible parser control block (pcb)
+- Wide-character and UTF-8 unicode input support
 - Trace and stack trace facilities
 - Build-in error recovery
 - Build-in syntax tree generator
@@ -55,7 +55,7 @@ Any contributions to the UniCC standard parser template are welcome. Contributio
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 
-++ Use and Configuration ++
+++ Use and configuration ++
 As the C standard parser template has been developed simultaneously with UniCC itself and results in UniCC's own grammar parser, it is the best integrated parser template so far.
 To use it with a parser, the top-level directive
 
@@ -70,7 +70,7 @@ All symbols of the parsers which are or could become visible from outside the pa
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
-++ Value-types in Semantic Actions ++
+++ Value-types in semantic actions ++
 
 The UniCC Standard C Parser Template sets by default the data-type **int** for all symbols used in the grammar.
 A character-class terminal always returns the matched character as int-value.
@@ -94,10 +94,10 @@ The following example shows how to use the macros.
                                 /* This works in UTF-8 mode and
                                    without Unicode support */
                                 printf( "ident: length %d >%s<\n", @<, @> );
-                                
+
                                 /* This works in wide-character mode */
                                 printf( "ident: length %d >%S<\n", @<, @> );
-                                
+
                                 #if UNICC_ON_SHIFT
                                 /* Copy current token */
                                 @@ = strdup( @> );
@@ -127,7 +127,7 @@ The allocation of memory in above example could be performed like this.
                                 /* Semantic terminal determination */
                                 if( strcmp( @>, "name" ) == 0 )
 									@!symbol:name;
-                                
+
                                 #if UNICC_ON_SHIFT
                                 /* Copy current token */
                                 @@ = strdup( @> );
@@ -141,7 +141,9 @@ This causes the block within UNICC_ON_SHIFT only will be executed if the token h
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 
-++ @@prefix_pcb: The Parser Control Block ++[pcb]
+@NEWPAGE@
+
+++ @@prefix_pcb - parser control block ++[pcb]
 The parser control block is the main data structure which is passed to all parser-related functions in order to provide any runtime information on the current parser state, input buffering and much more. It is always accessable within all configuration macros as well as semantic codes, and simply identified by a variable called ``pcb``. The parser control block itself is a typedef that is refered as ``@@prefix_pcb``. ``@@prefix`` is replaced by the value specified at the [#prefix #ref_prefix] directive in UniCC, if not specified, it will be replaced by nothing (empty string), so ``_pcb`` will be the type name.
 
 Using the ``#pcb`` directive as described in the UniCC reference above, individual members of the parser control block can be defined, which avoids the problem of using global variables; Global variables must not be used in the standard C parser. This makes it entirely thread-safe, recursive calls of the parser are possible. If there is the need to pass on any values or pointers to subsequent parts of the parse-tree that hold global run-time information of the parser, they should be put into the parser control block using the ``#pcb`` directive.
@@ -160,16 +162,16 @@ typedef struct
 
     /* Stack size */
     unsigned int        stacksize;
-    
+
     /* Values */
     @@prefix_vtype      ret;
     @@prefix_vtype      test;
-    
+
     /* State */
     int                 act;
     int                 idx;
     int                 lhs;
-    
+
     /* Lookahead */
     int                 sym;
     int                 old_sym;
@@ -185,11 +187,11 @@ typedef struct
     UNICC_CHAR          next;
     UNICC_CHAR          eof;
     UNICC_BOOLEAN       is_eof;
-    
+
     /* Error handling */
     int                 error_delay;
     int                 error_count;
-    
+
     unsigned int        line;
     unsigned int        column;
 
@@ -197,7 +199,7 @@ typedef struct
     /* Syntax tree */
     @@prefix_syntree*   syntax_tree;
 #endif
-    
+
     /* User-defined components */
     @@pcb
 
@@ -237,6 +239,8 @@ To avoid compile errors, names differing from the above ones must be chosen to a
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
+
 ++ Additional data structures ++
 There are also some additional data structures used in the UniCC Standard C Parser Template. Knowledge on them is only required when interested in the syntax tree construction feature.
 
@@ -269,7 +273,9 @@ typedef struct
 
 TABLE##Member variables of @@prefix_tok.
 
-+++ @@prefix_syminfo: Symbol Information Table +++[_syminfo]
+@NEWPAGE@
+
++++ @@prefix_syminfo - symbol Information Table +++[_syminfo]
 Parsers constructed with the UniCC Standard C Parser Template contain a symbol table holding information about the grammatical symbols used in the parser. This symbol table is used by the parser itself to get additional informations about symbols, e.g. its type or if its configured as whitespace. For debug purposes, this table also contains the original name of the symbol as defined in UniCC.
 
 The grammar symbol table is a structure of type ``@@prefix_syminfo``, and can be accessed via a static, global variable ``@@prefix_symbols`` in within the parser module.
@@ -280,9 +286,9 @@ typedef struct
 {
     char*				name;
     int					type;
-    int					lexem;
-    int					whitespace;
-    int					greedy;
+    UNICC_BOOLEAN		lexem;
+    UNICC_BOOLEAN		whitespace;
+    UNICC_BOOLEAN		greedy;
 } @@prefix_syminfo;
 ```
 
@@ -296,7 +302,9 @@ typedef struct
 
 TABLE##Member variables of @@prefix_syminfo.
 
-+++ @@prefix_prodinfo: Production information table +++[_prodinfo]
+@NEWPAGE@
+
++++ @@prefix_prodinfo - production information table +++[_prodinfo]
 All parsers constructred via the UniCC Standard C Parser Template also contain a production information table holding information about the productions used in the parser. This production information table is used by the parser itself to get additional informations about its productions.
 
 The production information table is a structure of type ``@@prefix_prodinfo`` and can be refered as a static, global variable called ``@@prefix_productions``.
@@ -322,6 +330,7 @@ TABLE##Member variables of @@prefix_prodinfo.
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
 ++ Unicode support ++[unicode]
 The UniCC Standard C Parser Template supports Unicode in various ways. Unicode support means that it is capable to consume Unicode-characters as input.
@@ -342,13 +351,14 @@ The data-types of UNICC_CHAR and UNICC_SCHAR depends on these switches. By defau
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
-++ Build-in Syntax Tree Generator ++[_syntree]
+++ Build-in syntax tree generator ++[_syntree]
 
-The UniCC Standard C Parser Template features a build-in syntax tree construction mechanism. This mechanism can be enabled by defining ``UNICC_SYNTAXTREE`` to 1.
+The UniCC Standard C Parser Template features a build-in syntax tree construction automatism. This automatism can be enabled by defining ``UNICC_SYNTAXTREE`` to 1.
 The core aspect of this feature is to get a tree representation of the parsed input, which can be used for several purposes. One example are the graphical syntax trees that are printed in this manual; Most of them had been build automatically using this feature, in combination with some SVG rendering tools.
 
-The syntax tree data structure is made up of elements of type ``@@prefix_syntree``. 
+The syntax tree data structure is made up of elements of type ``@@prefix_syntree``.
 
 ```
 /* Parse tree node */
@@ -363,7 +373,7 @@ struct @@prefix_SYNTREE
     @@prefix_syntree*   child;
     @@prefix_syntree*   prev;
     @@prefix_syntree*   next;
-}; 
+};
 ```
 
 || Member | Type | Content |
@@ -387,23 +397,23 @@ void print_syntax_tree( @@prefix_pcb* pcb, @@prefix_syntree* node )
 
     if( !node )
         return;
-    
+
     while( node )
     {
         for( i = 0; i < rec; i++ )
             printf( "." );
-            
+
         printf( "%s", node->symbol.symbol->name );
-        
+
         if( node->token )
             printf( ": '%s'", node->token );
-        
+
         printf( stream, "\n" );
-        
+
         rec++;
         print_syntax_tree( pcb, node->child );
         rec--;
-        
+
         node = node->next;
     }
 }
@@ -444,7 +454,9 @@ calculator'
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
-++ main(): The build-in main-function ++[main]
+@NEWPAGE@
+
+++ main() - the build-in main-function ++[main]
 
 The UniCC Standard C Parser Template provides an automatically constructed main()-function.
 This function will be made available if no semantic code is submitted to UniCC's ``#epilogue``-directive, or if the define UNICC_MAIN is manually configured to 1.
@@ -488,11 +500,13 @@ or simply
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
-++ @@prefix_parse(): Function to invoke the parser ++[_parse]
+@NEWPAGE@
+
+++ @@prefix_parse() - the parser invocation function ++[_parse]
 
 The inital parser invocation function of the C standard parser template is called ``@@prefix_parse()``, where ``@@prefix`` will be replaced by the prefix specified at the [#prefix #ref_prefix]-directive. If no prefix is given, the function is simply called ``_parse()``. If the parser function is called from within a function defined in the parser definition file itself, it is still possible to write ``@@prefix_parse()`` also in the semantic code. The ``@@prefix`` variable will be replaced with its correct content by the code generator when the code is build.
 
-The function's prototype is 
+The function's prototype is
 ``` UNICC_STATIC @@prefix_vtype @@prefix_parse( @@prefix_pcb* pcb );
 
 The function only requests for one parameter, which is a structure of the [parser control block #pcb]. The structure must be initialized to zero, and user-defined values must be filled correctly before the parse-function is invoked. Else, the parser will come into unpredictable states and parse errors, or simply cores. It is also possible to pass ``(@@prefix_pcb*)NULL`` to the parser invocation function. In this case, the function will allocate a parser control block structure on its own, but this is only useful in validating parsers that do not perform much semantic actions working on pointers of the parser control block.
@@ -502,11 +516,13 @@ The parser-function returns a value of kind ``@@prefix_vtype``, which is the ret
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
-++ @@prefix_utf8_getchar(): UTF-8 character fetch function ++[_utf8_getchar]
+@NEWPAGE@
+
+++ @@prefix_utf8_getchar() - UTF-8 character fetch function ++[_utf8_getchar]
 
 If the parser is compiled with UNICC_UTF8-enabled (default), the macro UNICC_GETINPUT directs by default to the function //@@prefix_utf8_getchar( getchar )//. The function reads characters from a character retrival function (by default ``getchar()``) until a valid UTF-8 sequence was matched. It can be used by invidividual tasks also.
 
-The function's prototype is 
+The function's prototype is
 ``` UNICC_STATIC UNICC_CHAR @@prefix_utf8_getchar( int (*getfn)() );
 
 The function expects a function pointer as parameter to a function returning one byte per character. ``@@prefix_utf8_getchar()`` then automatically calls ``getfn`` until the correct number of sequences is taken to match one valid UTF-8 character.
@@ -514,11 +530,13 @@ The function expects a function pointer as parameter to a function returning one
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
-++ @@prefix_lexem(): Take current lexical value ++[_utf8_getchar]
+@NEWPAGE@
+
+++ @@prefix_lexem() - take current lexical value ++[_utf8_getchar]
 
 The function ``@@prefix_lexem()`` has the purpose to return the current input token recognized from a terminal symbol as UNICC_SCHAR*-pointer that can be used in semantic actions.
 
-The function's prototype is 
+The function's prototype is
 ``` UNICC_STATIC UNICC_SCHAR* @@prefix_lexem( @@prefix_pcb* pcb );
 
 It should not be called in reduction actions, only on shift-operations, respective in terminal actions. The ``@>`` macro within semantic terminal actions calls ``@@prefix_lexem()`` internally. The function allocates memory only in UTF-8 mode, all other input modes force only a pointer mapping, so no memory allocation is done. Memory management will be taken automatically, by the parser, so it is not required to care about.
@@ -526,6 +544,7 @@ It should not be called in reduction actions, only on shift-operations, respecti
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
 ++ Configuration Macro Reference ++
 
@@ -582,7 +601,7 @@ One could define ``UNICC_GETINPUT`` as
 ``` #define UNICC_GETINPUT *pcb->inputstring++
 to read from a buffered string, but this could read over the string's end, when ``UNICC_GETINPUT`` is called multiple times (which can be the case!).
 So a definition of
-``` 
+```
 #define UNICC_GETINPUT *( *pcb->inputstring ? pcb->inputstring : pcb->inputstring++ )
 ```
 would be more adequate and causes no unwanted effects.

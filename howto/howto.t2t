@@ -11,6 +11,8 @@ Every compiler, as the most common example, has a parser for the language it com
 
 The UniCC parser generator supports the programmer dealing with any type of parsing issue in two important steps: A new (or existing) language can quickly be prototyped and tested. This prototype then can be used to implement the parser that constructs an abstract syntax tree out of the given input, which is in turn used for the further processing of this fetched information.
 
+@NEWPAGE@
+
 ++ Defining grammars ++
 
 The ways of how data is analyzed, their syntax rules, can be defined using a so called //grammar// - the grammar of the language the parser accepts. Every kind of computer language - even simple text matching patterns - can be defined in some kind of grammar.
@@ -40,7 +42,7 @@ This single line defines all three elements described above: One //nonterminal//
 
 The arrow-symbol ``->`` separates the nonterminal-name from its production definitions, semicolon ``;`` closes the definition block. Because of this syntactical structuring of grammar elements (note that BNF //is// even a language with its own grammar to express grammars!) the nonterminal-name is sometimes called as the "left-hand side", where the associated productions resist on the "right-hand side". Using this definition, our grammar allows for integer numbers with one digit.
 
-If we want to extend the grammar now to allow for one or multiple digits forming an integer, we have to add a new production which calls nonterminal ``integer`` recursively, besides its one-digit rule. 
+If we want to extend the grammar now to allow for one or multiple digits forming an integer, we have to add a new production which calls nonterminal ``integer`` recursively, besides its one-digit rule.
 
 Adding such a new production is done by separating the first production from the second, using a pipe-character ``|``. Adding more productions requires even more pipes to separate them.
 
@@ -118,6 +120,8 @@ Finally, we use the same nonterminal, which is ``integer``, for day- and year-nu
 The parse tree of the input string "August 17, 2008" using this grammar will be
 
 AST#"date'" [ date [ month [ August ] integer [ integer [ 1 ] 7 ] "," integer [ integer [ integer [ integer [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree derived from the input 'August 17, 2008' (simplyfied)
+
+@NEWPAGE@
 
 ++ Grammar modularity ++
 
@@ -212,6 +216,8 @@ virtual2       -> !'"'
 
 You can see: Much lesser efforts in writing the grammar by reaching the same effect, right?
 
+@NEWPAGE@
+
 ++ Building a working parser ++
 
 UniCC is a parser generator. This means that is generates parsers from such as the above shown grammar definitions into an adequate, simplified parser representation. UniCC parses grammar definitions, performs some revisions on it, constructs the parse tables and lexical analyzers, which are required by the underlying parser driver to match the defined grammar and produces some output. In terms of a compiler-writer, UniCC is nothing else than a compiler to compile grammars into parsers. So this is also the reason why UniCC is used to compile its own grammar during its build.
@@ -293,6 +299,8 @@ ok
 
 ```
 
+@NEWPAGE@
+
 ++ Writing compilers ++
 
 With above examples, we only created parsers that match valid and reject invalid input. Based upon the above grammar for parsing dates, it can now be simply turned it into a real compiler.
@@ -317,7 +325,7 @@ date$           -> month:month integer:day ',' integer:year
                        *]
                 ;
 
-month           -> "January"    [* @@ = 1; *]	
+month           -> "January"    [* @@ = 1; *]
                 | "February"    [* @@ = 2; *]
                 | "March"       [* @@ = 3; *]
                 | "April"       [* @@ = 4; *]
@@ -374,7 +382,7 @@ To assign a value to the left-hand side, which is the upper node in the parse tr
 
 All values stored to nonterminals are written there by reduction actions. The atomic values from the input-stream, the terminals, are the base for these values, and obtain their values directly from the input, or an lexical analyzer, which is introduced later.
 
-In the standard C parser template delivered with UniCC, every character terminal gets the character-code of the character it matches in the input. Therefore, the semantic value that is constructed using nonterminal ``integer`` is 
+In the standard C parser template delivered with UniCC, every character terminal gets the character-code of the character it matches in the input. Therefore, the semantic value that is constructed using nonterminal ``integer`` is
 
 ```
 integer         -> '0-9'        [* @@ = @1 - '0'; *]
@@ -538,6 +546,8 @@ Such an grammar would be the following, when we try to compile it.
 
 %!include: ``howto/conflicts.par``
 
+@NEWPAGE@
+
 When this grammar is fed to UniCC using the ``-w`` command line switch, we get many lines with the following warnings:
 
 %!include: ``howto/conflicts.out``
@@ -569,10 +579,11 @@ This will parse and calculate the correct values, including all precedence relat
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
 ++ Implementing a programming language ++
 
-Now that we have learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called //eXample Programming Language//, shortened //XPL//, and is a C-styled language.
+Now that we have learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called eXample Programming Language, shortened XPL, and is a C-styled language.
 
 The language should match the following requirements:
 
@@ -582,26 +593,30 @@ The language should match the following requirements:
 - Simple control structures (conditionals, iterations)
 - Variable assignments
 - Nested calls to build-in functions with variable arguments
-- These functions should provide simple data manipulation routines and input/output facilities
+- The functions should provide simple data manipulation routines and input/output facilities
 
 
-We first don't care about how to execute this programming language, first it is only a draft for a syntax describing the language's grammar. A simple example to rudely define the syntax of XPL shall be the 99-bottles-of-beer programming example.
+We first don't care about how to execute this programming language. First it is only a draft for a syntax describing the language grammar. A simple example to rudely define the syntax of XPL shall be the 99-bottles-of-beer programming example.
 
 %!include: ``xpl/99bottles.prg``
 
 +++ Source code downloads +++
 
-All the source code presented in the following sections section is not covered in detail, but it is a working example for a programming language implemented entirely with the UniCC LALR(1) Parser Generator and the UniCC Standard C Parser Template. To obtain the latest version of the XPL source code presented here, access the Mercurial source repository using
+All source code presented in the following sections is not covered in detail, but it is a working example for a programming language implemented entirely with the UniCC language development system. To obtain the latest version of the XPL source code presented here, access the Mercurial source repository using
 
 ``` hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/xpl
 
-The source code printed here can also be found in the [appendix #appendix1] or as a downloadable file archive on the [Phorward Software website  http://unicc.phorward-software.com].
+The source code printed here can also be found in the [appendix #appendix1] or as a downloadable tarball on the [Phorward Software website  http://unicc.phorward-software.com].
+
+@NEWPAGE@
 
 +++ Drafting the Grammar +++
 
-The plain grammar of the language is described below. We intermix already known grammar constructs like lexemes here with some new features that had not been covered yet.
+The plain grammar of the language is described below. This intermixes already known grammar constructs like lexemes with some new features that had not been covered for now.
 
 %!include: ``xpl/xpl_draft.par``
+
+@NEWPAGE@
 
 ++++ Terminals based on regular expressions ++++
 
@@ -616,17 +631,17 @@ The first, new feature used here is the definition block
                     ;
 ```
 
-This definition introduces two terminal symbols, ``@string`` and ``@identifier``. These terminal symbols are made of regular expressions. Regular expressions are some kind of formal language to describe a way in which characters or character-classes, words and sentences may appear in the input to match the corresponding terminal symbol and give this string sequence a semantic meaning. All terminal symbols in UniCC are some kind of regular expressions; The already known character-classes and strings. These terminals can be defined where they are used, but regular expressions may be defined that complex and powerful, that they require their own definition block.
+This definition introduces two terminal symbols, ``@string`` and ``@identifier``. These terminal symbols are made of regular expressions. Regular expressions are some kind of formal language to describe a way in which characters or character-classes, words and sentences may appear in the input to match the corresponding terminal symbol and give this string sequence a semantic meaning. All terminal symbols in UniCC, the already known character-classes and strings, are some kind of regular expressions. These terminals can be defined where they are used, but regular expressions may be defined that complex and powerful, that they require their own definition block.
 
-The first of the above regular expressions describe a terminal ``@string``, that begins with a double quotation mark ``'"'``, a sequence of zero or multiple characters except a quotation mark (``!'"'*``), and a closing double quotation mark ``'"'``. The second regular expression describes a terminal ``@identifier`` which is made of at least one character that may be in the upper- and lower-case letters or underscore (``'A-Za-z_``), and zero or multiple characters that are made up of upper-/lower-case letters, digits or underscores. This regular expression pattern matches for strings like ``a``, ``Hello``, ``_test`` or even ``i22``, but not for ``22`` on its own, which should be interpretered as integer number by our programming language. More about the use of regular expressions and their making up is covered in the [UniCC reference guide #ref_terminal_regex].
+The first of the above regular expressions describe a terminal ``@string``, that begins with a double quotation mark ``'"'``, a sequence of zero or multiple characters except a quotation mark (``!'"'*``), and a closing double quotation mark ``'"'``. The second regular expression describes a terminal ``@identifier`` which is made of at least one character that may be in the upper- and lower-case letters or underscore (``'A-Za-z_``), and zero or multiple characters that are made up of upper-/lower-case letters, digits and underscores. This regular expression pattern matches for strings like ``a``, ``Hello``, ``_test`` or even ``i22``, but not for ``22`` on its own, which should be recognized as an integer number by the grammar. More about the use of regular expressions and their making up is covered in the [UniCC reference guide #ref_terminal_regex].
 
 ++++ Overwriting production precedence ++++
 
 The second new feature that is used here but has not covered yet is the production
-                    
+
 ``` '-' expression              #precedence '*'
 
-This special ``#precedence`` directive sets a higher precdecence level to the production to overwrite its default precedence that is associated with the ``-``-operator to the precedence of the ``*``-operator. This configuration is done to allow for unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result, because ``-`` is below ``*`` in the operator precedence order. Setting this production's precedence to the level of multiply (or higher), it is parsed the correct way as //(-2)*4//.
+This special ``#precedence`` directive sets a higher precdecence level to the production to overwrite its default precedence that is associated with the substraction-operator (``-``) to the precedence of the multiplication-operator ``*``. This configuration is done to allow for an unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result, because substraction is below multiplication in the operator precedence order. Setting the production precedence to the level of the multiplication-operator (or higher), it is parsed the correct way as //(-2)*4//.
 
 ++++ Multiple left-hand sides ++++
 
@@ -638,11 +653,11 @@ function            ->      @identifier
                     ;
 ```
 
-This definition associates one production with two nonterminals, ``variable`` and ``function``. This construct allows to determine the final type of the nonterminal at runtime, by using UniCC's feature of [semantic nonterminal determination #ref_semantic_nonterminal_determination]. This feature allows to first check with our semantic code if an identifier is the name of a function or the name of a variable, and then return the correct gramatical symbol. This feature could be seen as a dynamic change of the way how the grammar is parsed at the parser's runtime.
+This definition associates one production with two nonterminals, **variable** and **function**. This construct allows to determine the final type of the nonterminal at runtime, by using UniCC's feature of [semantic nonterminal determination #ref_semantic_nonterminal_determination]. This feature allows to first check within the semantic code if an identifier is the name of a function or the name of a variable, and then return the appropriate nonterminal symbol. This feature could be seen as a dynamic change of the way how the grammar is recognized at runtime.
 
 ++++ The "dangling else" problem ++++
 
-When compiling this grammar, you will be concerned by a shift-reduce conflict warning.
+When compiling this grammar, we will be concerned by this shift-reduce conflict warning:
 
 ```
 unicc: warning: state 81: Shift-reduce conflict on lookahead: "else"
@@ -650,7 +665,7 @@ unicc: warning: state 81: Shift-reduce conflict on lookahead: "else"
     (23) statement -> if' (' expression )' statement .else' statement
 ```
 
-This problem is called "dangling else", and occurs in many LALR-/LR-based programming language grammars.
+This problem is called "dangling else", and occurs in many LALR-/LR-based grammars.
 The nature of this problem can be obtained from the following pseudo-code examples.
 
 ```
@@ -667,7 +682,7 @@ if( expression )
 else
 	statement;
 ```
-Now, the **else** is visually part of the first **if**, but the parser would take it as the **else** part of the second **if**. Both ways could be valid. UniCC notices this situation, that the grammar is ambigous with this syntax, so a warning is printed. By the way, this problem also exists in C itself, but also other languages like Java. The solution is to put the second "if" into a new statement block, and everything will be fine.
+Now, the **else** is visually part of the first **if**, but the parser would take it as the **else** part of the second **if**. Both ways could be valid. UniCC notices this situation, that the grammar is ambigous, so the above warning is printed. This problem is also found in grammars for wide-spread languages like C or Java. The solution is to put the second **if** into a new statement block, and everything is clear. The warning can be ignored in this case.
 ```
 if( expression )
 {
@@ -678,23 +693,23 @@ else
 	statement;
 ```
 
-Except of this warning, the draft version of the XPL parser already runs very well in the UniCC Standard C Parser Template's test mode for some simple expressions. Only function calls don't work, because the semantically determined nonterminal selection is not implemented yet, and the parser always detects a variable, and throws a parse error when the opening bracket for the function's parameters could not be consumed (because a variable followed by an opening bracket is not valid).
+Except of this warning, the draft version of the XPL parser already runs very well in the UniCC Standard C Parser Template's test mode for some simple expressions. Only function calls don't work, because the semantically determined nonterminal selection is not implemented yet. The parser now always detects a variable and throws a parse error when the opening bracket for the function call are statet, and a variable followed by an opening bracket is not valid. This problem will be solved after adding some semantic determination code soon.
 
-+++ The Virtual Machine +++
+@NEWPAGE@
 
-The topic of intermediate code generation performed by a compiler to build a binary program or directly run it is that huge and complex, that it can't be covered in this manual or even in huger compiler textbooks. You only have to know, that every compiler creates some kind of intermediate representation of its input. In most cases some kind of more or less abstract tree structure (Abstract Syntax Tree) representing semantics and nesting, but there are also compilers that compile into an intermediate language that can be used for further optimization or platform-dependent code generation. Also both methods are used in many of todays' compiler implementations.  
-An Abstract Syntax Tree is the representation of a parse tree where atomic syntactical elements are hidden, and only the semantic information (e.g. a number from code, a variable address or a node defining a conditional statement) and its nested structure is clearly defined. Such a AST-representation could already be used for direct interpretation. In C, this abstact syntax tree could be expressed as a huge union data structure providing several structures for every language element, e.g. one structure describing a value, one structure describing an assignment, one structure describing an IF-construct and so on. The result is a tree structure build of many nodes, links and leafs that can be easily interpretered by a recursively executed virtual machine. Althought this method is very simple to implement, it still requires a lot of coding efforts, and saving this tree to a file is not possible without the use of some nested structuring. The benefit of this method is, that no backpatching is required, because the structure is a logical tree.
++++ The virtual machine +++
 
-The generation of intermediate code could also be done from an Abstract Syntax Tree, but it can also directly be done out of the parser (in simple languages). Intermediate code, in turn, can be established on various paradigms. 3-address-code, for example, is very useful to generate optimized code for register-machines. 1-address-code can be used for stack-based machines, like the Java Virtual Machine.
+The topic of intermediate code generation performed by a compiler to build a binary program or directly run it is that huge and complex, that it can't be covered in this manual or even in huger compiler textbooks. You only have to know, that every compiler creates some kind of intermediate representation of its input. In most cases some kind of a more or less abstract tree structure (abstract syntax tree) representing semantics and nesting, but there are also compilers that compile into an intermediate language that can be used for further optimization or platform-dependent code generation. Both methods are used in many of todays existing compiler implementations.
 
-This is also the approach we want to implement with XPL. We define a virtual execution machine for a 1-address-code, stack-based virtual machine.
+An abstract syntax tree (AST) is the representation of a parse tree where atomic syntactical elements are hidden, and only the semantic information (e.g. a literal from the code, a variable address or a node defining a conditional statement) and its nested structure is clearly defined. Such an AST-representation could already be used for a direct interpretation of the input. In C, for example, such an abstact syntax tree could be expressed as a huge union data structure, providing several structures for every language element. There could be one structure describing a value, one structure describing an assignment, one structure describing an IF-construct, and so on. The result is a tree structure that is made-up of many of such nodes, links and leafs that can be easily interpretered by a recursively executed virtual machine. Althought this method is very simple to implement, it still requires a lot of coding efforts, and saving this tree to a file is not possible without the use of some nested structuring. The benefit of this method is, that no backpatching is required, because the structure is a logical tree.
 
-This simple virtual machine remains entirely independent from the overlying programming language, in this case our self-invented language //XPL//.
-So it can also be seen as a prototype for any other kind of language, e.g. a BASIC-dialect.
+The generation of intermediate code could also be done from an abstract syntax tree, but it can also directly be done out of the parser (in simple languages), where the parser serves as the immediate representation of the abstract syntax tree during input recognition. Intermediate code, in turn, can be established on various paradigms. 3-address-code is very useful to generate optimized code for register-machines. 1-address-code can be used for stack-based machines, like the Java Virtual Machine.
 
-++++ xpl_value: A dynamic value object ++++
+This is also the approach we want to implement in XPL. We define a virtual execution machine for a stack-based virtual machine, interpreting 1-address-code. This simple virtual machine remains entirely independent from the overlying language (here XPL). It can also be seen as a target-platform for any other kind of language, e.g. a simple BASIC-dialect.
 
-The stack-elements are described in a structure called ``xpl_value``, defined in ``xpl.h``.
+++++ xpl_value - a dynamic value object ++++
+
+The stack-elements of the simple virtual machine are described in a structure called ``xpl_value``, defined in ``xpl.h``.
 
 ```
 /* Virtual machine values */
@@ -709,14 +724,14 @@ typedef enum
 typedef struct
 {
     xpl_datatype    type;                   /* Value type */
-    
+
     union
     {
         int         i;
         float       f;
         char*       s;
     } value;                                /* Value storage union */
-    
+
     char*           strval;                 /* Temporary string value
                                                 representation pointer */
 } xpl_value;
@@ -726,9 +741,11 @@ To work with these value objects, a functions library is implemented in ``xpl.va
 
 %!include: ``xpl/xpl.value.c``
 
+@NEWPAGE@
+
 ++++ Defining a code set ++++
 
-The internal programming language for our virtual machine consists of an opcode, defining the operation to be performed, and an integer parameter that is only used by some operations as index reference. The following table describes the opcodes, their meaning and the use of the parameter.
+The internal assembly language for our virtual machine consists of an opcode, defining the operation to be performed, and an integer parameter that is only used by some operations as index reference. The following table describes the opcodes, their meaning and the use of the parameter.
 
 || Opcode | Operation | Parameter |
 | NOP | Does nothing. | - |
@@ -754,7 +771,7 @@ The internal programming language for our virtual machine consists of an opcode,
 
 TABLE##The virtual machine opcodes.
 
-Defining this in C as enum ``xpl_op`` and structure ``xpl_cmd``.
+Defining this in C as enum ``xpl_op`` and structure ``xpl_cmd`` results in the following code.
 
 ```
 /* Virtual machine opcodes */
@@ -792,9 +809,9 @@ typedef struct
 } xpl_cmd;
 ```
 
-++++ xpl_program: Representation of a compiled program ++++
+++++ xpl_program - representation of a compiled program ++++
 
-To provide a data representation of a compiled program, we require a structure holding a symbol table for variables, the used literals and the program code. All information in this structure should remain untouched during program runtime.
+To provide a data representation of a compiled program, XPL requires a structure holding a symbol table for variables, the used literals and the program code. All information in this structure should remain untouched at program runtime, and is only build-up by the compiler.
 
 ```
 /* Program structure */
@@ -822,7 +839,7 @@ To build-up the program structure, we also require some modification functions i
 
 %!include: ``xpl/xpl.program.c``
 
-And for debug purposes, we want to get a visible representation of the compiled program. This can be done with a program dump function, which is implemented in ``xpl.debug.c``.
+And for debug purposes, we want to get a visible representation of the compiled program. This can be done with a program dump function that is implemented in ``xpl.debug.c``.
 
 %!include: ``xpl/xpl.debug.c``
 
@@ -836,10 +853,9 @@ All build-in functions, some service functions and an array holding the function
 
 %!include: ``xpl/xpl.functions.c``
 
-++++ xpl_runtime: The runtime data structure ++++
+++++ xpl_runtime - the runtime data structure ++++
 
-This implementation of an XPL compiler and interpreter distinguishes between static data describing the compiled XPL program, and dynamic data that is only required at program runtime.
-The compiler creates and modifies the ``xpl_program``-object, the interpreter only reads the ``xpl_program``-object and works on a ``xpl_runtime``-object containing the variable data and stack.
+This implementation of an XPL compiler and interpreter distinguishes between static data describing the compiled XPL program, and dynamic data that is only required at program runtime. The compiler creates and modifies the ``xpl_program``-object, the interpreter only reads the ``xpl_program``-object and works on a ``xpl_runtime``-object containing the variable data and stack.
 
 ```
 /* Runtime structure */
@@ -859,8 +875,8 @@ typedef struct
                                                 the numbers of elements
                                                 resisting.
                                             */
-    
-    xpl_cmd*    ip;                         /* Instruction Pointer to the 
+
+    xpl_cmd*    ip;                         /* Instruction Pointer to the
                                                 currently executed code
                                                 address.
                                             */
@@ -873,13 +889,15 @@ Finally, the virtual machine is implemented into ``xpl.run.c`` as function ``xpl
 
 %!include: ``xpl/xpl.run.c``
 
-+++ Implementing the Compiler +++
+@NEWPAGE@
+
++++ Implementing the compiler +++
 
 Now both modules, the XPL runtime environment and the parser need to convence. The parser must be extended to work as a compiler, the code must be executed when the program successfully has been compiled. To turn the parser into a compiler, semantic actions need to be inserted to appropriate positions to generate the machine code for our virtual machine along the parse process now.
 
-The easiest part of this implementation is the nonterminal ``expression``. The productions of this nonterminal only require some code generation to push values onto the stack and perform operations and comparisons. The function call, which is part of nonterminal ``expression``, first pushes and evaluates all parameter values onto the stack, then pushes the number of parameters to be taken by the CAL operation to find out how many parameters shall be used for the function call, and to clear them later on. Semantic checking if the function call provides too less or too many parameters must also be done here by the function ``xpl_check_function_parameters()``.
+The easiest part of this implementation is the nonterminal **expression**. The productions of this nonterminal only require some code generation to push values onto the stack and perform operations and comparisons. The function call, which is part of nonterminal **expression**, first pushes and evaluates all parameter values onto the stack, then pushes the number of parameters to be taken by the CAL operation to find out how many parameters shall be used for the function call, and to clear them later on. Semantic checking if the function call provides too less or too many parameters is done here by the function ``xpl_check_function_parameters()`` already.
 
-The more difficult part is the nonterminal ``statement``. This nonterminal requires the backpatching of addresses and code generation within its productions. The best example for this is the statement **while**.
+The more difficult part is the nonterminal **statement**. This nonterminal requires the backpatching of addresses and code generation within its productions. The best example for this is the statement "while".
 
 The XPL-compiler should compile a while-statement
 
@@ -890,19 +908,19 @@ into a virtual machine code like this
 ```
  000: LOD 0 => i
  001: LIT 0 (0)
- 002: GRT 
+ 002: GRT
  003: JPC 011
  004: LOD 0 => i
  005: LIT 1 (1)
- 006: SUB 
- 007: DUP 
+ 006: SUB
+ 007: DUP
  008: STO 0 => i
- 009: DRP 
+ 009: DRP
  010: JMP 000
  011: NOP
 ```
 
-The first operations from address 000 to adress 003 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack (0 for false, 1 for true). The JPC instruction now checks this value, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a machine language.
+The first operations from address 000 to adress 002 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack (0 for false, 1 for true). The JPC instruction at address 003 now compares against this value on top of the stack, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a 1-address-code machine language.
 
 Our compiler can only emit code sequencially, and looking at the production for statement "while",
 
@@ -918,7 +936,7 @@ statement -> "while" '(' expression ')'
                        [* backpatch the jpc-call *] ;
 ```
 
-which is the same as we add a normal nonterminal and use it only once.
+which is the same as we add a normal nonterminal with an empty right-hand-side and use it only once.
 
 ```
 ANONYMOUS -> [* generate jpc code *] ;
@@ -930,8 +948,8 @@ statement -> "while" '(' expression ')'
 
 Anonymous nonterminals make it possible to define the entire nonterminal (with all its productions) on the right-hand side of another nonterminal, avoiding the creation of a special extra nonterminal to fullfill one special task, like it is the case here.
 
-Our anonymous nonterminal right after the closing bracked of the header of the **while** statement generates a JPC operation with an empty address, and returns its own operation address as semantic value. Then the following nonterminal ``statement`` is parsed, and finally the production of the statement **while** will be reduced.
-In the reduction code, we then know the final address where the JPC-operation should jump to, so we now can backpatch its parameter with the correct address. To finally generate the JMP-call at the bottom of the loop right behind the last statement code was executed, we also have to remember the last program memory address before the code for statement **while** was generated. Another anonymous nonterminal helps out, and we get the following exemplary version of the backpatching construct.
+Our anonymous nonterminal right after the closing bracked of the header of the "while"-statement generates a JPC operation with an empty address, and returns its own operation address as semantic value. Then the following nonterminal **statement** is parsed, and finally the production of the statement "while" will be reduced.
+In the reduction code, we then know the final address where the JPC-operation should jump to, so we now can backpatch its parameter with the correct address. To finally generate the JMP-call at the bottom of the loop right behind the last statement code was executed, we also have to remember the last program memory address before the code for statement "while" was generated. Another anonymous nonterminal helps out, and we get the following exemplary version of the backpatching construct.
 
 ```
 statement -> "while" ( [* stack up current program address *] ) '(' expression ')'
@@ -943,24 +961,24 @@ statement -> "while" ( [* stack up current program address *] ) '(' expression '
 The implemented version of this theory is this one, and may look a little bit confusing when used the first time.
 
 ```
-statement   ->  "while" 
+statement   ->  "while"
 
                 (
                     [*
-                        @@ = pcb->prog->program_cnt; 
+                        @@ = pcb->prog->program_cnt;
                     *]
                 ):begin
 
-                    '(' expression ')' 
-                    
+                    '(' expression ')'
+
                 (
                     [*
-                        @@ = xpl_emit( pcb->prog, XPL_JPC, 0 ); 
+                        @@ = xpl_emit( pcb->prog, XPL_JPC, 0 );
                     *]
                 ):jpc
-                    
+
                     statement
-                    
+
                 [*
                     @@ = xpl_emit( pcb->prog, XPL_JMP, @begin );
                     pcb->prog->program[ @jpc ].param =
@@ -970,12 +988,12 @@ statement   ->  "while"
 
 ```
 
-But anonymous nonterminals also have their disadvantages. They represent individual symbols that are only used in one position, but can be made up of a fully-fledged nonterminal definition with multiple productions and a return value. This is also the reason why the **if...else** statement is implemented a different way in the final XPL implementation. Trying to get the drafted version with two productions for **if** with **else** and **if** without **else** driven this way will fail, because the insertion of anonymous nonterminals into the existing productions removes the ambiguity of the grammar, and causes the wrong production to be reduced. This problem could also be resolved with the assistance of anonymous nonterminals, by simply adding an optional "else" part to the **if** statement, yielding in one production for the entire **if** and **if...else** construct.
+But anonymous nonterminals also have their disadvantages. They represent individual symbols that are only used in one position, but can be made up of a fully-fledged nonterminal definition with multiple productions and a return value. This is also the reason why the "if...else" statement is implemented a different way in the final XPL implementation. Trying to get the drafted version with two productions for "if" with "else" and "if" without "else" driven this way will fail, because the insertion of anonymous nonterminals into the existing productions removes the ambiguity of the grammar, and causes the wrong production to be reduced. This problem could also be resolved with the assistance of anonymous nonterminals, by simply adding an optional "else" part to the "if" statement, yielding in one production for the entire "if" and "if...else" construct.
 
-Please note, that this change has its origin in the way how we want to produce our code only. In other compiler implementations this could be solved much better than here, so the drafted grammar could also be used without anonymous nonterminals.
+Please note, that this change has its origin in the way how we want to produce our code only. In other compiler implementations this could be solved much better and differently than here, so the drafted grammar could also be used without anonymous nonterminals.
 
 The final version of our grammar turning it into an XPL compiler is this one.
 
 %!include: ``xpl/xpl.par``
 
-The entire, compileable source code of the XPL project can be found in [appendix 1 #appendix1] of this manual.
+The entire, compile- and executable source code of the XPL project can be found in [appendix 1 #appendix1] of this manual.

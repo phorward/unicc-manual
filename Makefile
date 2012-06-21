@@ -37,7 +37,7 @@ backup:
 	tar cvf ../manual.tar ../manual
 
 $(UNICC_PDF): $(UNICC_PDF_H)
-	htmldoc -t pdf14 --book --linkstyle plain --linkcolor 000030 \
+	htmldoc -t pdf14 --book --linkstyle plain --linkcolor 0000A0 \
 		--header .t. --no-title --duplex --browserwidth 1024 \
 			--toclevels 4 --no-jpeg -f $@.tmp $(UNICC_PDF_H)
 	pdftk book/front.pdf $@.tmp book/back.pdf cat output $@
@@ -47,7 +47,7 @@ $(UNICC_PDF_H): $(UNICC_SRC)
 	txt2tags -o $@.tmp -t html --no-enum-title -H \
 		--css-sugar --style unicc.css --css-inside \
 			$(UNICC_CONT)
-	awk -f markup.awk $@.tmp >$@
+	awk -f markup.awk -vnoastgen=$(NOASTGEN) $@.tmp >$@
 	rm -f $@.tmp
 	mv $@ $@.tmp
 	sed -e "/CONTENT/r $@.tmp" -e "/CONTENT/d" book.html >$@
@@ -57,7 +57,7 @@ $(UNICC_PDF_H): $(UNICC_SRC)
 $(UNICC_HTML): $(UNICC_SRC)
 	txt2tags -o $@.tmp -t html --toc --toc-level=4 --mask-email \
 		--css-sugar --style unicc.css --css-inside $(UNICC_MAIN)
-	awk -f markup.awk $@.tmp >$@
+	awk -f markup.awk -vnoastgen=$(NOASTGEN) $@.tmp >$@
 	rm -f $@.tmp
 	cp $(UNICC_IMG) output/html
 

@@ -1,3 +1,7 @@
+UniCC Parser Generator
+(C) 2006-2012 by Phorward Software Technologies, Jan Max Meyer
+%%date(%d.%m.%Y), Version 0.4
+================================================================================
 
 %!include: intro/intro.t2t
 %!include: howto/howto.t2t

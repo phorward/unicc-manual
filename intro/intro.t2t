@@ -13,6 +13,8 @@ UniCC is technically a target language independent parser generator, which means
 
 Next to the generation of parser program modules in a particular programming language, UniCC also offers the possibility to export all the grammar information, its parse tables, semantic actions and settings extracted from a UniCC parser definition into a target-independent XML-based output format that can be handled by any individual subsequent tasks or module - specialized code-generators, analyzers, or direct interpreters.
 
+@NEWPAGE@
+
 ++ The intention behind UniCC ++
 
 The UniCC Parser Generator has its origin at //Phorward Software Technologies// and is initially written and maintained by its 1985 born core developer //Jan Max Meyer//.
@@ -22,6 +24,8 @@ Phorward Software Technologies is a software-company from Dortmund, Germany, whi
 UniCC designates to be as one of the flagship-products of Phorward Software, and is the result for the request to an lightweight, simple, but flexible and platform-independent parser development system. UniCC is the base platform and compiler for many other compiler-related projects launched by Phorward Software Technologies, and will hopefully also be used by many other interesting software-projects in future.
 
 To get more information on Phorward Software Technologies and our projects and products, visit http://www.phorward-software.com on the web.
+
+@NEWPAGE@
 
 ++ A few words on this manual ++
 
@@ -42,6 +46,8 @@ The UniCC User Manual is divided into four sections:
 
 
 The manual will be continously be updated and extended with more or detailed information. Hopefully it answers all of your questions coming up when UniCC shall become the workhorse of your upcoming compiler project. If not, don't avoid to drop a mail, to get individual support and help with the UniCC Parser Generator and its subsequent modules.
+
+@NEWPAGE@
 
 ++ Contributions to UniCC ++
 

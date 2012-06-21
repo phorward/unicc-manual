@@ -12,7 +12,8 @@ BEGIN		{	FS="#"
 
 				astpath = pwd "/" astfile
 
-				system( "ast_draw/unicc2ast " $2 " \"" $3 "\" " astpath " " $4 )
+				if( !noastgen )
+					system( "ast_draw/unicc2ast " $2 " \"" $3 "\" " astpath " " $4 )
 
 				figtext = ""
 				html = ""
@@ -28,7 +29,7 @@ BEGIN		{	FS="#"
 
 				if( figtext )
 				{
-					html = html "\n<br />" figtext "\n"
+					html = html "\n<br /><b>" figtext "</b>\n"
 				}
 				
 				html = html "</center>"
@@ -45,7 +46,8 @@ BEGIN		{	FS="#"
 
 				astpath = pwd "/" astfile
 
-				system( "ast_draw/mkast " astpath " " $2 )
+				if( !noastgen )
+					system( "ast_draw/mkast " astpath " " $2 )
 				#print "ast_draw/mkast " astpath " " $2
 
 				figtext = ""
@@ -62,7 +64,7 @@ BEGIN		{	FS="#"
 
 				if( figtext )
 				{
-					html = html "\n<br />" figtext "\n"
+					html = html "\n<br /><b>" figtext "</b>\n"
 				}
 				
 				html = html "</center>"
@@ -84,7 +86,7 @@ BEGIN		{	FS="#"
 				html = img( $2, figtext ) "<br />\n"
 
 				if( figtext )
-					html = html figtext "\n"
+					html = html "<b>" figtext "</b>\n"
 				html = html "</center>\n"
 
 				print html
@@ -92,14 +94,14 @@ BEGIN		{	FS="#"
 			}
 
 /FIGURE#/	{
-				print "Fig. " img_count ": " $2 "\n"
+				print "<b>Fig. " img_count ": " $2 "</b>\n"
 				img_count++
 				next
 			}
 			
 /TABLE#/	{
 				print "<center>"
-				print "Table " tab_count ": " $3 "\n"
+				print "<b>Table " tab_count ": " $3 "</b>\n"
 				print "</center>"
 
 				tab_count++
@@ -113,6 +115,11 @@ BEGIN		{	FS="#"
 
 /CENTER/	{
 				print "<center>"
+				next
+			}
+
+/@NEWPAGE@/	{
+				print "<!-- NEW PAGE -->"
 				next
 			}
 

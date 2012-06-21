@@ -9,33 +9,43 @@ To obtain the latest version of the XPL source code presented here, access the M
 ++ Makefile ++
 %!include: ``xpl/Makefile``
 
+@NEWPAGE@
 ++ xpl.par ++
 %!include: ``xpl/xpl.par``
 
+@NEWPAGE@
 ++ xpl.h ++
 %!include: ``xpl/xpl.h``
 
+@NEWPAGE@
 ++ xpl.proto.h ++
 %!include: ``xpl/xpl.proto.h``
 
+@NEWPAGE@
 ++ xpl.debug.c ++
 %!include: ``xpl/xpl.debug.c``
 
+@NEWPAGE@
 ++ xpl.functions.c ++
 %!include: ``xpl/xpl.functions.c``
 
+@NEWPAGE@
 ++ xpl.main.c ++
 %!include: ``xpl/xpl.main.c``
 
+@NEWPAGE@
 ++ xpl.program.c ++
 %!include: ``xpl/xpl.program.c``
 
+@NEWPAGE@
 ++ xpl.run.c ++
 %!include: ``xpl/xpl.run.c``
 
+@NEWPAGE@
 ++ xpl.util.c ++
 %!include: ``xpl/xpl.util.c``
 
+@NEWPAGE@
 ++ xpl.value.c ++
 %!include: ``xpl/xpl.value.c``
 

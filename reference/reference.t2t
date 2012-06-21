@@ -115,6 +115,8 @@ Building a function reference documentation of the Phorward Foundation Libraries
 
 ``` makeall doc
 
+@NEWPAGE@
+
 ++ Invocation and command-line options ++[ref_commandline_parameters]
 
 UniCC primarily provides a command-line interface to invoke the parser generation process.
@@ -149,6 +151,8 @@ Errors and warnings are printed to STDERR, any other kind of output to STDOUT.
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
+
 ++ Code generators ++[ref_codegen]
 
 CENTER
@@ -216,6 +220,8 @@ The entire document type definition (DTD) of the UniCC Parser Description Files 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
+
 ++ Parser construction modes ++[ref_construction_modes]
 UniCC is a flexible parser generator that can handle two different methods to construct its parsers and their lexical analyzators.
 
@@ -320,6 +326,8 @@ int -> '0-9'+ ;
 ```
 
 Any other type of definition is invalid, and will result in a parse error.
+
+@NEWPAGE@
 
 ++ Grammars ++
 Grammars are expressed using rules that describe in which way symbols may appear. The symbols within a grammar define grammatical units in form of //terminal symbols// (terminals) which immediatelly are expected in the input, and //nonterminal symbols// (nonterminals). Nonterminal symbols union one or more grammatical rules, so called //productions// into one "fictive" symbol to be inserted into other productions, or to form the goal symbol. Every symbol (both terminal and nonterminal) in UniCC is always declared by its first use. Its particular description or definition - if required - can be made elsewhere later in the grammar. Symbols without a definition will be reported by UniCC, and maybe stop the further compilation process of the grammar, with a request for correction.
@@ -544,6 +552,7 @@ Terminal anomalies do not raise up in insensitive mode parsers.
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
 +++ Nonterminal symbols +++
 Nonterminal symbols (nonterminals) can be seen as "grammar variables". They always cause a branch to a subsequent grammatical structure within the parse tree, and represent nodes to other nonterminals, which are nodes as usual, or terminals, which are leafs of the tree.
@@ -616,6 +625,7 @@ A similar mechanism can also be implemented within the use of [lexical analyzer 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
 +++ Productions +++
 A production defines a sequence of symbols that is valid in the context the production may appear in. Every production is associated with a nonterminal symbol, a nonterminal symbol in turn is made up of one or multiple productions (see above).
@@ -806,6 +816,7 @@ In some parser generators, this feature is called "embedded actions", but in Uni
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
 ++ Directives ++
 //Directives// are used to configure and influence various behaviors and settings of UniCC according to parsing, rewriting or constructing the grammar and its parse tables. Directives do always begin with a ``#``-symbol (hash), similar to C-preprocessor directives. A special kind of directive are the "top-level directives", which begin with the sequence ``#!``.
@@ -1079,6 +1090,7 @@ More about terminal anomalies can be found in the section [terminal anomalies #r
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
 ++ Special symbols ++[ref_special_symbols]
 UniCC grammars may contain some special terminal and nonterminal symbols under various circumstances. These special symbols begin with an ampersand ``&``, and cannot be expressed in the grammar itself, except the symbol ``&error``. Their meaning and usage is listed in the following table below.
@@ -1095,6 +1107,7 @@ TABLE##Special symbols in UniCC parsers.
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
+@NEWPAGE@
 
 ++ Error recovery ++[ref_error_recovery]
 
