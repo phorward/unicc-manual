@@ -1,0 +1,9 @@
+Required tools for building
+
+- gcc toolchain
+- java 1.6
+- UniCC
+- txt2tags
+- imagemagick
+- pdftk
+

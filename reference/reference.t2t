@@ -20,6 +20,8 @@ Setting up UniCC on Windows is quite simple. There is a downloadabe setup packag
 On Linux, it is recommended to follow the steps described in [the following chapter #ref_compile_from_source] and compile UniCC from source.
 Currently, there is no RPM or similar package available, but may follow soon.
 
+@NEWPAGE@
+
 ++ Building UniCC from source ++[ref_compile_from_source]
 
 UniCC is a product that was entirely established and developed on top of the Phorward Foundation Toolkit (to be more exactly, most parts of the Phorward Foundation Toolkit are having their origin in earlier development stages of the UniCC Parser Generator, but where moved into libraries for usage outside UniCC).
@@ -180,33 +182,33 @@ The entire document type definition (DTD) of the UniCC Parser Description Files 
 %-------------------------------------------------------------------------------
 @NEWPAGE@
 
-++ Parser construction modes ++[ref_construction_modes]
+++ The parser construction modes ++[ref_construction_modes]
 UniCC is a flexible parser generator that can handle two different methods to construct its parsers and their lexical analyzators.
 
-The first and default method is called the //sensitive// parser construction mode. This construction mode is a speciality of UniCC, and gives a maximum of flexibility to implement parsers for nearly any type of context-free language. UniCC analyzes and rewrites the grammar according to several rules influencing whitespace and lexeme detection and separation. The lexical analysis, including whitespace, can be broken down to single input characters to enable full context-free grammars on lexem level this way. Lexical analysis is still done silently, but with the option that there is no direct cut between lexer and parser required.
+The first and defaultly used method is called the //sensitive// parser construction mode. This construction mode is a speciality of UniCC, and gives a maximum of flexibility to implement parsers for nearly any type of context-free language. UniCC analyzes and rewrites the grammar according to several rules influencing whitespace and lexeme detection and separation. The lexical analysis, including the handling of whitespace, is broken down to single input characters enabling full context-free grammars on lexem level. A lexical analysis is still done silently in the background, but with the option that there is no direct cut between lexer and parser required.
 
 The second method, called //insensitive// parser construction mode, always uses one single lexical analyzer that identifies terminal symbols. The difference to the sensitive mode is, that lesser states are produced, because the grammar is not rewritten, and whitespace is directly absorbed within the stage of lexical analysis. Overlapping character-classes can not be used in this mode. This construction mode can be compared to most other parser generators like the one used by the combination of //lex// and //yacc//.
 
 It depends on the requirements of the grammar which construction mode should be used. The specialities on the two construction methods are described below. The construction mode can be changed with the ``#!mode`` top-level directive.
 
 +++ Sensitive mode +++[ref_sensitive_mode]
-The whitespace sensitive parser construction mode gives a maximum of flexibility on whitespace and lexeme construction and their behavior, and is used by default. It is a UniCC-speciality that was never provided by any other parser generator before in this way.
+The whitespace sensitive parser construction mode gives a maximum of flexibility on whitespace and lexeme construction and their behavior, and is the default if no other construction mode is wanted. It is a UniCC-speciality that was never provided by any other parser generator before in this way.
 
-The most common characteristic of this construction mode is, that UniCC entirely rewrites the grammar according to whitespace and lexeme definitions, to make whitespace only valid in selected situations. The definition of whitespace is not limited to one terminal symbol anymore in this mode. The symbol defining whitespace can be a nonterminal described as part of the context-free grammar itself without any limitations. An optional call to this nonterminal is added behind every terminal symbol and in front of the goal symbol during the grammar revision. To disallow whitespace in particular constructs, some nonterminals can be defined as lexemes. They are covered as terminal symbols during grammar revision in order to the whitespace-matching, but can also consist of any context-free grammar.
+The most common characteristic of this construction mode is, that UniCC entirely rewrites the grammar according to whitespace and lexeme definitions, to make whitespace only valid in selected situations. The definition of whitespace is not limited to one terminal symbol anymore in this mode. The symbol defining whitespace can be a nonterminal described as part of the context-free grammar itself without any limitations. An optional call to this nonterminal is added behind every terminal symbol and in front of the goal symbol during the grammar revision process. To disallow whitespace in particular constructs, some nonterminals can be defined as lexemes, and will be covered like terminal symbols during grammar revision in order to the whitespace-matching, but are also made up as part of the context-free grammar.
 
-The advantage of this construction mode is, that whitespace and lexemes can be expressed in a context-free grammar rather than as regular strings matched by the lexical analyzer. The lexical analysis apparently becomes part of the parser with all its possibilites, but the grammar is expressed as whitespace would be handled apart from it. Additionally, the true lexical analyzer can be optionally used to parse the atomic terminals, as part of lexemes or on its own.
+The advantage of this construction mode is, that whitespace and lexemes can be expressed in a much more powerful context-free grammar rather than as regular patterns matched by the lexical analyzer. The lexical analysis apparently becomes part of the parser with all its possibilites, but the grammar is expressed as whitespace would be handled apart from it. Additionally, the true lexical analyzer can be optionally used to parse the atomic terminals, as part of lexemes or on its own.
 
-To make this parsing approach possible, overlapping character terminals are made unique and split up into nonterminals. A lexical analyzer is constructed individually for every LALR state, to only match symbols that are valid in the sensitive context of the given state. Some grammars that use this mode may cause a high number of states and many different lexical analyzers. But it enables the ultimative maximum of flexibility ever provided by a LALR(1) parsed grammar.
+To make this parsing approach possible, overlapping character terminals are made unique and split up into nonterminals. A lexical analyzer is constructed individually for every LALR state, to only match symbols that are valid in the sensitive context of the given state. Some grammars that use this mode may cause a high number of states and many different lexical analyzers. But it enables the ultimative maximum of flexibility ever provided by any LALR(1) parser.
 
 As an example, then following grammar is given.
 
 %!include: ``reference/sensitive.par``
 
-``whitespace`` is configured as whitespace nonterminal here, ``integer`` is a lexem that is triggered as a coherent lexical unit, where not whitespace is allowed within. Using this grammar to parse the input string //18 * 2//, the following syntax tree will be constructed. The nonterminals ``&whitespace*``, ``&whitespace+`` and ``&whitespace`` are automatically inserted by UniCC. Also the symbol ``\t-\n #``, likewise a generated nonternimal symbol, has been inserted by UniCC during character-class separation. Grammars modified by UniCC are heavier to read, but they gain this unique features in flexibility.
+//whitespace// is configured as whitespace nonterminal here, //integer// is a lexem that is triggered as a coherent lexical unit, where not whitespace is allowed within. Using this grammar to parse the input string //18 * 2//, the following syntax tree will be constructed. The nonterminals //&whitespace*//, //&whitespace+// and //&whitespace// are automatically inserted by UniCC. Also the symbol //\t-\n #//, likewise a generated nonternimal symbol, has been inserted by UniCC during character-class separation. Grammars modified by UniCC are heavier to read, but they gain this unique features in flexibility.
 
 GENAST#reference/sensitive.par#18 * 2##Syntax tree of the string "18 * 2" using a sensitively constructed parser.
 
-The underlying, rewritten grammar that is generated by UniCC can be dumped by using the //-G// command-line option.
+The underlying, rewritten grammar that is generated by UniCC can be dumped by using the //-G// [command-line option #ref_commandline_parameters].
 
 +++ Insensitive mode +++[ref_insensitive_mode]
 The whitespace insensitive parser construction mode can be compared to most existing parser generators. It strictly separates the part of the lexical analysis from the parser. Whitespace is only handled and consumed by the lexical analyzer. Every terminal symbol is concerned as a lexical unit standing on its own. The grammar is not rewritten nor modified by UniCC, and results in a faster parser with lesser states.
@@ -217,7 +219,7 @@ Trying to compile above grammar using ``#!mode insensitive;`` will throw some er
 
 %!include: ``reference/insensitive.par``
 
-In insensitive mode, it is only allowed to use one terminal symbol as whitespace. This terminal symbol can be a character-class, a string or a regular expression definition. Nonterminal symbols can't be configured to be used as whitespace. The use of the lexeme-directive becomes effectless, so the former lexem nonterminal ``integer`` must be rewritten to a regular-expression terminal ``@integer`` here.
+In insensitive mode, it is only allowed to use one terminal symbol as whitespace. This terminal symbol can be a character-class, a string or a regular expression definition. Nonterminal symbols can't be configured to be used as whitespace. The use of the lexeme-directive becomes effectless, so the former lexem nonterminal ///integer// must be rewritten to a regular-expression terminal //@integer// here.
 
 Parsing the same expression //18 * 2// yields in the following, much smaller syntax tree. The whitespace handling is not covered by the parser anymore, and is run "silently" in the background within the lexical analyzer.
 
@@ -588,7 +590,9 @@ A similar mechanism can also be implemented within the use of [lexical analyzer 
 +++ Productions +++
 A production defines a sequence of symbols that is valid in the context the production may appear in. Every production is associated with a nonterminal symbol, a nonterminal symbol in turn is made up of one or multiple productions (see above).
 
-Productions can only be defined within a grammar definition block as part of a nonterminal definition, by using a Backus-Naur-Form-compliant syntax. All productions a nonterminal is constructed from are defined on the right of the arrow-sign ``->``, which is the reason why a production is also called //the right-hand side// of a grammatical rule. In turn, the nonterminal it belongs to is called //the left-hand side//. Multiple production definitions on the right-hand side are separated by pipes (``|``), or must be stated into a new grammar definition block.
+Productions can only be defined within a grammar definition block as part of a nonterminal definition, by using a Backus-Naur-Form-compliant syntax. All productions a nonterminal is constructed from are defined on the right of the arrow-sign ``->``, which is the reason why a production is also called //the right-hand side// of a grammatical rule. In turn, the nonterminal it belongs to is called //the left-hand side//.
+
+Multiple production definitions on the right-hand side are separated by pipes (``|``), or must be stated into a new grammar definition block.
 
 ``` nonterm -> hello | world ;
 
@@ -600,7 +604,8 @@ nonterm -> world ;
 ```
 
 When the parser of a defined grammar is executed, it reads terminal-symbols from the input according the sequence rules defined by the grammar's productions. Every symbol (both terminal and nonterminal symbol) is shifted, which means it is consumed and put on a stack when its matched in the input.
-When one production's sequence is exactly met, and all its symbols had been shifted onto the stack, it will be reduced. To reduce a production means, that the parser validated the input according to a production's rules as valid. It then replaces the production's sequence by its left-hand side nonterminal, which is part of the next, subsequent production, or the goal-symbol, which defines the input to be valid and stops the parser. All this shifting and reducing is done on an internal stack within the parser, which holds the current parser state. The parser is oriented on the parse-tables constructed by UniCC. They predict which terminal symbols are valid in the current context and which action should be performed next.
+
+Then, if a sequence of symbols resisting on the stack exactly matches to one production, it will be reduced. In this case, the term //handle// is used, so there is a handle to a production on the stack. To reduce the production means, that the parser validated the input according to a productions rules as valid. It then replaces the productions sequence (the handle) by its left-hand side nonterminal, which is part of the next, subsequent production, or the goal-symbol, which defines the input to be valid and sucessfully terminates the parser. All this shifting and reducing is done on an internal stack within the parser, which is holding the current parser state. The parser is oriented on the parse-tables constructed by UniCC. They predict which terminal symbols are valid in the current context and which action must be performed next.
 
 A production may also exist of no symbol sequence. These productions are called //epsilon productions//. Their appearance performs an immediate reduction of the nonterminal, if no other production mets. This is an example for an nonterminal with two productions. Latter one is an epsilon production.
 
@@ -690,6 +695,8 @@ example$ -> abc 	    [* printf( ">%c<\n", @1 ); *];
 abc      -> 'a' | 'b' | 'c' | ;
 ```
 
+@NEWPAGE@
+
 ++++ Virtual productions ++++
 UniCC provides a virtual production feature, which is very useful to prototype a grammar quickly. Virtual productions are created when the modifiers ``*``, ``+`` and ``?`` are used. These modifiers can be assigned to any symbol, which is virtually turned into a nonterminal with some productions then.
 
@@ -715,6 +722,8 @@ or one could say
 ``` statements_or_null -> statement* ;
 
 Virtual productions have one disadvantage: Their expanding content can't be augmented with semantic code. This is because their most common use is in language prototyping, or in places where no special semantic operations on the input are required. All default semantic action blocks for productions and empty productions are automatically assigned and executed.
+
+@NEWPAGE@
 
 ++++ Anonymous nonterminals ++++[ref_anonymous_nonterminals]
 There are several situations where the grammar developer requires to create a new nonterminal that is only used once to build-up a desired grammatical construct. Other situations require the creation of a nonterminal with only one empty production just to perform semantic tasks within another production __before__ this production is reduced.
@@ -777,7 +786,7 @@ In some parser generators, this feature is called "embedded actions", but in Uni
 @NEWPAGE@
 
 ++ Directives ++
-//Directives// are used to configure and influence various behaviors and settings of UniCC according to parsing, rewriting or constructing the grammar and its parse tables. Directives do always begin with a ``#``-symbol (hash), similar to C-preprocessor directives. A special kind of directive are the "top-level directives", which begin with the sequence ``#!``.
+//Directives// are used to configure and influence various behaviors and settings of UniCC related to the parsing, revision or construction of the grammar and its parse tables. Directives do always begin with a ``#``-symbol (hash), similar to C-preprocessor directives. A special kind of directive are the "top-level directives", which begin with the sequence ``#!``.
 
 Directives may appear anywhere in the grammar definition, except top-level directives, because they modify options and parameters of the fundamental behavior of UniCC or the grammar, which affect any subsequential directive or definition. They must be specified on top of the grammar, but their use is not required (so the default settings for these top-level directives take place).
 
@@ -860,7 +869,7 @@ These are the simplest parser directives, which only have the purpose to store a
 
 All these values are only hold by UniCC and can be inserted into the parser-template or will be written to the XML output file - depending on the desired output code generator.
 
-In the template engine, their values will expand with the template variables @@copyright, @@description, @@parser, @@prefix and @@version.
+In the program-code generator, their values will expand with the template variables @@copyright, @@description, @@parser, @@prefix and @@version.
 
 +++ #prologue, #epilogue +++[ref_prologue_epilogue]
 The ``#prologue`` and ``#epilogue`` directives are used to define any program code that is inserted before and behind the parser implementation in the yielding parser module.
@@ -961,9 +970,9 @@ yields in a revised grammar UniCC outputs as
 
 %!include: ``reference/w_sensitive.out``
 
-which introduces new virtual nonterminals ``&whitespace``, ``&whitespace+``, ``&whitespace*``, ``Hello'`` and ``start'``.
+which introduces new virtual nonterminals //&whitespace//, //&whitespace+//, //&whitespace*//, //Hello'// and //start'//.
 
-But it uses a fully-fledged nonterminal ``whitespace`` which could possibly exist of very flexible, grammatical constructions. The behavior of terminal symbols within the revision can also be influenced by the directives [``#lexeme`` #ref_lexeme], [``#fixate`` #ref_fixate] and [``#lexeme separation`` #ref_lexeme_separation].
+But it uses a fully-fledged nonterminal //whitespace// which could possibly exist of very flexible, grammatical constructions. The behavior of terminal symbols within the revision can also be influenced by the directives [``#lexeme`` #ref_lexeme], [``#fixate`` #ref_fixate] and [``#lexeme separation`` #ref_lexeme_separation].
 
 Whitespace becomes part of the grammar, but its existence is hidden from the semantic actions of the grammar developer. There is no obvious indicator if whitespace handling has been done, this can only be indicated on demand.
 
@@ -998,18 +1007,17 @@ Adding a lexem configuration
 
 to this grammar yields in a different, correct parser, which only accepts the lexeme we want to allow for.
 
-The difference that is done during the automatic revision of the grammar caused by the ``#whitespaces``-directive in combination with the sensitive mode can be made visible using the ``-G`` flag to let UniCC print out the final grammar. The inital version of the revised grammar is this one, if no lexeme configuration is done.
+The difference that is done during the automatic revision of the grammar caused by the ``#whitespaces``-directive in combination with the sensitive mode can be made visible using the ``-G`` command-line flag to let UniCC print out the final grammar. The inital version of the revised grammar is this one, if no lexeme configuration is done.
 
 %!include: ``reference/no_lexeme.out``
 
-The rewritten nonterminals derived from the terminal symbols are extended by their origin symbol name with an appended quote ``'``.
-In this case, the character-class terminals ``'A-Za-z_'`` had been rewritten to a new nonterminal with the name ``A-Za-z_'``, which allows for whitespace behind every character that matches the character-class.
+The rewritten nonterminals derived from the terminal symbols are extended by their origin symbol name with an appended quote ('). In this case, the character-class terminal ``'A-Za-z_'`` is rewritten to a new nonterminal with the name //A-Za-z_'//, which allows for whitespace behind every character that matches the character-class.
 
 The version with lexemes configured will be a little shorter, because UniCC revises not all terminals of the grammar to allow for whitespace.
 
 %!include: ``reference/lexeme.out``
 
-Now, nonterminals ``integer`` and ``ident`` stay on their own, they are not revised. Instead, there is now a nonterminal ``integer'`` and ``ident'`` that allows for whitespace __behind__ the lexeme. With a sharp look to the nonterminals generated to parse the whitespace, it gets more clear that whitespace-related nonterminals are themself some kind of lexeme.
+Now, nonterminals //integer// and //ident// stay on their own, they are not revised. Instead, there is now a nonterminal //integer'// and //ident'// that allows for whitespace __behind__ the lexeme. With a sharp look to the nonterminals generated to parse the whitespace, it gets more clear that whitespace-related nonterminals are themself some kind of lexeme.
 
 It is obvious, that the ``#lexeme`` directive is one of UniCC's most powerful features in the sensitive parser construction mode, because it enables for richer grammatical constructions than any regular language allows for, with the difference that this constructs are handled as they would lexeme taken from the lexical analyzer.
 

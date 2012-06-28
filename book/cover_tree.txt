@@ -1,0 +1,1 @@
+./mkast coverast "UniCC [ LALR(1) [ universal ] Parser Generator [ program-code [ target-language-independent ] XML ] ]"
