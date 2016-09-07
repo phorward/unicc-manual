@@ -4,7 +4,7 @@
 This is the appendix that includes the entire source code of the XPL programming language example from the tutorial.
 To obtain the latest version of the XPL source code presented here, access the Mercurial source repository using
 
-``` hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/xpl
+``` hg clone https://bitbucket.org/codepilot/xpl
 
 ++ Makefile ++
 %!include: ``xpl/Makefile``
