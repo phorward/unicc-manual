@@ -10,7 +10,7 @@ This manual relates to the UniCC Standard C Parser Template, version 1.0, and hi
 ++ Overview ++
 The UniCC Standard C Parser Template enables the UniCC LALR(1) Parser Generator to support the C programming language in its program module generator. Using this template, UniCC is capable to generate parsers expressed in the C programming language from a UniCC Grammar Definition. The template also provides facilities for further grammar processing and integration of the generated parser modules with other C modules.
 
-For now, there is no other programming language template available. Phorward Software Technologies aims to provide more Standard Parser Templates for UniCC targetting other programming languages in future. If there is an interest in [contributing #tpl_contributions] adapted parser template to make UniCC's taget language range more richer than like now, check out the respective chapter.
+For now, there is no other programming language template available. If there is an interest in [contributing #tpl_contributions] adapted parser template to make UniCC's taget language range more richer than like now, check out the respective chapter.
 
 The UniCC Standard C Parser Template is also used by UniCC itself for bootstrap, meaning that UniCC constructs its own parser out of itself.
 
@@ -33,16 +33,6 @@ Below is the feature set the UniCC Standard C Parser Template provides.
 - Symbol and production tables for debug and syntax tree construction
 - Provides a default parser test environment if no semantic code is given
 - Dynamic end-of-file behavior
-
-
-%-------------------------------------------------------------------------------
-%-------------------------------------------------------------------------------
-%-------------------------------------------------------------------------------
-
-++ License ++
-The UniCC Standard C Parser Template is licensed under the BSD open source license.
-
-The BSD license differs from the Artistic License that is used by UniCC itself, but it is compatible with it. This decision has been done to make the use of the parser template and its derivative works (every parser generated using this template is a derivate of the original template) also possible in other combinations, including proprietary software. The license terms are printed on top of the UniCC Standard C Parser Template, C.tlt.
 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------

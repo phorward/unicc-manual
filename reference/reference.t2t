@@ -17,27 +17,25 @@ Due the target-language independency of the UniCC parser generator and its parse
 
 Setting up UniCC on Windows is quite simple. There is a downloadabe setup package on the offical [UniCC product website http://unicc.phorward-software.com] hostet at Phorward Software Technologies. The setup package contains both the 64-bit or 32-bit binary versions of UniCC, which can be installed as wanted. The system runs out of the box after installation. It only has to be arranged with the favorized compiler and/or IDE that is used for productive usage.
 
-On Linux, it is recommended to follow the steps described in [the following chapter #ref_compile_from_source] and compile UniCC from source.
-Currently, there is no RPM or similar package available, but may follow soon.
+On Linux or other Unix-derivates, it is recommended to follow the steps described in [the following chapter #ref_compile_from_source] and compile UniCC from source.
 
 @NEWPAGE@
 
 ++ Building UniCC from source ++[ref_compile_from_source]
 
-UniCC is a product that was entirely established and developed on top of the Phorward Foundation Toolkit (to be more exactly, most parts of the Phorward Foundation Toolkit are having their origin in earlier development stages of the UniCC Parser Generator, but where moved into libraries for usage outside UniCC).
+UniCC is a software that was entirely established and developed on top of the Phorward Toolkit.
 
-The Phorward Foundation Toolkit and its library //libphorward// provide many useful functions for general purpose and extended software-development tasks, including standard data structures, a system-independent interface, extending data types and regular expression management functions, required by UniCC to construct the lexical analyzers.
+The Phorward Toolkit and its library //libphorward// provide many useful functions for general purpose and extended software-development tasks, including standard data structures, a system-independent interface, extending data types and regular expression management functions, required by UniCC to construct the lexical analyzers.
 
-The Phorward Foundation Libraries are released under the BSD License, more information can be obtained from the official product website at http://phorward.phorward-software.com.
+The Phorward Toolkit is released under the BSD License, more information can be obtained from the official product website at http://phorward-software.com.
 
-Before UniCC, can be built, ensure that the Phorward Foundation Toolkit is installed in its latest version.
+Before UniCC can be built, ensure that the Phorward Toolkit is installed in its latest version.
 
 Getting the latest version is simple using the Mercurial SCM with
 
-``` hg clone http://phorward.hg.sourceforge.net:8000/hgroot/phorward/phorward
+``` hg clone https://bitbucket.org/codepilot/phorward
 
-Alternatively, download a release package of the desired version from the [Phorward Foundation Libraries product website http://phorward.phorward-software.com].
-After cloning or extracting, change into the created directory and run
+then, change into the cloned directory and run
 
 ```
 ./configure
@@ -46,16 +44,15 @@ make install
 ```
 
 After that, clone the following repositories. They provide the UniCC Parser Generator and XPL, a demonstration of a tiny programming language implementation written with UniCC.
-These packages can also be obtained from the official [UniCC website http://unicc.phorward-software.com].
 
 ```
-hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/unicc
-hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/xpl
+hg clone https://bitbucket.org/codepilot/unicc
+hg clone https://bitbucket.org/codepilot/xpl
 ```
 
 Optionally, if hacking the UniCC Standard C Parser Template is wanted, clone
 
-``` hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/Cparser
+``` hg clone https://bitbucket.org/codepilot/cparser
 
 also.
 
@@ -67,13 +64,17 @@ make
 make install
 ```
 
-If the UniCC bootstrapping toolchain is wanted to be enabled, configure with
+After UniCC was successfully built and installed, ``xpl`` can be compiled out of the box without any configuration script.
+
+If the UniCC bootstrapping toolchain is wanted, configure UniCC with
 
 ``` ./configure --with-bootstrap
 
 this will bootstrap the UniCC grammar parser with multiple generation states.
 
-After UniCC was successfully built and installed, ``xpl`` can be compiled out of the box without any configuration script.
+When bootstraping toolchain is enabled, it is additionally required to install the min_lalr1 parser generator. This program can be obtained with
+
+``` hg clone https://bitbucket.org/codepilot/min_lalr1
 
 @NEWPAGE@
 
