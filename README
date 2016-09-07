@@ -5,5 +5,5 @@ Required tools for building
 - UniCC
 - txt2tags
 - imagemagick
-- pdftk
-
+- pdftk-bin
+- htmldoc

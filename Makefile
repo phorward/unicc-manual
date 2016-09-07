@@ -18,6 +18,7 @@ UNICC_SRC	=	$(UNICC_MAIN) \
 UNICC_IMG	=	reference/*.png
 
 UNICC_PDF	=	output/pdf/unicc.pdf
+UNICC_PDF_R	=	output/pdf/unicc.raw.pdf
 UNICC_PDF_H	=	output/pdf/unicc.pdf.html
 
 UNICC_HTML	=	output/html/unicc.html
@@ -37,10 +38,11 @@ backup:
 	tar cvf ../manual.tar ../manual
 
 $(UNICC_PDF): $(UNICC_PDF_H)
-	htmldoc -t pdf14 --book --linkstyle plain --linkcolor 0000A0 \
+	HTMLDOC_DATA=/usr/share/htmldoc/ htmldoc -t pdf14 --book --linkstyle plain --linkcolor 0000A0 \
 		--header .t. --no-title --duplex --browserwidth 1024 \
 			--toclevels 4 --no-jpeg -f $@.tmp $(UNICC_PDF_H)
 	pdftk book/front.pdf $@.tmp book/back.pdf cat output $@
+	#convert -density 300 book/front.pdf $@.tmp book/back.pdf $@
 	rm -f $@.tmp
 
 $(UNICC_PDF_H): $(UNICC_SRC)
