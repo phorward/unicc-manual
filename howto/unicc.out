@@ -1,5 +1,5 @@
 $ unicc -v dates.par
-UniCC version: 1.0
+UniCC version: 1.2
 Parsing grammar...Done
 Parser construction mode: sensitive
 Goal symbol detection...Succeeded

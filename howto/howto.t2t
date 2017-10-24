@@ -63,7 +63,7 @@ FIGURE#Construction of parse tree from the string ``321``
 
 From this parse-process and the structure, how the input string is absorbed by the parser, the following visualized recursion tree is constructed.
 
-AST#"integer'" [ integer [ integer [ integer [ 3 ] 2 ] 1 ] ]#Parse tree derived from the input "321" (simplyfied)
+AST#"integer'" [ integer [ integer [ integer [ 3 ] 2 ] 1 ] ]#Parse tree derived from the input "321" (simplified)
 
 This structure is called the //parse tree// of the input, where the input is broken down into its grammatical structure created by the parser. Due the left-recursion of our simple grammar, the tree grows left-leaning, because the leftmost, recursive call to nonterminal //integer// results in a new branch each level. As you can see, all leafs of the parse tree are terminal symbols.
 It is also possible to write right-leaning trees, but in the LALR parse algorithm, right-recursive grammars require much more parse stack usage than leftmost ones while the parser analyzes the input. Parser stack usage should always be kept low, and this is the case in leftmost grammars.
@@ -84,8 +84,7 @@ The date grammar definition will simply be:
 #whitespaces   ' \t';
 #lexeme        integer;
 
-date$          -> month integer ',' integer
-               ;
+date$          -> month integer ',' integer ;
 
 month          -> "January"
                | "February"
@@ -101,9 +100,7 @@ month          -> "January"
                | "December"
                ;
 
-integer        -> '0-9'
-               | integer '0-9'
-               ;
+integer        -> '0-9' | integer '0-9' ;
 ```
 
 This is a valid UniCC grammar definition. Instead of the first, simple grammar definition, this grammar can be fed to UniCC as it is, and produces a working parser.
@@ -146,12 +143,9 @@ Here, the grammar's goal symbol, which was ``date`` until now, must be replace w
 #whitespaces   ' \t';
 #lexeme        integer title;
 
-appointment$   -> date title
-               | title date
-               ;
+appointment$   -> date title | title date ;
 
-title          -> '"' !'"'* '"'
-               ;
+title          -> '"' !'"'* '"' ;
 
 date           -> month integer ',' integer
                | integer '.' integer '.' integer
@@ -172,9 +166,7 @@ month          -> "January"
                | "December"
                ;
 
-integer        -> '0-9'
-               | integer '0-9'
-               ;
+integer        -> '0-9' | integer '0-9' ;
 ```
 
 You see, that we have quickly extended the original grammar for simple dates to match a small language, that allows for entering appointments with a date in several formats.
@@ -214,7 +206,7 @@ virtual2       -> !'"'
                ;
 ```
 
-You can see: Much lesser efforts in writing the grammar by reaching the same effect, right?
+As you can see, there is much lesser effort in writing the grammar by reaching the same effect.
 
 @NEWPAGE@
 
@@ -226,15 +218,15 @@ Since the first line of UniCC was written, one of its major design goals had bee
 
 UniCC provides two different parser generation target approaches. The first approach is a static, build-in code-generator working with a so called //parser code template//. This code-generator is a build-in part of UniCC and allows to directly turn a UniCC grammar definition into a program written in the syntax of a particular programming language. Because UniCC itself is written in C, its build-in code-generator is also optimized to generate parsers in C-similar, procedural-oriented languages. Hence there is only one parser template for C parsers yet, UniCC's build-in code-generator can only output C parsers for now.
 
-But for an //really// target-language independent approach, UniCC provides a secondary way for generating a parser, which is a parser description file. This file is expressed in an XML-language and includes much information on the grammar, its symbols, the parser and lexer states and the parser behavior itself. Using this type of output, third-party code-generators or other related software can be used to build or analyze parsers according to their specialized area using UniCC as their parser-generator.
+But for an //real// target-language independent approach, UniCC provides a secondary way for generating a parser, which is a parser description file. This file is expressed in an XML-language and includes much information on the grammar, its symbols, the parser and lexer states and the parser behavior itself. Using this type of output, third-party code-generators or other related software can be used to build or analyze parsers according to their specialized area using UniCC as their parser-generator.
 
 In this and the following chapters, we only rely UniCC's build-in code-generator. Because the C parser template, which is delivered with UniCC is the most stable and widely used one, we implement parsers in this manual only in C. You can easily adapt the knowledge from here to other languages when using other parser templates or code-generators in combination with UniCC. The examples we will deal with are hold simple, so even those of you who have no experience in C will understand them with ease. What is needed to run the examples in this manual is an installed C or C++ compiler, e. g. gcc on Linux.
 
-General build order for parsers implemented using UniCC is the following, once your grammar is written and stored into a file.
+The general build order for parsers implemented using UniCC is the following, once your grammar is written and stored into a file.
 
-# Compile (generate) the grammar using UniCC into a parser
-# Compile or run the generated parser with the particular compiler your parser is written for (not required if your language is interpretered!)
-# Run the resulting program
+- Compile (generate) the grammar using UniCC into a parser
+- Compile or run the generated parser with the particular compiler your parser is written for. This step is usually not required if your target language is interpretered!
+- Run the resulting program, either in binary form or via the interpreter.
 
 
 Using specialized code-generation tools e.g. which use the parser definition file feature may use another approach, in order they call UniCC or use a subsequent call to a generator which builds the output file for a particular programming language or solution.
@@ -253,7 +245,7 @@ If UniCC reports //errors//, these must be fixed. If errors are reported, this a
 
 Some //warnings// are normal in the daily use of UniCC. Warnings can normally be ignored, because the reference to automatically fixed grammar ambiguities or default mechanisms taking place if they where not explicitly defined. If you want to suppress all warnings, run UniCC without the ``-w`` or ``--warnings`` option. Using the ``-v`` or ``--verbose`` option, UniCC outputs some processing informations and grammar statistics.
 
-%!include: ``howto/unicc.out``
+%!include: ``unicc.out``
 
 To get an overview about all supported command-line options, run ``unicc`` without any parameters. There is also a section abount [command-line parameters #ref_commandline_parameters] in the reference manual.
 
@@ -544,13 +536,13 @@ The key elements for lazy grammar writers are the parser configuration directive
 
 Such an grammar would be the following, when we try to compile it.
 
-%!include: ``howto/conflicts.par``
+%!include: ``conflicts.par``
 
 @NEWPAGE@
 
 When this grammar is fed to UniCC using the ``-w`` command line switch, we get many lines with the following warnings:
 
-%!include: ``howto/conflicts.out``
+%!include: ``conflicts.out``
 
 This is caused due the ambiguity of the grammar, which comes up in the nonterminal definition of ``expression``. This ambiguity can be visualized when analyzing the expression //1+2+3//. Because our grammar defines each operator production as ``expression operator expression`` and ``expression`` itself can exists of such a composition again, the grammar allows for parsing it as //(1+2)+3// and as //1+(2+3)//, which results in completely different parse trees. It is correct, that the order of the operators in additions doesn't care, but what about //1+2*3//? Here, again, the grammar from above allows both for //(1+2)*3// and //1+(2*3)//, but only latter one is a valid result we want to accept.
 
@@ -572,7 +564,7 @@ AST#e [ e [ e [ e [ e [ e [ int [ 1 ] ] ] [ + ] [ e [ e [ int [ 2 ] ] ] [ / ] [ 
 
 Adding this precedence directives to above grammar, we'll get its unambiguous pendant.
 
-%!include: ``howto/expression.par``
+%!include: ``expression.par``
 
 This will parse and calculate the correct values, including all precedence relations.
 
@@ -581,7 +573,7 @@ This will parse and calculate the correct values, including all precedence relat
 %-------------------------------------------------------------------------------
 @NEWPAGE@
 
-++ Implementing a programming language ++
+++ Implementing a programming language ++[howto_xpl]
 
 Now that we have learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called eXample Programming Language, shortened XPL, and is a C-styled language.
 
@@ -598,15 +590,15 @@ The language should match the following requirements:
 
 We first don't care about how to execute this programming language. First it is only a draft for a syntax describing the language grammar. A simple example to rudely define the syntax of XPL shall be the 99-bottles-of-beer programming example.
 
-%!include: ``xpl/99bottles.prg``
+%!include: ``../xpl/99bottles.prg``
 
 +++ Source code downloads +++
 
-All source code presented in the following sections is not covered in detail, but it is a working example for a programming language implemented entirely with the UniCC language development system. To obtain the latest version of the XPL source code presented here, access the Mercurial source repository using
+All source code presented in the following sections is not covered in detail, but it is a working example for a programming language implemented entirely with the UniCC language development system. To obtain the latest version of the XPL source code presented here, clone the source repository:
 
-``` hg clone http://unicc.hg.sourceforge.net:8000/hgroot/unicc/xpl
+``` git clone https://github.com/phorward/xpl.git
 
-The source code printed here can also be found in the [appendix #appendix1] or as a downloadable tarball on the [Phorward Software website  http://unicc.phorward-software.com].
+The source code printed here can also be found in the [appendix #appendix1].
 
 @NEWPAGE@
 
@@ -614,7 +606,7 @@ The source code printed here can also be found in the [appendix #appendix1] or a
 
 The plain grammar of the language is described below. This intermixes already known grammar constructs like lexemes with some new features that had not been covered for now.
 
-%!include: ``xpl/xpl_draft.par``
+%!include: ``../xpl/xpl_draft.par``
 
 @NEWPAGE@
 
@@ -635,13 +627,13 @@ This definition introduces two terminal symbols, ``@string`` and ``@identifier``
 
 The first of the above regular expressions describe a terminal ``@string``, that begins with a double quotation mark ``'"'``, a sequence of zero or multiple characters except a quotation mark (``!'"'*``), and a closing double quotation mark ``'"'``. The second regular expression describes a terminal ``@identifier`` which is made of at least one character that may be in the upper- and lower-case letters or underscore (``'A-Za-z_``), and zero or multiple characters that are made up of upper-/lower-case letters, digits and underscores. This regular expression pattern matches for strings like ``a``, ``Hello``, ``_test`` or even ``i22``, but not for ``22`` on its own, which should be recognized as an integer number by the grammar. More about the use of regular expressions and their making up is covered in the [UniCC reference guide #ref_terminal_regex].
 
-++++ Overwriting production precedence ++++
+++++ Overriding production precedence ++++
 
 The second new feature that is used here but has not covered yet is the production
 
 ``` '-' expression              #precedence '*'
 
-This special ``#precedence`` directive sets a higher precdecence level to the production to overwrite its default precedence that is associated with the substraction-operator (``-``) to the precedence of the multiplication-operator ``*``. This configuration is done to allow for an unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result, because substraction is below multiplication in the operator precedence order. Setting the production precedence to the level of the multiplication-operator (or higher), it is parsed the correct way as //(-2)*4//.
+This special ``#precedence`` directive sets a higher precedence level to the production to overwrite its default precedence that is associated with the substraction-operator (``-``) to the precedence of the multiplication-operator ``*``. This configuration is done to allow for an unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result, because substraction is below multiplication in the operator precedence order. Setting the production precedence to the level of the multiplication-operator (or higher), it is parsed the correct way as //(-2)*4//.
 
 ++++ Multiple left-hand sides ++++
 
@@ -739,7 +731,7 @@ typedef struct
 
 To work with these value objects, a functions library is implemented in ``xpl.value.c``.
 
-%!include: ``xpl/xpl.value.c``
+%!include: ``../xpl/xpl.value.c``
 
 @NEWPAGE@
 
@@ -837,11 +829,11 @@ typedef struct
 
 To build-up the program structure, we also require some modification functions in ``xpl.program.c`` and a function ``xpl_emit()`` to emit the virtual machine code.
 
-%!include: ``xpl/xpl.program.c``
+%!include: ``../xpl/xpl.program.c``
 
 And for debug purposes, we want to get a visible representation of the compiled program. This can be done with a program dump function that is implemented in ``xpl.debug.c``.
 
-%!include: ``xpl/xpl.debug.c``
+%!include: ``../xpl/xpl.debug.c``
 
 ++++ xpl_fn: Integrating some useful functions ++++
 
@@ -851,7 +843,7 @@ The build-in functions in XPL are also described in one structure, ``xpl_fn``. T
 
 All build-in functions, some service functions and an array holding the functions as a symbol table is stated in ``xpl.functions.c``.
 
-%!include: ``xpl/xpl.functions.c``
+%!include: ``../xpl/xpl.functions.c``
 
 ++++ xpl_runtime - the runtime data structure ++++
 
@@ -887,7 +879,7 @@ typedef struct
 
 Finally, the virtual machine is implemented into ``xpl.run.c`` as function ``xpl_run()``.
 
-%!include: ``xpl/xpl.run.c``
+%!include: ``../xpl/xpl.run.c``
 
 @NEWPAGE@
 
@@ -994,6 +986,6 @@ Please note, that this change has its origin in the way how we want to produce o
 
 The final version of our grammar turning it into an XPL compiler is this one.
 
-%!include: ``xpl/xpl.par``
+%!include: ``../xpl/xpl.par``
 
-The entire, compile- and executable source code of the XPL project can be found in [appendix 1 #appendix1] of this manual.
+The full, compileable and executable sourcecode of XPL can be found in [appendix 1 #appendix1] of this manual or on the web.

@@ -3,13 +3,21 @@
 
 ++ Welcome to UniCC! ++
 
-UniCC, standing as an acronym for //universal compiler-compiler//, is a powerful LALR(1) parser generator and language development system for computer professionals. Its design-goal is to serve as an all-round design and build tool assisting compiler-writers in any parsing-related task, including production-quality compiler construction and the implementation of domains specific languages.
+UniCC, standing as an acronym for //universal compiler-compiler//, is a powerful parser generator and language development system for computer professionals. Its design-goal is to serve as an all-round tool for both design and building. It should assist compiler-writers in any parsing-related task, including production-quality compiler construction and the implementation of domains specific languages.
 
-UniCC unions an integrated generator for lexical analyzers and a powerful LALR(1) parser generator into one software solution. The programming interface of UniCC is a rich, extendable and innovative EBNF-based grammar definition language (Extended-Backus-Naur-Form). This language gives the compiler-developer's task much more comfort and simplicity in implementing parsers than ever before. It comes with useful features for both grammar prototyping and design, parser optimization, semantic augmentation and parser programming. Lexical symbols can be directly defined within productions, right-hand side items can be referenced by meaningful names within semantic actions, instead of only their offsets. Features like virtual- and embedded-productions finally help to rapidly build-up iterative and optional grammatical structures. Standard features like automatic conflict resolution, terminal and production precedence association, state compression as well as parser trace and behavior modification trough semantic actions round up the whole system.
+**Flexible grammar prototyping and parser definition**
 
-By default, UniCC constructs whitespace-sensitive parsers. This paradigm is a speciality of UniCC and causes an internal revision of the grammar according to rules that match whitespace only under certain circumstances. Whitespace handling will be performed by the parser rather than the lexer. The advantage of this approach is, that the entire power of a LALR(1) grammar can be used for creating very complex lexemes or whitespace constructs. If this feature is not required by a grammar, it can be switched off, resulting in smaller parse tables and faster parsers.
+UniCC unions both a generator for lexical analyzers and a parser generator into one handy software solution. The programming interface of UniCC is an easy-to-use, extended Backus-Naur-Form-based grammar definition language. This language gives the compiler-developer's task much more comfort and simplicity in implementing parsers than ever before.
 
-UniCC is technically a target language independent parser generator, which means that it is not bound to a special programming language. Currently, only support of the C programming language is given due the UniCC Standard C Parser Template. More standard templates for other languages like C++ and Java will be developed and released in future by Phorward Software Technologies, but are not available for now.
+This grammar definition language comes with useful features for grammar prototyping, parser optimization, semantic augmentation and semantic programming. Lexical symbols can be directly defined within productions, right-hand side items can be referenced by meaningful names within semantic actions, instead of only their offsets. Features like virtual- and embedded-productions finally help to rapidly build-up iterative and optional grammatical structures. Standard features like automatic conflict resolution, terminal and production precedence association, state compression as well as parser trace and behavior modification trough semantic actions are self-evident.
+
+**Lexical analysis on a context-free level**
+
+By default, UniCC constructs whitespace-sensitive parsers. This paradigm is a speciality of UniCC and causes an internal revision of the grammar according to rules that match whitespace only under certain circumstances. In this case, the whitespace handling will be performed by the parser rather than the lexer, enabling to use the entire power of a context-free grammar for creating complex token structures or whitespace constructs. If this feature is not required by a grammar, it can be switched off, resulting in smaller parse tables and faster parsers.
+
+**One parser generator, multiple targets**
+
+By design, UniCC serves as a target language independent parser generator. This means that it is not bound to emit parsers in a specific programming language and limited to it. Currently, only full support of the C programming language is given by the UniCC Standard C Parser Template.
 
 Next to the generation of parser program modules in a particular programming language, UniCC also offers the possibility to export all the grammar information, its parse tables, semantic actions and settings extracted from a UniCC parser definition into a target-independent XML-based output format that can be handled by any individual subsequent tasks or module - specialized code-generators, analyzers, or direct interpreters.
 
@@ -17,19 +25,19 @@ Next to the generation of parser program modules in a particular programming lan
 
 ++ The intention behind UniCC ++
 
-The UniCC Parser Generator has its origin at //Phorward Software Technologies// and is initially written and maintained by its 1985 born core developer //Jan Max Meyer//.
+The UniCC Parser Generator has its origin at //Phorward Software Technologies// and is initially written and maintained by //Jan Max Meyer//. Phorward Software Technologies is a one-man business from Dortmund, Germany, providing expertise in the area of parsing, compiler construction and systems programming.
 
-Phorward Software Technologies is a software-company from Dortmund, Germany, which focuses its business on compiler construction, scripting languages and software development tools, both in the area of open source and commercial solutions.
+The initial intention behind UniCC was the development of a high-portable solution for parsers developments that is flexible enough to fit many different demands and creates parsers that can be compiled and run on almost any platform.
 
-%UniCC designates to be as one of the flagship-products of Phorward Software, and is the result for the request to an lightweight, simple, but flexible and platform-independent parser development system. UniCC is the base platform and compiler for many other compiler-related projects launched by Phorward Software Technologies, and will hopefully also be used by many other interesting software-projects in future.
+The actually planned reference implementation for a UniCC-compiled parser was //RapidBATCH// version 6. RapidBATCH is a scripting language - formerly for Windows operating systems only - that was quite popular between 2001 and 2007. Due to the lack of time and some personal differences, RapidBATCH 6 sadly never came to an end, but it was reborn as an open source project in 2017. Nevertheless, UniCC and its underlying toolkit library //libphorward// was continued over the years, and is used in several proprietary software projects spreading over a wide array of platforms, including Linux, AIX, Solaris and Windows.
 
-To get more information on Phorward Software Technologies and our projects and products, visit http://www.phorward-software.com on the web.
+To get more information on Phorward Software Technologies and our projects and products, visit https://phorward.info on the web.
 
 @NEWPAGE@
 
-++ A few words on this manual ++
+++ Some words on this manual ++
 
-Parsing and compiler-construction is on of the most complex, on the first view tight-looking, but even fascinating and challenging topic of computer sciences. The knowledge and experience teached by this topic can be integrated into many software development issues of a programmer's everyday life and opens new possibilities and faster ways to success.
+Parsing and compiler-construction is on of the most complex, on the first view tight-looking, but even fascinating and challenging topic of computer science. The knowledge and experience teached by this topic can be integrated into many software development issues of a programmer's everyday life and opens new possibilities and faster ways to success.
 
 Some readers of this manual would have already taken some experience on this complex topic, maybe from a study on computer sciences, a business-related project that used some kind of programming or definition language or a private approach of writing a compiler for an domain-specific programming task. Rather others don't have any knowledge yet, but want to know how things work or require knowledge for an upcoming project.
 
@@ -45,21 +53,26 @@ The UniCC User Manual is divided into four sections:
 - The fourth section provides information about the Standard C Parser Template delivered with the UniCC software package. It should be mostly attended by C programmers who want to develop parsers with UniCC targeting the C programming language. There will be more sections or separate manuals like this one for other target languages, e.g. C++ or Java, as soon as they are implemented and well tested.
 
 
-Hopefully, this manual answers all of your questions coming up when UniCC shall become the workhorse of your upcoming compiler project. If not, don't be afraid to drop a mail, to get individual support and help with UniCC and its subsequent modules.
+Hopefully, this manual answers most of the questions coming up when UniCC shall become the workhorse of your upcoming project requiring a compiler or parser to be implemented. If not, don't be afraid to drop a mail or issue on https://github.com/phorward/unicc.
 
 @NEWPAGE@
-++ The future of UniCC ++
+%!postproc(html) '¹' '<sup>1</sup>'
 
-UniCC consists currently of two open source projects:
+++ UniCC is free software! ++[free_software]
 
-- The //UniCC LALR(1) Parser Generator//, which has its product website located under http://unicc.phorward-software.com/.
-- The //UniCC Standard C Parser Template// (C.tlt), which is part of the UniCC software package, but also a project on its own. This project also has its own website located under http://cparser.phorward-software.com/.
+UniCC is a modularized software and made up from several open source projects:
+
+- //[libphorward https://github.com/phorward/phorward]// is the base library and toolchain providing much of UniCC's functionality¹. It is written in C, and especially the computations for the lexical analysis is done here.
+- The //[parser generator https://github.com/phorward/unicc]// itself, which does all stuff related to the LALR parse table computation, grammar revision and code generation.
+- The //[C parser template #stdcparser]// enables the parser generator to directly emit parsers as C program code. Its source code lives at https://github.com/phorward/Cparser. The parser generator uses the C parser template to bootstrap its own grammar parser out of itself.
 
 
-UniCC uses its Standard C Parser Template to bootstrap its own parser out of itself. To compile UniCC, the newest version of the //Phorward Toolkit// (http://phorward.phorward-software.com) is required. The Phorward Toolkit serves as a toolchain and C programming framework for software projects written at Phorward Software Technologies. There is also an how-to guide about [how to build UniCC from source #ref_compile_from_source] within this manual.
+All projects are distributed under the terms and conditions of the BSD-license.
 
-In September 2016, four years after the first official release of UniCC version 1.0, we decided that UniCC gets the development status of being "feature complete" and to discontinue this project. So no more active development on UniCC is done by Phorward Software Technologies for now and in the future. But we wanted to leave this project in a good state, not only because it is a good running software. Therefore, there was an update on UniCC to version 1.1 now in 2016. The manual has been updated, and also a license terms change from the Artistic License 2.0 to the more flexible BSD license was done. The reason for discontinuing UniCC was, that our initial ideas and concepts, the reasons why we built UniCC in the past, have changed and where not achieved. Anyway, much of the knowledge that flow into UniCC also influenced other projects, e.g. the further development of the Phorward Toolkit, which can be seen as the inofficial successor of UniCC, althought it follows different approaches.
+To build UniCC from its sourcecode, there is also an how-to guide about [how to build UniCC from source #ref_compile_from_source] within this manual. Any contribution to UniCC and its related tools and libraries, be it code, bugfixes, parser templates, ideas, enhancement proposals or documentation are always welcome. Help is also appreciated in form of support, advertising or just by using it :-).
 
-This does not mean that UniCC is death. Any contribution to UniCC are always welcome. Code, fixes, features, enhancements and documentation contributions to the UniCC project are always accepted, if they are in favor of the general public. Help is also appreciated in form of support and advertise.
 
-Please contact us if you have any interest in contribution or maintenance.
+
+---------------
+
+¹ //libphorward// does also provide tools for parser construction and abstract syntax tree processing. These tools are currently in an under development state, but may result as the base for an upcoming UniCC version 2 in future.

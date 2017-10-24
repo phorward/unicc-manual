@@ -1,4 +1,4 @@
 
-+ Appendix II: The UniCC Document Type Definition (DTD) +[appendix2]
++ Appendix II: unicc.dtd +[appendix2]
 
-%!include: ``appendix2/unicc.dtd.man``
+%!include: ``unicc.dtd.man``

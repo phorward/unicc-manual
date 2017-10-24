@@ -26,7 +26,7 @@ UNICC_HTML	=	output/html/unicc.html
 UNICC_TXT	=	output/text/unicc.txt
 
 #all: $(UNICC_HTML) $(UNICC_PDF) $(UNICC_TXT)
-all: $(UNICC_PDF) $(UNICC_TXT)
+all: $(UNICC_PDF)
 
 clean:
 	rm -f $(UNICC_HTML)
@@ -38,7 +38,7 @@ backup:
 	tar cvf ../manual.tar ../manual
 
 $(UNICC_PDF): $(UNICC_PDF_H)
-	HTMLDOC_DATA=/usr/share/htmldoc/ htmldoc -t pdf14 --book --linkstyle plain --linkcolor 0000A0 \
+	htmldoc -t pdf14 --book --linkstyle plain --linkcolor 0000A0 \
 		--header .t. --no-title --duplex --browserwidth 1024 \
 			--toclevels 4 --no-jpeg -f $@.tmp $(UNICC_PDF_H)
 	pdftk book/front.pdf $@.tmp book/back.pdf cat output $@

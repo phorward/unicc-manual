@@ -1,51 +1,52 @@
 
-+ Appendix I: The XPL programming language +[appendix1]
++ Appendix I: eXample Programming Language +[appendix1]
 
-This is the appendix that includes the entire source code of the XPL programming language example from the tutorial.
-To obtain the latest version of the XPL source code presented here, access the Mercurial source repository using
+This is the appendix that includes the full source code of the XPL programming language from the tutorial.
 
-``` hg clone https://bitbucket.org/codepilot/xpl
+To obtain the latest copy of the source code presented here, clone the source repository with
+
+``` git clone https://github.com/phorward/xpl.git
 
 ++ Makefile ++
-%!include: ``xpl/Makefile``
+%!include: ``../xpl/Makefile``
 
 @NEWPAGE@
 ++ xpl.par ++
-%!include: ``xpl/xpl.par``
+%!include: ``../xpl/xpl.par``
 
 @NEWPAGE@
 ++ xpl.h ++
-%!include: ``xpl/xpl.h``
+%!include: ``../xpl/xpl.h``
 
 @NEWPAGE@
 ++ xpl.proto.h ++
-%!include: ``xpl/xpl.proto.h``
+%!include: ``../xpl/xpl.proto.h``
 
 @NEWPAGE@
 ++ xpl.debug.c ++
-%!include: ``xpl/xpl.debug.c``
+%!include: ``../xpl/xpl.debug.c``
 
 @NEWPAGE@
 ++ xpl.functions.c ++
-%!include: ``xpl/xpl.functions.c``
+%!include: ``../xpl/xpl.functions.c``
 
 @NEWPAGE@
 ++ xpl.main.c ++
-%!include: ``xpl/xpl.main.c``
+%!include: ``../xpl/xpl.main.c``
 
 @NEWPAGE@
 ++ xpl.program.c ++
-%!include: ``xpl/xpl.program.c``
+%!include: ``../xpl/xpl.program.c``
 
 @NEWPAGE@
 ++ xpl.run.c ++
-%!include: ``xpl/xpl.run.c``
+%!include: ``../xpl/xpl.run.c``
 
 @NEWPAGE@
 ++ xpl.util.c ++
-%!include: ``xpl/xpl.util.c``
+%!include: ``../xpl/xpl.util.c``
 
 @NEWPAGE@
 ++ xpl.value.c ++
-%!include: ``xpl/xpl.value.c``
+%!include: ``../xpl/xpl.value.c``
 

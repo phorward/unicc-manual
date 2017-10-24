@@ -13,11 +13,11 @@ Additionally, a parser definition file can contain operational programming code 
 
 Due the target-language independency of the UniCC parser generator and its parser definition language, a parser definition file can also contain additional information called //tags//. These tags can be defined globally or associated with various grammatical objects. Use of this feature is in the interest of subsequent, from UniCC detached tasks which perform operations on the output of UniCC and the use this additional information for various purposes or results.
 
-++ Setting up UniCC ++
+% ++ Setting up UniCC ++
 
-Setting up UniCC on Windows is quite simple. There is a downloadabe setup package on the offical [UniCC product website http://unicc.phorward-software.com] hostet at Phorward Software Technologies. The setup package contains both the 64-bit or 32-bit binary versions of UniCC, which can be installed as wanted. The system runs out of the box after installation. It only has to be arranged with the favorized compiler and/or IDE that is used for productive usage.
+% Setting up UniCC on Windows is quite simple. There is a downloadabe setup package on the offical [UniCC product website http://unicc.phorward-software.com] hostet at Phorward Software Technologies. The setup package contains both the 64-bit or 32-bit binary versions of UniCC, which can be installed as wanted. The system runs out of the box after installation. It only has to be arranged with the favorized compiler and/or IDE that is used for productive usage.
 
-On Linux or other Unix-derivates, it is recommended to follow the steps described in [the following chapter #ref_compile_from_source] and compile UniCC from source.
+% On Linux or other Unix-derivates, it is recommended to follow the steps described in [the following chapter #ref_compile_from_source] and compile UniCC from source.
 
 @NEWPAGE@
 
@@ -27,13 +27,13 @@ UniCC is a software that was entirely established and developed on top of the Ph
 
 The Phorward Toolkit and its library //libphorward// provide many useful functions for general purpose and extended software-development tasks, including standard data structures, a system-independent interface, extending data types and regular expression management functions, required by UniCC to construct the lexical analyzers.
 
-The Phorward Toolkit is released under the BSD License, more information can be obtained from the official product website at http://phorward-software.com.
+The Phorward Toolkit is released under the BSD License, more information can be obtained from the official product website at https://phorward.info.
 
 Before UniCC can be built, ensure that the Phorward Toolkit is installed in its latest version.
 
 Getting the latest version is simple using the Mercurial SCM with
 
-``` hg clone https://bitbucket.org/codepilot/phorward
+``` git clone https://github.com/phorward/phorward.git
 
 then, change into the cloned directory and run
 
@@ -43,16 +43,16 @@ make
 make install
 ```
 
-After that, clone the following repositories. They provide the UniCC Parser Generator and XPL, a demonstration of a tiny programming language implementation written with UniCC.
+After that, clone the following repositories. They provide the UniCC Parser Generator and XPL, the demonstration of a tiny C-style programming language implementation written with UniCC.
 
 ```
-hg clone https://bitbucket.org/codepilot/unicc
-hg clone https://bitbucket.org/codepilot/xpl
+git clone https://github.com/phorward/unicc.git
+git clone https://github.com/phorward/xpl.git
 ```
 
 Optionally, if hacking the UniCC Standard C Parser Template is wanted, clone
 
-``` hg clone https://bitbucket.org/codepilot/cparser
+``` git clone https://github.com/phorward/Cparser.git
 
 also.
 
@@ -71,10 +71,6 @@ If the UniCC bootstrapping toolchain is wanted, configure UniCC with
 ``` ./configure --with-bootstrap
 
 this will bootstrap the UniCC grammar parser with multiple generation states.
-
-When bootstraping toolchain is enabled, it is additionally required to install the min_lalr1 parser generator. This program can be obtained with
-
-``` hg clone https://bitbucket.org/codepilot/min_lalr1
 
 @NEWPAGE@
 
@@ -129,14 +125,14 @@ The //program-module generator// is the default code generator that is used by U
 The standard C parser template provided with UniCC is a parser template of such kind. It gives UniCC the ability to build parsers written in the C programming language which can be compiled after generation without any further modification. If more parser templates will exist somewhere in the future, UniCC will also be capable to generate program-modules for parsers written in other programming languages, like C++, C#, Java, Pascal, Fortran or anything else.
 
 Given the very simple grammar
-%!include: ``reference/simple.par``
+%!include: ``simple.par``
 
 UniCC constructs a C program that consists of more than 1000 lines of code using the program-module generator in combination with the standard C parser template. This output source can directly be passed to a standard C/C++ compiler like //gcc// without any further modification.
 
 %This is the output program module:
-%%!include: ``reference/simple.c``
+%%!include: ``simple.c``
 %And this is the related header-file, in case of the [UniCC standard C parser template#stdcparser]:
-%%!include: ``reference/simple.h``
+%%!include: ``simple.h``
 
 +++ The XML-based parser description generator +++[ref_codegen_descfile]
 The //parser description generator// outputs an XML-based representation of the generated parser. This parser description file contains the LALR(1) parse tables, tables for the lexical analyzer, conditioned semantic code, a structured listing of all symbols and productions with all of its tagged information, the original parser definition source and any warning or error messages produced by UniCC during the parser construction process.
@@ -146,10 +142,10 @@ Third-party programs can work on this information to generate individual parser 
 To trigger the parser description generator, UniCC must be run with the //-x// or //-X// command-line option. //-x// runs both the program-module generator and the parser description generator, //-X// will only run the parser description generator.
 
 With the very simple grammar from above,
-%!include: ``reference/simple.par``
+%!include: ``simple.par``
 
 UniCC causes to build a grammar definition file like this when using the parser description file generator:
-%!include: ``reference/simple.xml``
+%!include: ``simple.xml``
 
 All semantic code parts and their macros and variables are split into several tags which can be easily adapted, modified or enhanced.
 For example, the following production definition
@@ -203,7 +199,7 @@ To make this parsing approach possible, overlapping character terminals are made
 
 As an example, then following grammar is given.
 
-%!include: ``reference/sensitive.par``
+%!include: ``sensitive.par``
 
 //whitespace// is configured as whitespace nonterminal here, //integer// is a lexem that is triggered as a coherent lexical unit, where not whitespace is allowed within. Using this grammar to parse the input string //18 * 2//, the following syntax tree will be constructed. The nonterminals //&whitespace*//, //&whitespace+// and //&whitespace// are automatically inserted by UniCC. Also the symbol //\t-\n #//, likewise a generated nonternimal symbol, has been inserted by UniCC during character-class separation. Grammars modified by UniCC are heavier to read, but they gain this unique features in flexibility.
 
@@ -218,7 +214,7 @@ The disadvantage of this parser construction mode is, that the whitespace-sensit
 
 Trying to compile above grammar using ``#!mode insensitive;`` will throw some errors because this grammar uses features that can only be handled in insensitive mode.
 
-%!include: ``reference/insensitive.par``
+%!include: ``insensitive.par``
 
 In insensitive mode, it is only allowed to use one terminal symbol as whitespace. This terminal symbol can be a character-class, a string or a regular expression definition. Nonterminal symbols can't be configured to be used as whitespace. The use of the lexeme-directive becomes effectless, so the former lexem nonterminal ///integer// must be rewritten to a regular-expression terminal //@integer// here.
 
@@ -498,11 +494,11 @@ When using the [whitespace sensitive parser construction mode #ref_sensitive_mod
 
 The following example defines a grammar that generates this kind of conflict.
 
-%!include: ``reference/anomaly.par``
+%!include: ``anomaly.par``
 
 If this is compiled with ``unicc -w``, the following warnings are raising up.
 
-%!include: ``reference/anomaly.out``
+%!include: ``anomaly.out``
 
 UniCC detects these conflicts by testing suspicious nonterminals against all regular expression-based terminals. These messages declare, that the input for //ELSE// and //ENDIF// is both recognized by the nonterminal ``ident`` and their relating string terminals, defining them as keywords. Due to UniCCs build-in terminal precedence leveling, the string terminals will always take a higher precedence than the character-class terminals, but maybe the grammar developer gets an unwanted parse result. This warning helps to detect and fix this issue.
 
@@ -913,17 +909,17 @@ The ``#left``, ``#right`` and ``#nonassoc`` directives set associativity and pre
 
 Depending on the left- or right-associativity configuration, the syntax tree grows left- or right-leaning. This can be visualized with two simple grammars and their related syntax trees on the input expression //1+2+3+4;//.
 
-%!include: ``reference/left.par``
+%!include: ``left.par``
 GENAST#reference/left.par#1+2+3+4;#-semantics#Syntax tree of input "1+2+3+4;" in a left-leaning configuration.
 
 Now the opposite using the ``#right`` directive.
 
-%!include: ``reference/right.par``
+%!include: ``right.par``
 GENAST#reference/right.par#1+2+3+4;#-semantics#Syntax tree of input "1+2+3+4;" in a right-leaning configuration.
 
 Multiple calls of these directives cause higher precedence leveling, so it is necessary to perform multiple calls of ``#left`` to build-up a pecedence/associativity matrix for, e.g. expressions. All symbols passed to the first ``#left`` directive call get a precedence level of 1, all symbols passed to the second ``#left`` call get a precedence level of 2, and so on.
 
-%!include: ``reference/assoc.par``
+%!include: ``assoc.par``
 
 GENAST#reference/assoc.par#1*2+3;#-semantics#Syntax tree with association precedences.
 
@@ -935,7 +931,7 @@ The ``#precedence``-directive is a special-case directive. It is the only kind o
 
 Given a grammar, that allows for both an ary and unary minus. Correct precedence associaton has already been done for ``+``, ``-``, ``*`` and ``/``.
 
-%!include: ``reference/no_prec.par``
+%!include: ``no_prec.par``
 
 Let this parser run with the expression //-2*3//, it will produce this incorrect parse tree.
 
@@ -965,11 +961,11 @@ If ``#whitespaces`` is used in [sensitive mode #ref_construction_modes] (default
 
 For example, the simple grammar
 
-%!include: ``reference/w_sensitive.par``
+%!include: ``w_sensitive.par``
 
 yields in a revised grammar UniCC outputs as
 
-%!include: ``reference/w_sensitive.out``
+%!include: ``w_sensitive.out``
 
 which introduces new virtual nonterminals //&whitespace//, //&whitespace+//, //&whitespace*//, //Hello'// and //start'//.
 
@@ -990,7 +986,7 @@ The ``#lexeme`` directive can only be used within the [sensitive parser construc
 
 Given is this example grammar:
 
-%!include: ``reference/no_lexeme.par``
+%!include: ``no_lexeme.par``
 
 When this grammar is passed to UniCC, it will produce a parser that allows to parse statements like
 
@@ -1010,13 +1006,13 @@ to this grammar yields in a different, correct parser, which only accepts the le
 
 The difference that is done during the automatic revision of the grammar caused by the ``#whitespaces``-directive in combination with the sensitive mode can be made visible using the ``-G`` command-line flag to let UniCC print out the final grammar. The inital version of the revised grammar is this one, if no lexeme configuration is done.
 
-%!include: ``reference/no_lexeme.out``
+%!include: ``no_lexeme.out``
 
 The rewritten nonterminals derived from the terminal symbols are extended by their origin symbol name with an appended quote ('). In this case, the character-class terminal ``'A-Za-z_'`` is rewritten to a new nonterminal with the name //A-Za-z_'//, which allows for whitespace behind every character that matches the character-class.
 
 The version with lexemes configured will be a little shorter, because UniCC revises not all terminals of the grammar to allow for whitespace.
 
-%!include: ``reference/lexeme.out``
+%!include: ``lexeme.out``
 
 Now, nonterminals //integer// and //ident// stay on their own, they are not revised. Instead, there is now a nonterminal //integer'// and //ident'// that allows for whitespace __behind__ the lexeme. With a sharp look to the nonterminals generated to parse the whitespace, it gets more clear that whitespace-related nonterminals are themself some kind of lexeme.
 
@@ -1080,11 +1076,11 @@ TABLE##Special symbols in UniCC parsers.
 
 Requirements to modern parsers and compilers expect, that a parse error on wrong input don't causes a final stop of the parser or compiler. As many errors as possible should be reported to the user before a correction of the input and a re-compilation process is invoked. UniCC parsers normally stop on invalid input, respective a parse error. To get a parse error resynchronized and continue parsing, the special symbol ``&error`` can be used within the grammar.
 
-%!include: ``reference/error.par``
+%!include: ``error.par``
 
 Error resynchronization means that the error is handled by the grammar and its semantic actions rather than the parser. In the above example, the parser will, in case of a parse error, try to pop as many items off the parse stack until it finds the error resynchronization token, ``&error``. This is shifted then, and the parser comes into a new, valid state that is covered by the grammar, so the production with the error state takes place. The parse error had been recovered, respective it is not a parse error anymore. By modifiying the actions in the semantic action of a error state, error messages can still be forced and errors counted, as it is done in above example. But the parser continues, and will output correct values on wrong input, e.g. "2*5+x".
 
-%!include: ``reference/error.out``
+%!include: ``error.out``
 
 ``&error`` can be used on several positions, so it is also possible to report errors with it or to silently fix them and let the parser continue. It must be mentioned, that the way how parse errors and the error synchronization token is handled relies on the used target language parser template, and is not a direct feature of the UniCC Parser Generator itself.
 
