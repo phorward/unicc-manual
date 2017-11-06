@@ -409,9 +409,10 @@ Some examples in C:
 
 In various target languages, the semantic action code of regular expression terminals may be the source for memory leaks if they are used faulty. Depending on the used parser target language template and the parser mode, the semantic part of a regular expression terminal can be executed multiple times, to allow for semantic symbol selections, but also to extract semantic values from the input, as shown above. For such cases, every parser template sets some variables or pre-processor directives to turn-off areas within the semantic code which may cause memory problems. The documentation of the particular UniCC parser target language template should handle this topic.
 
-+++++ #greedy, #non-greedy: Defining greedyness +++++
-Terminal symbols based on regular expressions can be defined to work //greedy// or //non-greedy//, relating to their behavior during the process of lexical analysis.
-UniCC automatically defines a terminal that uses the character-class ``.`` for any character as non-greedy. The greedyness can also be overwritten and explicitly defined using the terminal symbol configuration directives ``#greedy`` and ``#non-greedy``.
++++++ Defining the greedyness (#greedy, #non-greedy) +++++
+Terminal symbols based on regular expressions can be defined to be in a //greedy// or //non-greedy// configuration,  relating to their behavior during the process of the lexical analysis.
+
+UniCC automatically switches a regular expression terminal that uses the dot-wildcard (``.``, for matching any character) as non-greedy. The greedyness can also be explicitly set or overridden using the terminal symbol configuration directives ``#greedy`` and ``#non-greedy``.
 
 To describe the problem, the following grammar is used.
 
@@ -429,23 +430,18 @@ To describe the problem, the following grammar is used.
                 [* printf( "int %s\n", @> ); *]
                 ;
 
-
-start$ -> @int ;
+start$          -> @int ;
 ```
 
-There is a whitespace definition for comments reading
-
-``` "/*" .* "*/"
-
-This definition will cause a regular expression terminal reading a comment that begins with ``/*`` and ends with ``*/``. The ``.*`` defines none or several characters of any kind. In this special case, UniCC switches the nonterminal ``@WHITESPACE`` to be non-greedy, due to the use of the ``.`` placeholder.
+There is a whitespace definition for comments reading ``"/*" .* "*/"``. This definition will result in a regular expression terminal matching a comment that begins with ``/*`` and ends with ``*/``. The ``.*`` defines "none or multiple characters of any kind". In this special case, UniCC switches the nonterminal ``@WHITESPACE`` to be non-greedy, due to the use of the dot-placeholder (``.``).
 
 Now, using the input
 
 ``` 3 /* Hello */ 4 /* World */ 5
 
-One would expect, that ``3``, ``4`` and ``5`` are returned by the above grammar, and the comments are ignored. A non-greedy configuration of ``@WHITESPACE``, as it is automatically set by UniCC in this example would do this. But a "greedy" configuration of ``@WHITESPACE`` would only return ``3`` and ``5``, because a comment that is ``/* Hello */ 4 /* World */`` will be identified. This first ``*/`` is also recognized in greedy-mode terminals, but the lexical analyzer will scan further until it (maybe) gets a second ``*/``.
+one would expect, that ``3``, ``4`` and ``5`` are returned by the above grammar, and the comments are ignored. A non-greedy configuration of ``@WHITESPACE``, as it is automatically set by UniCC in this example would correclty do this. Nevertheless, a "greedy" configuration of ``@WHITESPACE`` only return ``3`` and ``5``, because a comment that is ``/* Hello */ 4 /* World */`` is identified. This first ``*/`` is also recognized in greedy-mode terminals, but the lexical analyzer will scan further until it (maybe) gets a second ``*/``, which is the case here. Sometimes, this behavior is wanted, sometimes it is not.
 
-To enable full control about if such regular expression-based terminals are configured to be greedy or non-greedy, UniCC offers the directives ``#greedy`` and ``#nongreedy``, that had been mentioned above.
+Finally it depends on the grammar writer how it should be handled. To enable full control about if such regular expression-based terminals are configured to be greedy or non-greedy, UniCC offers the directives ``#greedy`` and ``#nongreedy``, that had been mentioned above.
 
 Changing above definition of ``@WHITESPACE`` to be read as
 
@@ -456,8 +452,7 @@ Changing above definition of ``@WHITESPACE`` to be read as
                 ;
 ```
 
-Would scan up the way in the second, greedy case. ``#greedy`` and ``#non-greedy`` are attached right before the definition's end marker (``;``) but behind possible semantic code.
-Switchting terminals to be greedy or non-greedy may cause entirely different parse trees and results, so that the use of this tool should only be done carefully.
+Would scan up the way in the second, greedy case. ``#greedy`` and ``#non-greedy`` are attached right before the definition's end marker (``;``) but behind possible semantic code. Switching terminals to greedy or non-greedy may result in entirely different parse trees and results, so that the use of this tool should only be done carefully.
 
 +++++ Semantic terminal determination +++++[ref_semantic_terminal_determination]
 UniCC supports a possibility to perform semantic terminal determination in lexical semantic actions. This possibility is well implemented and tested, but has some caveats to know about when used in the sensitive parser construction mode in combination with programming languages that don't have an automatic memory management (like C). It is more secure to use the method of [semantic nonterminal determination #ref_semantic_nonterminal_determination] as described below, which has no disadvantages according to the lexical way. So this topic is only shortly discussed here, and it is advised to use the nonterminal way of semantic terminal determination.

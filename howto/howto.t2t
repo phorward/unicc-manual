@@ -1,9 +1,9 @@
 
 + Constructing parsers with UniCC +
 
-++ What does 'parsing' mean? ++
+++ Parsing - a developers everyday task ++
 
-Parsing is required in many situations of a software developers everyday business. Information is fed to a program and must be analyzed, sometimes with a more or less logical structure. Information can be a data dump in a character separated file, the command-line parameters of a program, a stream of data in various formattings, an XML-file or another type of file with a logical, meaningful structure, and input syntax - maybe even a program source code written in a programming language.
+Parsing is required in many situations. Information is fed to a program and must be analyzed, sometimes with a more or less logical structure. Information can be a data dump in a character separated file, the command-line parameters of a program, a stream of data in various formattings, an XML-file or another type of file with a logical, meaningful structure, and input syntax - maybe even a program source code written in a programming language.
 
 This syntax can be analyzed and verified for correctness using a special type of program task: A parser. This parser is used to analyze a sequence of input data and produces a logical interpretation of this data according to an underlying grammar, which describes the data's valid syntax - rules that express this data in its logical way. If the syntax a parser follows is not matched, the information is useless or error-prone and cannot be processed by subsequent tasks that rely on the correctness of the parsed information.
 
@@ -210,17 +210,17 @@ As you can see, there is much lesser effort in writing the grammar by reaching t
 
 @NEWPAGE@
 
-++ Building a working parser ++
+++ Building parsers with UniCC ++
 
 UniCC is a parser generator. This means that is generates parsers from such as the above shown grammar definitions into an adequate, simplified parser representation. UniCC parses grammar definitions, performs some revisions on it, constructs the parse tables and lexical analyzers, which are required by the underlying parser driver to match the defined grammar and produces some output. In terms of a compiler-writer, UniCC is nothing else than a compiler to compile grammars into parsers. So this is also the reason why UniCC is used to compile its own grammar during its build.
 
 Since the first line of UniCC was written, one of its major design goals had been to be universal, related to the parsers it outputs: UniCC is not bounded to one or a special set of programming language a UniCC-compiled parser can be written in. UniCC is //target-language independent//, which means that the parsers it outputs could be implemented in any programming language a parser template or code generator is provided for.
 
-UniCC provides two different parser generation target approaches. The first approach is a static, build-in code-generator working with a so called //parser code template//. This code-generator is a build-in part of UniCC and allows to directly turn a UniCC grammar definition into a program written in the syntax of a particular programming language. Because UniCC itself is written in C, its build-in code-generator is also optimized to generate parsers in C-similar, procedural-oriented languages. Hence there is only one parser template for C parsers yet, UniCC's build-in code-generator can only output C parsers for now.
+UniCC provides two different parser generation target approaches. The first approach is a static, build-in code-generator working with a so called //parser code template//. This code-generator is a build-in part of UniCC and allows to directly turn a UniCC grammar definition into a program written in the syntax of a particular programming language. For now, UniCC ships with support for C and Python as target languages, but more targets can easily be adapted, actually without modifying a single line of UniCCs own sourcecode.
 
-But for an //real// target-language independent approach, UniCC provides a secondary way for generating a parser, which is a parser description file. This file is expressed in an XML-language and includes much information on the grammar, its symbols, the parser and lexer states and the parser behavior itself. Using this type of output, third-party code-generators or other related software can be used to build or analyze parsers according to their specialized area using UniCC as their parser-generator.
+As a total approach for target-language independency, UniCC provides a secondary way for emitting a parser. This is a parser description file. Such a file is expressed in an XML-based document and includes much information on the grammar, its symbols, the parsing states and lexical recogniziers and the parser behavior as well. Using this type of output, third-party code-generators or other related software can be used to build or analyze parsers according to their specialized task using UniCC as an universal front-end.
 
-In this and the following chapters, we only rely UniCC's build-in code-generator. Because the C parser template, which is delivered with UniCC is the most stable and widely used one, we implement parsers in this manual only in C. You can easily adapt the knowledge from here to other languages when using other parser templates or code-generators in combination with UniCC. The examples we will deal with are hold simple, so even those of you who have no experience in C will understand them with ease. What is needed to run the examples in this manual is an installed C or C++ compiler, e. g. gcc on Linux.
+In the upcoming and the following chapters, we only rely on the build-in code-generator. Because the C parser template, which is delivered with UniCC is the most stable and widely used one, we implement parsers in this guide in C. You can easily adapt the knowledge from here to other languages when using other target languages. The examples we will deal with are hold simple, so even those of you who have no experience in C will understand them with ease. What is needed to run the examples in this manual is an installed C or C++ compiler, e. g. gcc on Linux.
 
 The general build order for parsers implemented using UniCC is the following, once your grammar is written and stored into a file.
 
@@ -293,7 +293,7 @@ ok
 
 @NEWPAGE@
 
-++ Writing compilers ++
+++ Parsing semantics ++
 
 With above examples, we only created parsers that match valid and reject invalid input. Based upon the above grammar for parsing dates, it can now be simply turned it into a real compiler.
 
@@ -356,7 +356,7 @@ date$           -> month integer:day ',' integer:year
                 ;
 ```
 
-from above, so we are able to access ``month``, ``day`` and ``year`` over their meaningful names instead of their position offsets. There is no label specified for ``month`` because UniCC automatically associates the nonterminal's name with an right-hand side value specifier. This default can be overwritten by defining it manually, as its done with ``day`` and ``year``.
+from above, so we are able to access ``month``, ``day`` and ``year`` over their meaningful names instead of their position offsets. There is no label specified for ``month`` because UniCC automatically associates the nonterminal's name with an right-hand side value specifier. This default can be overidden by defining it manually, as its done with ``day`` and ``year``.
 
 By using the position offsets, the same result could be reached by writing
 
@@ -573,17 +573,15 @@ This will parse and calculate the correct values, including all precedence relat
 %-------------------------------------------------------------------------------
 @NEWPAGE@
 
-++ Implementing a programming language ++[howto_xpl]
+++ Implementing a comiler ++[howto_xpl]
 
-Now that we have learned to know how to implement simple expressions using UniCC, it's time to implement an example of real programming language. The programming language should be called eXample Programming Language, shortened XPL, and is a C-styled language.
+Now that we have learned to know how to implement simple expressions using UniCC, it's time to implement a real-world example of a toy programming language. This toy language is called eXample Programming Language, shortened XPL, and is a C-styled language.
 
-The language should match the following requirements:
+The language should match the following criteria:
 
-- A typeless language
-- Arithmetic and conditional expressions
-- Support of integer, floating point and string values
-- Simple control structures (conditionals, iterations)
-- Variable assignments
+- Dynamically typed language, supporting integer, floating point and string values
+- Support of arithmetic and conditional expressions
+- Simple control structures for conditionals and iterations
 - Nested calls to build-in functions with variable arguments
 - The functions should provide simple data manipulation routines and input/output facilities
 
@@ -592,9 +590,9 @@ We first don't care about how to execute this programming language. First it is 
 
 %!include: ``../xpl/99bottles.prg``
 
-+++ Source code downloads +++
++++ Getting the sources +++
 
-All source code presented in the following sections is not covered in detail, but it is a working example for a programming language implemented entirely with the UniCC language development system. To obtain the latest version of the XPL source code presented here, clone the source repository:
+All the source code presented in the following sections is not covered in detail, but it is a working example for a programming language implemented entirely using UniCC. To obtain the latest version of the XPL source code presented here, clone the source repository:
 
 ``` git clone https://github.com/phorward/xpl.git
 
@@ -602,7 +600,7 @@ The source code printed here can also be found in the [appendix #appendix1].
 
 @NEWPAGE@
 
-+++ Drafting the Grammar +++
++++ Drafting the grammar +++
 
 The plain grammar of the language is described below. This intermixes already known grammar constructs like lexemes with some new features that had not been covered for now.
 
@@ -623,7 +621,7 @@ The first, new feature used here is the definition block
                     ;
 ```
 
-This definition introduces two terminal symbols, ``@string`` and ``@identifier``. These terminal symbols are made of regular expressions. Regular expressions are some kind of formal language to describe a way in which characters or character-classes, words and sentences may appear in the input to match the corresponding terminal symbol and give this string sequence a semantic meaning. All terminal symbols in UniCC, the already known character-classes and strings, are some kind of regular expressions. These terminals can be defined where they are used, but regular expressions may be defined that complex and powerful, that they require their own definition block.
+These two blocks introduce two terminal symbols, ``@string`` and ``@identifier``. These terminal symbols are made of regular expressions. Regular expressions are some kind of formal language to describe a way in which characters or character-classes, words and sentences may appear in the input to match the corresponding terminal symbol and give this string sequence a semantic meaning. All terminal symbols in UniCC, the already known character-classes and strings, are some kind of regular expression. These terminals can be defined where they are used, but regular expressions may be defined that complex and powerful, that they require their own definition block.
 
 The first of the above regular expressions describe a terminal ``@string``, that begins with a double quotation mark ``'"'``, a sequence of zero or multiple characters except a quotation mark (``!'"'*``), and a closing double quotation mark ``'"'``. The second regular expression describes a terminal ``@identifier`` which is made of at least one character that may be in the upper- and lower-case letters or underscore (``'A-Za-z_``), and zero or multiple characters that are made up of upper-/lower-case letters, digits and underscores. This regular expression pattern matches for strings like ``a``, ``Hello``, ``_test`` or even ``i22``, but not for ``22`` on its own, which should be recognized as an integer number by the grammar. More about the use of regular expressions and their making up is covered in the [UniCC reference guide #ref_terminal_regex].
 

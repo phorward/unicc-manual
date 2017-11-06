@@ -13,7 +13,7 @@ Terminal anomaly detection...Done
 Constructing lexical analyzer...Done
 Detecting default rules...Done
 Code generation target: C (default)
-Invoking code generator...[UniCC Standard C Template, v1.0]...Done
+Invoking code generator...[UniCC Standard C Template, v1.1]...Done
 
 dates.par produced 36 states (0 errors, 0 warnings), 2 files
 $ 

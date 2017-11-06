@@ -17,9 +17,9 @@ By default, UniCC constructs whitespace-sensitive parsers. This paradigm is a sp
 
 **One parser generator, multiple targets**
 
-By design, UniCC serves as a target language independent parser generator. This means that it is not bound to emit parsers in a specific programming language and limited to it. Currently, only full support of the C programming language is given by the UniCC Standard C Parser Template.
+By design, UniCC serves as a target language independent parser generator. Therefore, it is not bound or limited to emit parsers written in one special kind of target programming language. For now, UniCC fully supports C and Python as target languages. More targets are planned. Support for new or different target programming languages can be done with minimal effort, because every code generation target is specified in an XML-based template file which can easily be adapted for other languages.
 
-Next to the generation of parser program modules in a particular programming language, UniCC also offers the possibility to export all the grammar information, its parse tables, semantic actions and settings extracted from a UniCC parser definition into a target-independent XML-based output format that can be handled by any individual subsequent tasks or module - specialized code-generators, analyzers, or direct interpreters.
+Next to emitting parsers in a particular programming language, UniCC also offers the possibility to export all the grammar information, the parse tables, lexical recognizers, semantic actions and settings extracted from a UniCC parser definition into an independent, XML-based output format that can be handled by any individual subsequent tasks or module, like optimizing code-generators, analyzers, or direct parser interpreters.
 
 @NEWPAGE@
 
@@ -60,19 +60,15 @@ Hopefully, this manual answers most of the questions coming up when UniCC shall 
 
 ++ UniCC is free software! ++[free_software]
 
-UniCC is a modularized software and made up from several open source projects:
+Since 2016 and version 1.1, UniCC, the parser generator, its build tools and its supported target language templates are released and distributed under the terms and conditions of the 3-clause BSD license. Everybody is permitted to obtain, use, copy, modify and share the program and its sourcecode freely and without any charges. Since 2017, the main development of UniCC is done on GitHub, where the sourcecode, a bug tracker, a wiki and more resources remain. The official URL is **https://github.com/phorward/unicc**. Since version 1.2 in 2017, all parts of UniCC, including the C parser template sources, the Python parser template and the minimal parser generator //min_lalr1// that is used for bootstrapping, are unioned into one single sourcecode repository. So no more partitioning of the sourcecodes is done anymore into several source repos, which was done before also for different licensing reasons.
 
-- //[libphorward https://github.com/phorward/phorward]// is the base library and toolchain providing much of UniCC's functionality¹. It is written in C, and especially the computations for the lexical analysis is done here.
-- The //[parser generator https://github.com/phorward/unicc]// itself, which does all stuff related to the LALR parse table computation, grammar revision and code generation.
-- The //[C parser template #stdcparser]// enables the parser generator to directly emit parsers as C program code. Its source code lives at https://github.com/phorward/Cparser. The parser generator uses the C parser template to bootstrap its own grammar parser out of itself.
+The UniCC parser generator makes heavy use of the toolchain provided by the //Phorward Toolkit//, shortly also called //libphorward//. It is the base library and backend toolchain implementing much of the functionality¹ provided by UniCC. It is written in C, and especially the computations for the lexical analysis is done here. UniCC itself does all the stuff related to the parse table computation, grammar revision, code generation and finally the implementation of parsers working on the generated tables. libphorward is also released and distributed under the 3-clause BSD license, but developed separately from it. You can find its sourcecode, help and resources on GitHub at **https://github.com/phorward/phorward**
 
+To build UniCC from its sourcecode, there is also an how-to guide about [how to build UniCC from source #ref_compile_from_source] within this manual. Any contribution to UniCC and its related tools and libraries, be it code, bugfixes, parser templates, ideas, enhancement proposals or documentation are always welcome. Help is also appreciated in form of support, advertising or just by using it.
 
-All projects are distributed under the terms and conditions of the BSD-license.
-
-To build UniCC from its sourcecode, there is also an how-to guide about [how to build UniCC from source #ref_compile_from_source] within this manual. Any contribution to UniCC and its related tools and libraries, be it code, bugfixes, parser templates, ideas, enhancement proposals or documentation are always welcome. Help is also appreciated in form of support, advertising or just by using it :-).
-
+Thank you!
 
 
 ---------------
 
-¹ //libphorward// does also provide tools for parser construction and abstract syntax tree processing. These tools are currently in an under development state, but may result as the base for an upcoming UniCC version 2 in future.
+¹ //libphorward// does also provide tools for parser construction and abstract syntax tree processing. These tools are currently in an unprecise development state, but maybe result as the source base for an upcoming UniCC version 2 in future.
