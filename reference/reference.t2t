@@ -3,7 +3,7 @@
 
 ++ Overview ++
 
-The UniCC parser generator is a software program that compiles augmented parser definitions into program-modules of a higher programming language or optionally into a structured, not further targetted parser description file.
+The UniCC parser generator is a software that compiles augmented parser definitions into program-modules of a higher programming language or optionally into a structured, not further targetted parser description file.
 
 A parser definition analyzed by UniCC is an UTF-8-ASCII formatted textfile that generally contains definitions for //terminal symbols//, //nonterminal symbols// and //productions// to describe a context-free grammar. These definitions are expressed in a Backus-Naur-Form-styled notation, but with many powerful extensions and the possibility of integrated semantic code segments.
 
@@ -21,17 +21,17 @@ Due the target-language independency of the UniCC parser generator and its parse
 
 @NEWPAGE@
 
-++ Building UniCC from source ++[ref_compile_from_source]
+++ Building from source ++[ref_compile_from_source]
 
-UniCC is a software that was entirely established and developed on top of the Phorward Toolkit.
+UniCC was entirely established and developed on top of the Phorward Toolkit.
 
 The Phorward Toolkit and its library //libphorward// provide many useful functions for general purpose and extended software-development tasks, including standard data structures, a system-independent interface, extending data types and regular expression management functions, required by UniCC to construct the lexical analyzers.
 
-The Phorward Toolkit is released under the BSD License, more information can be obtained from the official product website at https://phorward.info.
+The Phorward Toolkit is released under the BSD License. More information can be obtained from the official product website at https://phorward.info, or on GitHub (https://github.com/phorward/phorward).
 
 Before UniCC can be built, ensure that the Phorward Toolkit is installed in its latest version.
 
-Getting the latest version is simple using the Mercurial SCM with
+Getting the latest version is simple. Using git, type
 
 ``` git clone https://github.com/phorward/phorward.git
 
@@ -43,18 +43,12 @@ make
 make install
 ```
 
-After that, clone the following repositories. They provide the UniCC Parser Generator and XPL, the demonstration of a tiny C-style programming language implementation written with UniCC.
+After that, clone the following repositories. They provide the UniCC Parser Generator and XPL, the demonstration of a C-style toy programming language done with UniCC.
 
 ```
 git clone https://github.com/phorward/unicc.git
 git clone https://github.com/phorward/xpl.git
 ```
-
-Optionally, if hacking the UniCC Standard C Parser Template is wanted, clone
-
-``` git clone https://github.com/phorward/Cparser.git
-
-also.
 
 Change into the directory ``unicc`` and, again run
 
@@ -64,17 +58,17 @@ make
 make install
 ```
 
-After UniCC was successfully built and installed, ``xpl`` can be compiled out of the box without any configuration script.
+After UniCC was successfully build and installed, ``xpl`` can be compiled out of the box without any configuration script.
 
 If the UniCC bootstrapping toolchain is wanted, configure UniCC with
 
 ``` ./configure --with-bootstrap
 
-this will bootstrap the UniCC grammar parser with multiple generation states.
+this will bootstrap the UniCC grammar parser with multiple generation states. Please do also check the README.md files of both libphorward and UniCC to get more information and build and setup.
 
 @NEWPAGE@
 
-++ Invocation and command-line options ++[ref_commandline_parameters]
+++ Command-line options ++[ref_commandline_parameters]
 
 UniCC primarily provides a command-line interface to invoke the parser generation process.
 The general calling convention of the UniCC parser generator is

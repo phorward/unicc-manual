@@ -25,13 +25,13 @@ Next to emitting parsers in a particular programming language, UniCC also offers
 
 ++ The intention behind UniCC ++
 
-The UniCC Parser Generator has its origin at //Phorward Software Technologies// and is initially written and maintained by //Jan Max Meyer//. Phorward Software Technologies is a one-man business from Dortmund, Germany, providing expertise in the area of parsing, compiler construction and systems programming.
+The UniCC parser generator has its origin at //Phorward Software Technologies// and is initially written and maintained by Jan Max Meyer. Phorward Software Technologies is a one-man business from Dortmund (Germany), providing expertise in the area of parsing, compiler construction and systems programming.
 
-The initial intention behind UniCC was the development of a high-portable solution for parsers developments that is flexible enough to fit many different demands and creates parsers that can be compiled and run on almost any platform.
+The initial intention behind UniCC was the development of a high-portable software solution for parser implementations that is flexible enough to fit many different demands and that constructs parsers that can be compiled and run on almost any platform.
 
-The actually planned reference implementation for a UniCC-compiled parser was //RapidBATCH// version 6. RapidBATCH is a scripting language - formerly for Windows operating systems only - that was quite popular between 2001 and 2007. Due to the lack of time and some personal differences, RapidBATCH 6 sadly never came to an end, but it was reborn as an open source project in 2017. Nevertheless, UniCC and its underlying toolkit library //libphorward// was continued over the years, and is used in several proprietary software projects spreading over a wide array of platforms, including Linux, AIX, Solaris and Windows.
+The previously planned reference implementation for a UniCC-compiled parser was //RapidBATCH// version 6. RapidBATCH (https://rapidbatch.com) is a scripting language - formerly for Windows operating systems only - that was quite popular between 2001 and 2007. Due to the lack of time and some personal differences, RapidBATCH 6 sadly never came to an end, but it was reborn as an open source project in 2017. Nevertheless, UniCC and its underlying toolkit library //libphorward// was continued over the years, and is used in several proprietary software projects spreading over a wide array of platforms, including Linux, AIX, Solaris and Windows.
 
-To get more information on Phorward Software Technologies and our projects and products, visit https://phorward.info on the web.
+To get more information on Phorward Software Technologies and our projects and products, visit https://phorward.info.
 
 @NEWPAGE@
 
@@ -60,15 +60,17 @@ Hopefully, this manual answers most of the questions coming up when UniCC shall 
 
 ++ UniCC is free software! ++[free_software]
 
-Since 2016 and version 1.1, UniCC, the parser generator, its build tools and its supported target language templates are released and distributed under the terms and conditions of the 3-clause BSD license. Everybody is permitted to obtain, use, copy, modify and share the program and its sourcecode freely and without any charges. Since 2017, the main development of UniCC is done on GitHub, where the sourcecode, a bug tracker, a wiki and more resources remain. The official URL is **https://github.com/phorward/unicc**. Since version 1.2 in 2017, all parts of UniCC, including the C parser template sources, the Python parser template and the minimal parser generator //min_lalr1// that is used for bootstrapping, are unioned into one single sourcecode repository. So no more partitioning of the sourcecodes is done anymore into several source repos, which was done before also for different licensing reasons.
+Since 2016 and version 1.1, UniCC, the parser generator, its build tools and its supported target language templates are released and distributed under the terms and conditions of the 3-clause BSD license. Everybody is permitted to obtain, use, copy, modify and share the program and its sourcecode freely and without any charges. Since 2017, the main development of UniCC is done on GitHub, where the sourcecode, a bug tracker, a wiki and more resources remain. The official URL is **https://github.com/phorward/unicc**.
 
-The UniCC parser generator makes heavy use of the toolchain provided by the //Phorward Toolkit//, shortly also called //libphorward//. It is the base library and backend toolchain implementing much of the functionality¹ provided by UniCC. It is written in C, and especially the computations for the lexical analysis is done here. UniCC itself does all the stuff related to the parse table computation, grammar revision, code generation and finally the implementation of parsers working on the generated tables. libphorward is also released and distributed under the 3-clause BSD license, but developed separately from it. You can find its sourcecode, help and resources on GitHub at **https://github.com/phorward/phorward**
+Since version 1.2 in 2017, all parts of UniCC, including the C parser template sources, the Python parser template and the minimal parser generator //min_lalr1//, that is used for bootstrapping UniCC, had all been unified into one single source repository. So there is no more scattering of all the UniCC sources anymore into several repositories, which has been previously done due different licensing terms and origins.
 
-To build UniCC from its sourcecode, there is also an how-to guide about [how to build UniCC from source #ref_compile_from_source] within this manual. Any contribution to UniCC and its related tools and libraries, be it code, bugfixes, parser templates, ideas, enhancement proposals or documentation are always welcome. Help is also appreciated in form of support, advertising or just by using it.
+The UniCC parser generator makes heavy use of the toolchain provided by the //Phorward Toolkit//, shortly also called //libphorward//. It is the base library and backend toolchain implementing much of the functionality¹ provided by UniCC. It is also written in C, and especially the computation of the lexical analysis part is done here. UniCC does all the stuff related to the parse table computation, grammar revision, code generation and finally the implementation of parsers working on the generated tables. libphorward is also released and distributed under the 3-clause BSD license, but developed apart from UniCC, by different reasons. Source code, help, resources and support can also be found on GitHub at **https://github.com/phorward/phorward**.
+
+Later in this manual, there is also an [how to guide to build UniCC from source #ref_compile_from_source]. Any contribution to UniCC or libphorward, be it code, bugfixes, parser templates, ideas, enhancements, proposals or documentation is always welcome. Help is also appreciated in form of support, advertising or simply by using it.
 
 Thank you!
 
 
 ---------------
 
-¹ //libphorward// does also provide tools for parser construction and abstract syntax tree processing. These tools are currently in an unprecise development state, but maybe result as the source base for an upcoming UniCC version 2 in future.
+¹ //libphorward// does also provide newer tools for parser construction and abstract syntax tree processing. These tools are currently in an unprecise development state, but maybe provide as the development base for an upcoming UniCC version 2 or higher in future.
