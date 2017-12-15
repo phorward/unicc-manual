@@ -1,13 +1,14 @@
 UniCC Parser Generator
 (C) 2006-2017 by Phorward Software Technologies, Jan Max Meyer
-%%date(%d.%m.%Y), Version 1.2
+%%date(%d.%m.%Y), Version 1.3
 %!postproc(html): '¹' '<sup>1</sup>'
 ================================================================================
 
 %!include: intro/intro.t2t
 %!include: howto/howto.t2t
 %!include: reference/reference.t2t
-%!include: stdcparser/stdcparser.t2t
+%!include: c-target/c-target.t2t
+%!include: python-target/python-target.t2t
 %!include: appendix1/appendix1.t2t
 %!include: appendix2/appendix2.t2t
 

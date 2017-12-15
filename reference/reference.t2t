@@ -82,6 +82,7 @@ This command-line interface supports various, combinable options to invoke, modi
 | -b //name// | --basename //name// | Defines the specified basename //name// to be used for the output file(s) instead of the one derived by the ``#prefix`` directive or by the name of the input filename. This basename is used for all output files if the provided parser template causes the construction of multiple files. |
 | -G | --grammar | Dumps an overview of the finally constructred grammar to stderr, right before the parse-tables are generated. |
 | -h | --help | Prints a short overview about the command-line options and exits. |
+| -l //target// | --language //target// | Sets the target laguage via command-line. A "#!language" directive in the grammar definition will override this value. |
 | -V | --version | Prints copyright and version information and exists. |
 | -n | --no-opt | Disables state optimization; By default, the resulting LALR(1) parse states are optimized during table construction by introducing a special SHIFT_REDUCE action which combines a shift and reduction, which is possible when the last symbol of a production is shifted. Standard LALR(1) parsers only support SHIFT or REDUCE, not both operations at the same time. When this option is used, UniCC produces about 20-30% more LALR(1) states. |
 | -P | --production | Dumps an overview about the finally produced productions and their semantic actions. |
@@ -839,7 +840,7 @@ The ``#default value type`` directives allows to define a default value type tha
 
 ``` #default value type	<float> ;
 
-+++ #copyright, #description, #parser, #prefix, #version +++[ref_prefix]
++++ #copyright, #description, #parser, #prefix, #version (all deprecated) +++[ref_prefix]
 These are the simplest parser directives, which only have the purpose to store an informal string value.
 
 ``#parser``, ``#description``, ``#copyright`` and ``#version`` should be used to name and describe the parser and its version implemented by the grammar. ``#prefix`` defines a prefix value that can be inserted in function- or variable-identifiers within the generated parser to allow for various parsers in one input source file, or to meet specific symbol naming conventions in generated parser modules. When one of these directives is specified multiple times, their values will be glued together to one huge string.
@@ -856,6 +857,8 @@ These are the simplest parser directives, which only have the purpose to store a
 All these values are only hold by UniCC and can be inserted into the parser-template or will be written to the XML output file - depending on the desired output code generator.
 
 In the program-code generator, their values will expand with the template variables @@copyright, @@description, @@parser, @@prefix and @@version.
+
+**All these directives are flagged as deprecated, because they don't have any real benefit to the user and are relict of older times.**
 
 +++ #prologue, #epilogue +++[ref_prologue_epilogue]
 The ``#prologue`` and ``#epilogue`` directives are used to define any program code that is inserted before and behind the parser implementation in the yielding parser module.
@@ -1073,5 +1076,57 @@ Error resynchronization means that the error is handled by the grammar and its s
 
 ``&error`` can be used on several positions, so it is also possible to report errors with it or to silently fix them and let the parser continue. It must be mentioned, that the way how parse errors and the error synchronization token is handled relies on the used target language parser template, and is not a direct feature of the UniCC Parser Generator itself.
 
-%++ Tagging ++
-%The tagging feature, also called optional augmentation, is a feature in UniCC that is not clearly specified yet, but maybe becomes important in future versions of UniCC. Tagging is the possibility to tag grammatical elements like symbols, productions and the grammar itself with additional information that could be used by subsequent analysis or code generation tasks. This feature is only interesting for the XML-based Parser Description Generator for now, because it adds these tags to appropriate positions in the XML-output, to be validated by subs
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+@NEWPAGE@
+
+++ Abstract Syntax Tree Notations ++[ref_ast]
+%!postproc(html) '²' '<sup>2</sup>'
+
+As a new feature introduced with UniCC version 1.3, abstract syntrax tree notations can be specified within a grammar. These notations instruct the resulting parser to automatically construct an abstract syntrax tree (AST) during the full parse tree construction. The feature of constructing abstract syntrax trees rather than performing semantics during the parse process is a new approach which will become more important in a next UniCC major release².
+
+For AST notations, the grammar definition language has been slightly modified to allow for some more distinctive syntax. The following example implements the well-known expressional grammar without any semantics. The benefit is, that such kinds of grammars can be implemented in any UniCC target without any modification.
+
+%!include: ``expr.ast.par``
+
+That's all. This example already uses the new-style syntax, where ``->`` is replaced by ``:`` and the new operators ``:=`` and ``=`` take place.
+
+The equal-operator (=) can be used on productions and token definitions to define a generated AST node, while the defines-equal-operator (:=) is used to specify the defined nonterminal as name for the AST node. In case of multiple nonterminal definitions, the first will be used.
+
+Compile and run with C:
+```
+$ unicc expr.ast.par
+$ cc -o expr.ast expr.ast.c
+$ ./expr.ast -l
+
+ok
+1+2*3+4
+add
+ add
+  int (1)
+  mul
+   int (2)
+   int (3)
+ int (4)
+```
+
+Compile and run with Python:
+```
+$ unicc -l python expr.ast.par
+$ python expr.ast.py
+>1+2*3+4
+add
+ add
+  int (1)
+  mul
+   int (2)
+   int (3)
+ int (4)
+```
+
+Please note, that this feature is still in beta, and will become useful in an upcoming UniCC version.
+
+---------------
+
+² //UniCC v2// https://github.com/phorward/unicc/wiki/UniCC-v2.

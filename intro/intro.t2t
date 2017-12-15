@@ -62,7 +62,7 @@ Hopefully, this manual answers most of the questions coming up when UniCC shall 
 
 Since 2016 and version 1.1, UniCC, the parser generator, its build tools and its supported target language templates are released and distributed under the terms and conditions of the 3-clause BSD license. Everybody is permitted to obtain, use, copy, modify and share the program and its sourcecode freely and without any charges. Since 2017, the main development of UniCC is done on GitHub, where the sourcecode, a bug tracker, a wiki and more resources remain. The official URL is **https://github.com/phorward/unicc**.
 
-Since version 1.2 in 2017, all parts of UniCC, including the C parser template sources, the Python parser template and the minimal parser generator //min_lalr1//, that is used for bootstrapping UniCC, had all been unified into one single source repository. So there is no more scattering of all the UniCC sources anymore into several repositories, which has been previously done due different licensing terms and origins.
+With version 1.2 in 2017, all parts of UniCC, including the C parser template sources, the Python parser template and the minimal parser generator //min_lalr1//, that is used for bootstrapping UniCC, had all been unified into one single source repository. So there is no more scattering of all the UniCC sources anymore into several repositories, which has been previously done due different licensing terms and origins.
 
 The UniCC parser generator makes heavy use of the toolchain provided by the //Phorward Toolkit//, shortly also called //libphorward//. It is the base library and backend toolchain implementing much of the functionality¹ provided by UniCC. It is also written in C, and especially the computation of the lexical analysis part is done here. UniCC does all the stuff related to the parse table computation, grammar revision, code generation and finally the implementation of parsers working on the generated tables. libphorward is also released and distributed under the 3-clause BSD license, but developed apart from UniCC, by different reasons. Source code, help, resources and support can also be found on GitHub at **https://github.com/phorward/phorward**.
 
@@ -73,4 +73,4 @@ Thank you!
 
 ---------------
 
-¹ //libphorward// does also provide newer tools for parser construction and abstract syntax tree processing. These tools are currently in an unprecise development state, but maybe provide as the development base for an upcoming UniCC version 2 or higher in future.
+¹ //libphorward// does also provide newer tools for parser construction and abstract syntax tree processing. These tools are currently in an unprecise development state, but will sooner or later provide as the development base for an upcoming UniCC version 2 in future. For more about that, please visit https://github.com/phorward/unicc/wiki/UniCC-v2.
