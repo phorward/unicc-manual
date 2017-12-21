@@ -82,7 +82,7 @@ This command-line interface supports various, combinable options to invoke, modi
 | -b //name// | --basename //name// | Defines the specified basename //name// to be used for the output file(s) instead of the one derived by the ``#prefix`` directive or by the name of the input filename. This basename is used for all output files if the provided parser template causes the construction of multiple files. |
 | -G | --grammar | Dumps an overview of the finally constructred grammar to stderr, right before the parse-tables are generated. |
 | -h | --help | Prints a short overview about the command-line options and exits. |
-| -l //target// | --language //target// | Sets the target laguage via command-line. A "#!language" directive in the grammar definition will override this value. |
+| -l //target// | --language //target// | Sets the target language via command-line. A "#!language" directive in the grammar definition will override this value. |
 | -V | --version | Prints copyright and version information and exists. |
 | -n | --no-opt | Disables state optimization; By default, the resulting LALR(1) parse states are optimized during table construction by introducing a special SHIFT_REDUCE action which combines a shift and reduction, which is possible when the last symbol of a production is shifted. Standard LALR(1) parsers only support SHIFT or REDUCE, not both operations at the same time. When this option is used, UniCC produces about 20-30% more LALR(1) states. |
 | -P | --production | Dumps an overview about the finally produced productions and their semantic actions. |
@@ -1082,9 +1082,8 @@ Error resynchronization means that the error is handled by the grammar and its s
 @NEWPAGE@
 
 ++ Abstract Syntax Tree Notations ++[ref_ast]
-%!postproc(html) '²' '<sup>2</sup>'
 
-As a new feature introduced with UniCC version 1.3, abstract syntrax tree notations can be specified within a grammar. These notations instruct the resulting parser to automatically construct an abstract syntrax tree (AST) during the full parse tree construction. The feature of constructing abstract syntrax trees rather than performing semantics during the parse process is a new approach which will become more important in a next UniCC major release².
+As a new feature introduced with UniCC version 1.3, abstract syntrax tree notations can be specified within a grammar. These notations instruct the resulting parser to automatically construct an abstract syntrax tree (AST) during the full parse tree construction. The feature of constructing abstract syntrax trees rather than performing semantics during the parse process is a new approach which will become more important in a next UniCC major release (see https://github.com/phorward/unicc/wiki/UniCC-v2).
 
 For AST notations, the grammar definition language has been slightly modified to allow for some more distinctive syntax. The following example implements the well-known expressional grammar without any semantics. The benefit is, that such kinds of grammars can be implemented in any UniCC target without any modification.
 
@@ -1127,6 +1126,3 @@ add
 
 Please note, that this feature is still in beta, and will become useful in an upcoming UniCC version.
 
----------------
-
-² //UniCC v2// https://github.com/phorward/unicc/wiki/UniCC-v2.
