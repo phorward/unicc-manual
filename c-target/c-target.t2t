@@ -137,7 +137,7 @@ This causes the block within UNICC_ON_SHIFT only will be executed if the token h
 @NEWPAGE@
 
 ++ The parser control block (@@prefix_pcb) ++[pcb]
-The parser control block is the main data structure which is passed to all parser-related functions in order to provide any runtime information on the current parser state, input buffering and much more. It is always accessable within all configuration macros as well as semantic codes, and simply identified by a variable called ``pcb``. The parser control block itself is a typedef that is refered as ``@@prefix_pcb``. ``@@prefix`` is replaced by the value specified at the [#prefix #ref_prefix] directive in UniCC, if not specified, it will be replaced by nothing (empty string), so ``_pcb`` will be the default type name.
+The parser control block is the main data structure which is passed to all parser-related functions in order to provide any runtime information on the current parser state, input buffering and much more. It is always accessible within all configuration macros as well as semantic codes, and simply identified by a variable called ``pcb``. The parser control block itself is a typedef that is referred as ``@@prefix_pcb``. ``@@prefix`` is replaced by the value specified at the [#prefix #ref_prefix] directive in UniCC, if not specified, it will be replaced by nothing (empty string), so ``_pcb`` will be the default type name.
 
 Using the ``#pcb`` directive as described in the UniCC reference above, individual members of the parser control block can be defined, which avoids the problem of using global variables; Global variables must not be used in the standard C parser. This makes it entirely thread-safe, recursive calls of the parser are possible. If there is the need to pass on any values or pointers to subsequent parts of the parse-tree that hold global run-time information of the parser, they should be put into the parser control block using the ``#pcb`` directive.
 
@@ -259,9 +259,9 @@ typedef struct
 ```
 
 || Member | Type | Content |
-| column | unsigned int | The column of the symbol occurence in the input. |
+| column | unsigned int | The column of the symbol occurrence in the input. |
 | id | int | The symbol id, which refers to the stack symbol. Every symbol, terminal or nonterminal, has its own id. |
-| line | unsigned int | The line of the symbol occurence in the input. |
+| line | unsigned int | The line of the symbol occurrence in the input. |
 | symbol | [@@prefix_syminfo* #_syminfo] | Pointer to the symbol entry in the parser symbol table. This symbol table contains the name and additional informations about the symbol. |
 | state | int | The state that was current when the symbol was pushed. |
 | value | [@@prefix_vtype #_vtype] | The semantic value that is associated with the symbol. |
@@ -305,7 +305,7 @@ TABLE##Member variables of @@prefix_syminfo.
 +++ The production information table (@@prefix_prodinfo) +++[_prodinfo]
 All parsers constructred via the C parser target also contain a production information table holding information about the productions used in the parser. This production information table is used by the parser itself to get additional informations about its productions.
 
-The production information table is a structure of type ``@@prefix_prodinfo`` and can be refered as a static, global variable called ``@@prefix_productions``.
+The production information table is a structure of type ``@@prefix_prodinfo`` and can be referred as a static, global variable called ``@@prefix_productions``.
 
 ```
 /* Typedef for production information table */
@@ -320,7 +320,7 @@ typedef struct
 
 || Member | Type | Content |
 | definition | char* | A string representing the production's definition as expressed in the UniCC parser definition. |
-| emit | char* | String to be emitted by a particular production reducting in [abstract syntax tree construction #ctarget_ast]. |
+| emit | char* | String to be emitted by a particular production reduction in [abstract syntax tree construction #ctarget_ast]. |
 | length | int | The length of the production. This is the number of symbols on the right-hand side. |
 | lhs | int | The id of the default left-hand side symbol (indexing an entry in the symbol information table). |
 
@@ -337,10 +337,10 @@ The C parser target supports Unicode in several ways. Unicode support means that
 
 In general, the template supports three types of input methods.
 
-|| Type | Define switch | Desciption | UNICC_CHAR (internal) | UNICC_SCHAR (external) |
-| ASCII | - | Unicode-less mode, works with symetric 8-bit ASCII input only. | char | char |
-| UTF-8 (default) | UNICC_UTF8 | UTF-8 mode supporting 8-bit asymetric input sequences. | wchar_t | char |
-| Wide-character | UNICC_WCHAR | Wide-character 32-bit symetric input mode. | wchar_t | wchar_t |
+|| Type | Define switch | Description | UNICC_CHAR (internal) | UNICC_SCHAR (external) |
+| ASCII | - | Unicode-less mode, works with symmetric 8-bit ASCII input only. | char | char |
+| UTF-8 (default) | UNICC_UTF8 | UTF-8 mode supporting 8-bit asymmetric input sequences. | wchar_t | char |
+| Wide-character | UNICC_WCHAR | Wide-character 32-bit symmetric input mode. | wchar_t | wchar_t |
 
 
 TABLE##Input type modes of the C parser target.
@@ -354,8 +354,7 @@ To configure a parser template for a specific mode, the defines above (UNICC_UTF
 
 ++ Abstract syntax tree construction ++[ctarget_ast]
 
-With the availability of the new [abstract syntax tree notation #ref_ast] feature provided with UniCC version 1.3 and higher, the C parser
-target constructs a browsable abstract sytnax tree with the following node structure:
+With the availability of the new [abstract syntax tree notation #ref_ast] feature provided with UniCC version 1.3 and higher, the C parser target constructs a browsable abstract syntax tree with the following node structure:
 
 ```
 /* Abstract Syntax Tree */
@@ -394,7 +393,7 @@ void print_ast( @@prefix_ast* node )
 The target provides the following functions:
 
 - ``@@prefix_ast_print( FILE* stream, @@prefix_ast* node )`` to print the AST or parts of it
-- ``@@prefix_ast_free( @@prefix_ast* node )`` to recusrively free any consumed memory.
+- ``@@prefix_ast_free( @@prefix_ast* node )`` to recursively free any consumed memory.
 -
 
 %-------------------------------------------------------------------------------
@@ -541,7 +540,7 @@ the parser test mode can be invoked with
 
 ``` ./expression -l
 
-If ``-l`` is not sumbitted, a parse error occurs when input is read via stdin from keyboard, and the enter-key is pressed. Writing the expression to be parsed to a file will be consumed without ``-l``.
+If ``-l`` is not submitted, a parse error occurs when input is read via stdin from keyboard, and the enter-key is pressed. Writing the expression to be parsed to a file will be consumed without ``-l``.
 
 ```
 echo -n "1+2*3" >test.expr
@@ -564,7 +563,7 @@ The function's prototype is
 
 The function only requests for one parameter, which is a structure of the [parser control block #pcb]. The structure must be initialized to zero, and user-defined values must be filled correctly before the parse-function is invoked. Else, the parser will come into unpredictable states and parse errors, or simply cores. It is also possible to pass ``(@@prefix_pcb*)NULL`` to the parser invocation function. In this case, the function will allocate a parser control block structure on its own, but this is only useful in validating parsers that do not perform much semantic actions working on pointers of the parser control block.
 
-The parser-function returns a value of kind ``@@prefix_vtype``, which is the return value of the goal symbol. To find out if errors occured, the variable ``error_count`` from the parser control block should be checked.
+The parser-function returns a value of kind ``@@prefix_vtype``, which is the return value of the goal symbol. To find out if errors occurred, the variable ``error_count`` from the parser control block should be checked.
 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
@@ -573,7 +572,7 @@ The parser-function returns a value of kind ``@@prefix_vtype``, which is the ret
 
 ++ UTF-8 character fetch function (@@prefix_utf8_getchar()) ++[_utf8_getchar]
 
-If the parser is compiled with UNICC_UTF8-enabled (default), the macro UNICC_GETINPUT directs by default to the function //@@prefix_utf8_getchar( getchar )//. The function reads characters from a character retrival function (by default ``getchar()``) until a valid UTF-8 sequence was matched. It can be used by invidividual tasks also.
+If the parser is compiled with UNICC_UTF8-enabled (default), the macro UNICC_GETINPUT directs by default to the function //@@prefix_utf8_getchar( getchar )//. The function reads characters from a character retrieval function (by default ``getchar()``) until a valid UTF-8 sequence was matched. It can be used by individual tasks also.
 
 The function's prototype is
 ``` UNICC_STATIC UNICC_CHAR @@prefix_utf8_getchar( int (*getfn)() );
@@ -601,7 +600,7 @@ It should not be called in reduction actions, only on shift-operations, respecti
 
 ++ Configuration macro reference ++
 
-This short reference should bring an overview of the provided macros that can be pre-defined in the C parser target, and their behavior. All macros within the UniCC C Standard Template can be overridden when defined in the [``#prologue`` #ref_prologue_epilogue] semantic code area or at compiler invocation. If not submittet, the UniCC Standard C Template forces their definition to default values.
+This short reference should bring an overview of the provided macros that can be pre-defined in the C parser target, and their behavior. All macros within the UniCC C Standard Template can be overridden when defined in the [``#prologue`` #ref_prologue_epilogue] semantic code area or at compiler invocation. If not submitted, the C target forces their definition to default values.
 
 +++ UNICC_CLEARIN +++[UNICC_CLEARIN]
 Clears buffered input of the current token. This macro requires the parser control block as its parameter, and is pre-defined as
@@ -632,7 +631,7 @@ To show stack contents, also switch on [UNICC_STACKDEBUG #UNICC_STACKDEBUG]. Her
 %!include: ``debug.out``
 
 +++ UNICC_ERROR_DELAY +++[UNICC_ERROR_DELAY]
-Defines the error delay that is used to mark a parse error as successfully recovered. If there raise parse errors within this number of shifts after an inital parse error, during error recovery, no following error will be reported. UNICC_ERROR_DELAY is set to 3 shifts by default.
+Defines the error delay that is used to mark a parse error as successfully recovered. If there raise parse errors within this number of shifts after an initial parse error, during error recovery, no following error will be reported. UNICC_ERROR_DELAY is set to 3 shifts by default.
 
 +++ UNICC_GETINPUT +++[UNICC_GETINPUT]
 Defines a macro that is called when a character is fetched for buffing in the current input. The C parser target buffers input according to the needs of the lexer. This buffering is done automatically, but it is required to provide a way how characters are read from the input. By default, ``UNICC_GETINPUT`` is defined as
@@ -661,9 +660,9 @@ would be more adequate and causes no unwanted effects.
 Check out the function [@@prefix_utf8_getchar() #_utf8_getchar] if UTF-8 input processing is wanted.
 
 +++ UNICC_MAIN +++
-``UNICC_MAIN`` controls if the parser features its automatic main function. This feature enables to rapidly prototype a grammar and immediatelly test its result. The main function calls the parser in an endless loop and allows.
+``UNICC_MAIN`` controls if the parser features its automatic main function. This feature enables to rapidly prototype a grammar and immediately test its result. The main function calls the parser in an endless loop and allows.
 
-By default, if no semantic code is specified by [``#epilogue`` #ref_prologue_epilogue], UNICC_MAIN will be configured to 1, so a main function is generated. If an epilogue is given, it is defined automatically to 0 when no previous definition is done. To specifiy an epilogue and switch the parser's build-in main function on
+By default, if no semantic code is specified by [``#epilogue`` #ref_prologue_epilogue], UNICC_MAIN will be configured to 1, so a main function is generated. If an epilogue is given, it is defined automatically to 0 when no previous definition is done. To specify an epilogue and switch the parser's build-in main function on
 
 ``` #define UNICC_MAIN 1
 
@@ -694,11 +693,11 @@ but can be replaced by any other function call or macro construct.
 Internal use only, may not be changed or redefined.
 
 +++ UNICC_STACKDEBUG +++
-If switched 1 in comination with UNICC_DEBUG, stack content will be printed additionally to stderr.
+If switched 1 in combination with UNICC_DEBUG, stack content will be printed additionally to stderr.
 
 +++ UNICC_STATIC +++
 
-A define that holds the keyword ``static`` by default. It can be configured to be empty or anything else, just in case static data should be made accessable outside the parser module. The parser invocation function is always not declared to be UNICC_STATIC.
+A define that holds the keyword ``static`` by default. It can be configured to be empty or anything else, just in case static data should be made accessible outside the parser module. The parser invocation function is always not declared to be UNICC_STATIC.
 
 +++ UNICC_UTF8 +++
 Switches UTF-8 mode on, if configured as 1 (default).

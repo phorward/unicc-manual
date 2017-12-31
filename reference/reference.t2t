@@ -78,9 +78,9 @@ The general calling convention of the UniCC parser generator is
 This command-line interface supports various, combinable options to invoke, modify and specialize the parser generation process, or to trigger further tasks.
 
 || Option | Long option name | Description |
-| -a | --all-warnings | Runs UniCC to print all warnings that come up with the grammar. UniCC normaly supresses some warning messages that raise up during the parse table constructions according to their importance. |
+| -a | --all-warnings | Runs UniCC to print all warnings that come up with the grammar. UniCC normally suppresses some warning messages that raise up during the parse table constructions according to their importance. |
 | -b //name// | --basename //name// | Defines the specified basename //name// to be used for the output file(s) instead of the one derived by the ``#prefix`` directive or by the name of the input filename. This basename is used for all output files if the provided parser template causes the construction of multiple files. |
-| -G | --grammar | Dumps an overview of the finally constructred grammar to stderr, right before the parse-tables are generated. |
+| -G | --grammar | Dumps an overview of the finally constructed grammar to stderr, right before the parse-tables are generated. |
 | -h | --help | Prints a short overview about the command-line options and exits. |
 | -l //target// | --language //target// | Sets the target language via command-line. A "#!language" directive in the grammar definition will override this value. |
 | -V | --version | Prints copyright and version information and exists. |
@@ -92,7 +92,7 @@ This command-line interface supports various, combinable options to invoke, modi
 | -T | --symbols | Dumps an overview of all used symbols. |
 | -v | --verbose | Prints process messages about the specific tasks during parser generation process. Also turns on ``-s``. |
 | -w | --warnings | Print relevant warnings. |
-| -x | --xml | Triggers UniCC to run the [parser description file generator #ref_codegen_descfile] additionally to the program module generator. The parser description file generator outputs an XML-based parser representation of the generated parse tables, which can be used by third-party code generators or grammar analsys and debugging tools. |
+| -x | --xml | Triggers UniCC to run the [parser description file generator #ref_codegen_descfile] additionally to the program module generator. The parser description file generator outputs an XML-based parser representation of the generated parse tables, which can be used by third-party code generators or grammar analysis and debugging tools. |
 | -X | --XML | Triggers UniCC to only run the [parser description file generator #ref_codegen_descfile] without running the program-module generator. |
 
 
@@ -188,7 +188,7 @@ The whitespace sensitive parser construction mode gives a maximum of flexibility
 
 The most common characteristic of this construction mode is, that UniCC entirely rewrites the grammar according to whitespace and lexeme definitions, to make whitespace only valid in selected situations. The definition of whitespace is not limited to one terminal symbol anymore in this mode. The symbol defining whitespace can be a nonterminal described as part of the context-free grammar itself without any limitations. An optional call to this nonterminal is added behind every terminal symbol and in front of the goal symbol during the grammar revision process. To disallow whitespace in particular constructs, some nonterminals can be defined as lexemes, and will be covered like terminal symbols during grammar revision in order to the whitespace-matching, but are also made up as part of the context-free grammar.
 
-The advantage of this construction mode is, that whitespace and lexemes can be expressed in a much more powerful context-free grammar rather than as regular patterns matched by the lexical analyzer. The lexical analysis apparently becomes part of the parser with all its possibilites, but the grammar is expressed as whitespace would be handled apart from it. Additionally, the true lexical analyzer can be optionally used to parse the atomic terminals, as part of lexemes or on its own.
+The advantage of this construction mode is, that whitespace and lexemes can be expressed in a much more powerful context-free grammar rather than as regular patterns matched by the lexical analyzer. The lexical analysis apparently becomes part of the parser with all its possibilities, but the grammar is expressed as whitespace would be handled apart from it. Additionally, the true lexical analyzer can be optionally used to parse the atomic terminals, as part of lexemes or on its own.
 
 To make this parsing approach possible, overlapping character terminals are made unique and split up into nonterminals. A lexical analyzer is constructed individually for every LALR state, to only match symbols that are valid in the sensitive context of the given state. Some grammars that use this mode may cause a high number of states and many different lexical analyzers. But it enables the ultimative maximum of flexibility ever provided by any LALR(1) parser.
 
@@ -282,7 +282,7 @@ Any other type of definition is invalid, and will result in a parse error.
 @NEWPAGE@
 
 ++ Grammars ++
-Grammars are expressed using rules that describe in which way symbols may appear. The symbols within a grammar define grammatical units in form of //terminal symbols// (terminals) which immediatelly are expected in the input, and //nonterminal symbols// (nonterminals). Nonterminal symbols union one or more grammatical rules, so called //productions// into one "fictive" symbol to be inserted into other productions, or to form the goal symbol. Every symbol (both terminal and nonterminal) in UniCC is always declared by its first use. Its particular description or definition - if required - can be made elsewhere later in the grammar. Symbols without a definition will be reported by UniCC, and maybe stop the further compilation process of the grammar, with a request for correction.
+Grammars are expressed using rules that describe in which way symbols may appear. The symbols within a grammar define grammatical units in form of //terminal symbols// (terminals) which immediately are expected in the input, and //nonterminal symbols// (nonterminals). Nonterminal symbols union one or more grammatical rules, so called //productions// into one "fictive" symbol to be inserted into other productions, or to form the goal symbol. Every symbol (both terminal and nonterminal) in UniCC is always declared by its first use. Its particular description or definition - if required - can be made elsewhere later in the grammar. Symbols without a definition will be reported by UniCC, and maybe stop the further compilation process of the grammar, with a request for correction.
 
 +++ Terminal symbols +++
 Terminal symbols (terminals) define a piece of raw input data that is read from the input stream. They can be defined and specified in various ways. A [single character or a set of valid characters #ref_terminal_ccl] can form a terminal, but also a [static character sequence #ref_terminal_string] or character sequences that matches to a regular (type-0) language, defined via [regular expressions #ref_terminal_regex].
@@ -294,9 +294,9 @@ Character terminals, also called //character-classes//, are the simplest definit
 
 A character-class is specified by strings enclosed in single quotation marks  ``'...'``, and is defined by its use. Once a character-class terminal is used somewhere in the grammar or any directive, it is defined and becomes known to UniCC.
 
-To match only one individual character, for example an **a**, then ``'a'`` is the correct definition for such a terminal. To define all characters from ``a`` to ``f`` as valid input, ``'abcdef'`` and ``'a-f'`` as range definition is possible. To define a terminal matching the characters from ``a`` to ``z``, ``0`` to ``9`` and the ``=`` equal sign, ``'a-z0-9='`` can be specified. If the range is negative, for example ``'z-a``, its still interpretered as ``'a-z'``. To define the dash **-** itself as part of the character class, it the best to express it as first character of the character-class string, or in a place where no dash is interpreted as range definition, for example ``'-+*/'`` or ``'a-z-+'``.
+To match only one individual character, for example an **a**, then ``'a'`` is the correct definition for such a terminal. To define all characters from ``a`` to ``f`` as valid input, ``'abcdef'`` and ``'a-f'`` as range definition is possible. To define a terminal matching the characters from ``a`` to ``z``, ``0`` to ``9`` and the ``=`` equal sign, ``'a-z0-9='`` can be specified. If the range is negative, for example ``'z-a``, its still interpreted as ``'a-z'``. To define the dash **-** itself as part of the character class, it the best to express it as first character of the character-class string, or in a place where no dash is interpreted as range definition, for example ``'-+*/'`` or ``'a-z-+'``.
 
-UniCC accepts [escape sequences #ref_escape_sequences] to define special characters and unprinable characters. UTF-8 characters are directly accepted. For example ``'\n-€'`` is a valid definition with an escape-sequence for newline and the Euro currency sign.
+UniCC accepts [escape sequences #ref_escape_sequences] to define special characters and unprintable characters. UTF-8 characters are directly accepted. For example ``'\n-€'`` is a valid definition with an escape-sequence for newline and the Euro currency sign.
 
 Character terminals can be negated using an preceding exclamation-mark. For example ``!'a-z'`` accepts all characters except the range from ``a`` to ``z`` (this will include all characters in the [UniCC character universe #ref_terminal_charuniverse], from 0x0 to 0xFFFF, except above range).
 
@@ -329,7 +329,7 @@ The regular-expression itself is defined by sequences of the following, already 
 | ``'...'`` or ``!'...'`` | Specifies a character, character-class or negated character-class. |
 | ``"..."`` | Specifies a static string. |
 | ``.`` | Specifies a character-class standing for "any character". Using this construct causes the terminal to be configured as "non-greedy".
-| ``(`` and ``)`` | Parantheses to build sub-expressions, equal to [embedded productions #ref_embedded_productions]. |
+| ``(`` and ``)`` | Parentheses to build sub-expressions, equal to [embedded productions #ref_embedded_productions]. |
 | ``|`` | The alternative operator to define multiple expressions at one expression level. |
 | ``*`` | Kleene closure (none or several of previous expression) modifier. |
 | ``+`` | Positive closure (one or several of previous expression) modifier. |
@@ -338,7 +338,7 @@ The regular-expression itself is defined by sequences of the following, already 
 
 TABLE#ref_regex_construction#Lexical symbols for regular expression construction
 
-To get more familar with this syntax, a few examples follow.
+To get more familiar with this syntax, a few examples follow.
 
 ```
 //A simple identifier!
@@ -372,9 +372,9 @@ But they are also often the source for unexpected parser behaviors, that let som
 
 +++++ Semantic actions +++++
 Terminals defined via regular expressions can also be equipped with individual semantic code and a data-type for semantic augmentation, to return an individual semantic value to the reduction actions used in the grammar.
-This semantic code can be used for different purposes, also simultaneausly: To extract semantic values, to modify the input, or to perform semantic symbol selections.
+This semantic code can be used for different purposes, also simultaneously: To extract semantic values, to modify the input, or to perform semantic symbol selections.
 
-Same as within semantic reducton codes of productions, some macros within this semantic code block for termnals can be used to access the return value and the matched input string. Their meaning is not the same in all target languages, it depends on the target language template.
+Same as within semantic reduction codes of productions, some macros within this semantic code block for terminals can be used to access the return value and the matched input string. Their meaning is not the same in all target languages, it depends on the target language template.
 
 || Macro | Usage |
 | ``@@`` | Defines the return value that is associated with the terminal. This variable is of the same type that is specified for the symbol or the default type.
@@ -404,10 +404,10 @@ Some examples in C:
 
 In various target languages, the semantic action code of regular expression terminals may be the source for memory leaks if they are used faulty. Depending on the used parser target language template and the parser mode, the semantic part of a regular expression terminal can be executed multiple times, to allow for semantic symbol selections, but also to extract semantic values from the input, as shown above. For such cases, every parser template sets some variables or pre-processor directives to turn-off areas within the semantic code which may cause memory problems. The documentation of the particular UniCC parser target language template should handle this topic.
 
-+++++ Defining the greedyness (#greedy, #non-greedy) +++++
++++++ Defining the greediness (#greedy, #non-greedy) +++++
 Terminal symbols based on regular expressions can be defined to be in a //greedy// or //non-greedy// configuration,  relating to their behavior during the process of the lexical analysis.
 
-UniCC automatically switches a regular expression terminal that uses the dot-wildcard (``.``, for matching any character) as non-greedy. The greedyness can also be explicitly set or overridden using the terminal symbol configuration directives ``#greedy`` and ``#non-greedy``.
+UniCC automatically switches a regular expression terminal that uses the dot-wildcard (``.``, for matching any character) as non-greedy. The greediness can also be explicitly set or overridden using the terminal symbol configuration directives ``#greedy`` and ``#non-greedy``.
 
 To describe the problem, the following grammar is used.
 
@@ -434,7 +434,7 @@ Now, using the input
 
 ``` 3 /* Hello */ 4 /* World */ 5
 
-one would expect, that ``3``, ``4`` and ``5`` are returned by the above grammar, and the comments are ignored. A non-greedy configuration of ``@WHITESPACE``, as it is automatically set by UniCC in this example would correclty do this. Nevertheless, a "greedy" configuration of ``@WHITESPACE`` only return ``3`` and ``5``, because a comment that is ``/* Hello */ 4 /* World */`` is identified. This first ``*/`` is also recognized in greedy-mode terminals, but the lexical analyzer will scan further until it (maybe) gets a second ``*/``, which is the case here. Sometimes, this behavior is wanted, sometimes it is not.
+one would expect, that ``3``, ``4`` and ``5`` are returned by the above grammar, and the comments are ignored. A non-greedy configuration of ``@WHITESPACE``, as it is automatically set by UniCC in this example would correctly do this. Nevertheless, a "greedy" configuration of ``@WHITESPACE`` only return ``3`` and ``5``, because a comment that is ``/* Hello */ 4 /* World */`` is identified. This first ``*/`` is also recognized in greedy-mode terminals, but the lexical analyzer will scan further until it (maybe) gets a second ``*/``, which is the case here. Sometimes, this behavior is wanted, sometimes it is not.
 
 Finally it depends on the grammar writer how it should be handled. To enable full control about if such regular expression-based terminals are configured to be greedy or non-greedy, UniCC offers the directives ``#greedy`` and ``#nongreedy``, that had been mentioned above.
 
@@ -480,7 +480,7 @@ Given the example, that an empty string and a nonempty string shall be matched a
 ```
 
 ++++ Terminal anomalies ++++[ref_terminal_anomalies]
-When using the [whitespace sensitive parser construction mode #ref_sensitive_mode], terminals could be broken down to grammatical constructs parsing lexemes. This sometimes raises a problem that is known as a terminal anomaly. This terminal anomly can occur between regular expression-based terminals (these are terminal symbols, that are based on strings or regular expressions) and grammar constructs build on character-classes that may consume the same input sequence like the regular expression-based terminal does. In such a situation, the parser may run into an ambiguitiy conflict that matches both the content of a lexeme that is build of the same characters as the valid regular expression-based terminal does.
+When using the [whitespace sensitive parser construction mode #ref_sensitive_mode], terminals could be broken down to grammatical constructs parsing lexemes. This sometimes raises a problem that is known as a terminal anomaly. This terminal anomaly can occur between regular expression-based terminals (these are terminal symbols, that are based on strings or regular expressions) and grammar constructs build on character-classes that may consume the same input sequence like the regular expression-based terminal does. In such a situation, the parser may run into an ambiguity conflict that matches both the content of a lexeme that is build of the same characters as the valid regular expression-based terminal does.
 
 The following example defines a grammar that generates this kind of conflict.
 
@@ -540,7 +540,7 @@ A special case is the //goal-symbol//. This nonterminal symbol defines the root 
 Only one goal symbol is allowed per grammar. Multiple goal symbol definitions throw an error, and no parser will be constructed.
 
 ++++ Semantic nonterminal determination ++++[ref_semantic_nonterminal_determination]
-There may be cases, where the distinct determination of a nonterminal requires more semantic checks to define a symbol's correct meaning. This can be the case if a grammar allows for function and variable names that are made up of character sequences. There may be a construct within the grammar to recognize the identifier, e.g. a regular expression terminal ``@ident``. But there is no  possibility on the grammar definition level to clearly define wether a parsed identifier refers to a function name or to a variable name. For this case, UniCC supports semantic nonterminal determinations. The semantic code block triggers some kind of selection task, for example a symbol table call, to find out if the addressed identifier is the name of a variable or a function. Then, the semantic code selects the kind of nonterminal to be used in the parser. The feature of semantic nonterminal determination allows to perform a dynamic manipulation of the parser within semantic actions.
+There may be cases, where the distinct determination of a nonterminal requires more semantic checks to define a symbol's correct meaning. This can be the case if a grammar allows for function and variable names that are made up of character sequences. There may be a construct within the grammar to recognize the identifier, e.g. a regular expression terminal ``@ident``. But there is no  possibility on the grammar definition level to clearly define whether a parsed identifier refers to a function name or to a variable name. For this case, UniCC supports semantic nonterminal determinations. The semantic code block triggers some kind of selection task, for example a symbol table call, to find out if the addressed identifier is the name of a variable or a function. Then, the semantic code selects the kind of nonterminal to be used in the parser. The feature of semantic nonterminal determination allows to perform a dynamic manipulation of the parser within semantic actions.
 
 This mechanism is done by declaring a production with multiple left-hand sides. The first specified left-hand side will always be used as default. The semantic selection is specified in the reduction code using a special macro ``@!symbol:<name>``, where ``<name>`` refers to the name of the left-hand side symbol to be set.
 
@@ -592,9 +592,9 @@ nonterm -> world ;
 
 When the parser of a defined grammar is executed, it reads terminal-symbols from the input according the sequence rules defined by the grammar's productions. Every symbol (both terminal and nonterminal symbol) is shifted, which means it is consumed and put on a stack when its matched in the input.
 
-Then, if a sequence of symbols resisting on the stack exactly matches to one production, it will be reduced. In this case, the term //handle// is used, so there is a handle to a production on the stack. To reduce the production means, that the parser validated the input according to a productions rules as valid. It then replaces the productions sequence (the handle) by its left-hand side nonterminal, which is part of the next, subsequent production, or the goal-symbol, which defines the input to be valid and sucessfully terminates the parser. All this shifting and reducing is done on an internal stack within the parser, which is holding the current parser state. The parser is oriented on the parse-tables constructed by UniCC. They predict which terminal symbols are valid in the current context and which action must be performed next.
+Then, if a sequence of symbols resisting on the stack exactly matches to one production, it will be reduced. In this case, the term //handle// is used, so there is a handle to a production on the stack. To reduce the production means, that the parser validated the input according to a productions rules as valid. It then replaces the productions sequence (the handle) by its left-hand side nonterminal, which is part of the next, subsequent production, or the goal-symbol, which defines the input to be valid and successfully terminates the parser. All this shifting and reducing is done on an internal stack within the parser, which is holding the current parser state. The parser is oriented on the parse-tables constructed by UniCC. They predict which terminal symbols are valid in the current context and which action must be performed next.
 
-A production may also exist of no symbol sequence. These productions are called //epsilon productions//. Their appearance performs an immediate reduction of the nonterminal, if no other production mets. This is an example for an nonterminal with two productions. Latter one is an epsilon production.
+A production may also exist of no symbol sequence. These productions are called //empty productions//, or sometimes //epsilon productions//. Their appearance performs an immediate reduction of the nonterminal, if no other production matches. This is an example for a nonterminal with two productions. Latter one is an empty production.
 
 ``` nonterm -> hello | ;
 
@@ -614,7 +614,7 @@ This reduction code is written as a code-block ``[* ... *]`` behind the sequence
 
 TABLE#ref_production_macros#Semantic macros to be used within reduction actions.
 
-The reduction value (also refered as the //left-hand side value//) can be accessed with the macro ``@@``.
+The reduction value (also referred as the //left-hand side value//) can be accessed with the macro ``@@``.
 
 ```
 boolean$ -> "true"  [* @@ = 1; *]
@@ -640,7 +640,7 @@ expr     -> @integer '+' @integer  [* @@ = @1 + @3; *]
 
 UniCC does also support the feature of providing individual reference identifiers for every symbol of the right-hand side, using the syntax ``symbol:identifier``. For example ``'a-z':char`` or ``@name:ident`` would be adequate right-hand side identifiers. Its also possible to provide long-strings, for example ``'0-9'+:"A special number"``.
 
-In case a nonterminal or regular-expression-based terminal appears, an identifying name for it is automatically associated with the same name as the symbol, so no identifier must be provided manually. Note, that this automatism fits only to the first occurence of the symbol on the particular right-hand side. If the same symbol appears multiple times on the same right-hand side, its first occurence can be accessed with this default identifier only.
+In case a nonterminal or regular-expression-based terminal appears, an identifying name for it is automatically associated with the same name as the symbol, so no identifier must be provided manually. Note, that this automatism fits only to the first occurrence of the symbol on the particular right-hand side. If the same symbol appears multiple times on the same right-hand side, its first occurence can be accessed with this default identifier only.
 
 Identified symbols can then by accessed by ``@identifier``, ``@"Identifier String"`` or ``@'Identifier String'`` within the reduction code. The offset-access is always possible and can be mixed, as below.
 
@@ -801,7 +801,7 @@ The selected parser template describes various parts of the parser broken down t
 
 If UniCC is forced to create a parser description file, the ``#language``-directive will only be attached as attribute.
 
-Please read more about the UniCC code generation possibilites [in the section about the UniCC code generators #ref_codegen].
+Please read more about the UniCC code generation possibilities [in the section about the UniCC code generators #ref_codegen].
 
 +++ #case insensitive strings +++[ref_case_insensitive_strings]
 The ``#case insensitive strings`` directive switches string-based terminals to be case-insensitive or not. The directive can be called multiple times. Each time it is called and switched, subsequent string-based terminal symbol definitions are threatened according to the current case-order configuration state.
@@ -836,7 +836,7 @@ example$    -> @int ; //here, the default action will be used!
 
 ``#default action`` and ``#default epsilon action`` can only be defined once, subsequent calls will produce a warning and are ignored.
 
-The ``#default value type`` directives allows to define a default value type that is used for every symbol if no individual value type is specified. The parser templates for the standard UniCC code generator, and maybe subsequent code generators working on the XML output of UniCC may provide their own default value types. This directive allows to overide this default by explicitly specifying a value type triggered as default.
+The ``#default value type`` directives allows to define a default value type that is used for every symbol if no individual value type is specified. The parser templates for the standard UniCC code generator, and maybe subsequent code generators working on the XML output of UniCC may provide their own default value types. This directive allows to override this default by explicitly specifying a value type triggered as default.
 
 ``` #default value type	<float> ;
 
@@ -909,7 +909,7 @@ Now the opposite using the ``#right`` directive.
 %!include: ``right.par``
 GENAST#reference/right.par#1+2+3+4;#-semantics#Syntax tree of input "1+2+3+4;" in a right-leaning configuration.
 
-Multiple calls of these directives cause higher precedence leveling, so it is necessary to perform multiple calls of ``#left`` to build-up a pecedence/associativity matrix for, e.g. expressions. All symbols passed to the first ``#left`` directive call get a precedence level of 1, all symbols passed to the second ``#left`` call get a precedence level of 2, and so on.
+Multiple calls of these directives cause higher precedence leveling, so it is necessary to perform multiple calls of ``#left`` to build-up a precedence/associativity matrix for, e.g. expressions. All symbols passed to the first ``#left`` directive call get a precedence level of 1, all symbols passed to the second ``#left`` call get a precedence level of 2, and so on.
 
 %!include: ``assoc.par``
 
@@ -919,7 +919,7 @@ As a comparison to the above, correctly parsed syntax tree, this is the version 
 
 GENAST#reference/no_assoc.par#1*2+3;#-semantics#Syntax tree without association precedences. UniCC compile-time warnings had been ignored.
 
-The ``#precedence``-directive is a special-case directive. It is the only kind of directive that can be used on production level. ``#precedence`` is used to assign a terminal's precedence to a production, to let the production take a higher level of precedence in some conflicting situations. This feature was adoptet from well-known parser generators like bison.
+The ``#precedence``-directive is a special-case directive. It is the only kind of directive that can be used on production level. ``#precedence`` is used to assign a terminal's precedence to a production, to let the production take a higher level of precedence in some conflicting situations. This feature was adopted from well-known parser generators like GNU bison.
 
 Given a grammar, that allows for both an ary and unary minus. Correct precedence associaton has already been done for ``+``, ``-``, ``*`` and ``/``.
 
@@ -935,9 +935,9 @@ By using the ``#precedence``-directive, the production defining the unary minus 
 
 as production definition, the correct syntax tree will be constructed for //-2*3//.
 
-GENAST#reference/prec.par#-2*3##Correct syntax tree of "-2*3", using a production predecence declaration.
+GENAST#reference/prec.par#-2*3##Correct syntax tree of "-2*3", using a production precedence declaration.
 
-The ``#precedence``-directive has to be put right beind the production and its reduction code, so
+The ``#precedence``-directive has to be put right behind the production and its reduction code, so
 
 ``` '-' expression        [* @@ = -@2; *]    #precedence '*'
 
@@ -966,9 +966,9 @@ But it uses a fully-fledged nonterminal //whitespace// which could possibly exis
 Whitespace becomes part of the grammar, but its existence is hidden from the semantic actions of the grammar developer. There is no obvious indicator if whitespace handling has been done, this can only be indicated on demand.
 
 ++++ #whitespaces in insensitive mode ++++
-In the [insensitive parser construction mode #ref_construction_modes], the ``#whitespaces`` directive only accepts terminal symbols. Trying to specifiy a nonterminal at ``#whitespaces`` results in an error, because whitespace consumed by the parser can't be handled here. The grammar is not rewritten as in sensitive mode.
+In the [insensitive parser construction mode #ref_construction_modes], the ``#whitespaces`` directive only accepts terminal symbols. Trying to specify a nonterminal at ``#whitespaces`` results in an error, because whitespace consumed by the parser can't be handled here. The grammar is not rewritten as in sensitive mode.
 
-All specified terminal symbols are flagged as whitespace, and are simply ignored when read by the resuling lexical analyzer. The grammar is not rewritten, but the grammar developer is limited to only use character-classes, strings and regular expressions as whitespaces symbols, without a flexible grammar beyond.
+All specified terminal symbols are flagged as whitespace, and are simply ignored when read by the resulting lexical analyzer. The grammar is not rewritten, but the grammar developer is limited to only use character-classes, strings and regular expressions as whitespaces symbols, without a flexible grammar beyond.
 
 Resulting grammars result in much lesser states and will be parsed faster.
 
@@ -996,7 +996,7 @@ Adding a lexem configuration
 
 to this grammar yields in a different, correct parser, which only accepts the lexeme we want to allow for.
 
-The difference that is done during the automatic revision of the grammar caused by the ``#whitespaces``-directive in combination with the sensitive mode can be made visible using the ``-G`` command-line flag to let UniCC print out the final grammar. The inital version of the revised grammar is this one, if no lexeme configuration is done.
+The difference that is done during the automatic revision of the grammar caused by the ``#whitespaces``-directive in combination with the sensitive mode can be made visible using the ``-G`` command-line flag to let UniCC print out the final grammar. The initial version of the revised grammar is this one, if no lexeme configuration is done.
 
 %!include: ``no_lexeme.out``
 
@@ -1006,7 +1006,7 @@ The version with lexemes configured will be a little shorter, because UniCC revi
 
 %!include: ``lexeme.out``
 
-Now, nonterminals //integer// and //ident// stay on their own, they are not revised. Instead, there is now a nonterminal //integer'// and //ident'// that allows for whitespace __behind__ the lexeme. With a sharp look to the nonterminals generated to parse the whitespace, it gets more clear that whitespace-related nonterminals are themself some kind of lexeme.
+Now, nonterminals //integer// and //ident// stay on their own, they are not revised. Instead, there is now a nonterminal //integer'// and //ident'// that allows for whitespace __behind__ the lexeme. With a sharp look to the nonterminals generated to parse the whitespace, it gets more clear that whitespace-related nonterminals are themselves some kind of lexeme.
 
 It is obvious, that the ``#lexeme`` directive is one of UniCC's most powerful features in the sensitive parser construction mode, because it enables for richer grammatical constructions than any regular language allows for, with the difference that this constructs are handled as they would lexeme taken from the lexical analyzer.
 
@@ -1020,7 +1020,7 @@ This could be done by introducing a new virtual production.
 
 ``` start$ -> "print" value+ ;
 
-Feeding this to UniCC and with warning reporting switched on, this causes a shift-reduce conflict in two states, because UniCC detects an ambigous grammar in both lexeme.
+Feeding this to UniCC and with warning reporting switched on, this causes a shift-reduce conflict in two states, because UniCC detects an ambiguous grammar in both lexeme.
 
 ```
 unicc: warning: state 9: Shift-reduce conflict on lookahead: 'A-Z_a-z'
@@ -1032,10 +1032,10 @@ unicc: warning: state 10: Shift-reduce conflict on lookahead: '0-9'
     (8) integer -> '0-9' .      { ' ' '\n' 'A-Z_a-z' '0-9' }
 ```
 
-By using ``#lexeme separation on ;``, the warnings will be supressed, and UniCC always selects the way that input for an lexeme is consumed as much as possible.
+By using ``#lexeme separation on ;``, the warnings will be suppressed, and UniCC always selects the way that input for an lexeme is consumed as much as possible.
 
 +++ #fixate +++[ref_fixate]
-The ``#fixate`` directive can only be used within the [sensitive parser construction mode #ref_construction_modes]. It supresses shift-reduce warnings that may raise up for some nonterminals caused by the grammar construction, and always prefers to shift. ``#fixate`` expects a list of nonterminal symbols to be configured as fixed.
+The ``#fixate`` directive can only be used within the [sensitive parser construction mode #ref_construction_modes]. It suppresses shift-reduce warnings that may raise up for some nonterminals caused by the grammar construction, and always prefers to shift. ``#fixate`` expects a list of nonterminal symbols to be configured as fixed.
 
 +++ #reserve terminals +++[ref_reserve_terminals]
 The ``#reserve terminals`` directive switches if [terminal anomaly detection #ref_terminal_anomalies] is performed by UniCC or not. If ``#reserve terminals`` is switched on, UniCC assumes that terminals based on regular expressions take higher precedence in all places, and does not perform terminal anomaly detection. It is a boolean directive, and can be switched ``on`` or ``off``. Calling it without boolean parameter switches ``#reserve terminals`` as ``on``.
@@ -1053,7 +1053,7 @@ UniCC grammars may contain some special terminal and nonterminal symbols under v
 || Special symbol | Type | Usage |
 | &embedded_<num> | nonterminal | Anonymous nonterminals get this name with a consecutive number. |
 | &eof | terminal | Specifies the end-of-file symbol. This special symbol exists in every grammar, and will be automatically appended to the goal-symbol. The end-of-file symbol itself is determined by the parser, but is not bound to a special character sequence or value. In the UniCC Standard C Parser Template, the end-of-file symbol can be dynamically set to fit to the particular input. |
-| &error | terminal | Specifies the error resynchonization symbol. This symbol is used to resynchronize the parser after getting scrambled by a parse error. The chapter [error recovery #ref_error_recovery] covers the use and further meaning of the error resynchonitation terminal. |
+| &error | terminal | Specifies the error resynchronization symbol. This symbol is used to resynchronize the parser after getting scrambled by a parse error. The chapter [error recovery #ref_error_recovery] covers the use and further meaning of the error resynchronization terminal. |
 | &whitespace, &whitespace*, &whitespace+ | nonterminal | This group of nonterminals are only inserted in sensitive mode grammars that make use of the ``#whitespaces`` directive. Calls to this symbol are added to appropriate positions relating the lexeme configuration of the grammar. More about this topic can be read in chapter about the [``#whitespaces`` directive #ref_whitespaces]. |
 
 
@@ -1070,7 +1070,7 @@ Requirements to modern parsers and compilers expect, that a parse error on wrong
 
 %!include: ``error.par``
 
-Error resynchronization means that the error is handled by the grammar and its semantic actions rather than the parser. In the above example, the parser will, in case of a parse error, try to pop as many items off the parse stack until it finds the error resynchronization token, ``&error``. This is shifted then, and the parser comes into a new, valid state that is covered by the grammar, so the production with the error state takes place. The parse error had been recovered, respective it is not a parse error anymore. By modifiying the actions in the semantic action of a error state, error messages can still be forced and errors counted, as it is done in above example. But the parser continues, and will output correct values on wrong input, e.g. "2*5+x".
+Error resynchronization means that the error is handled by the grammar and its semantic actions rather than the parser. In the above example, the parser will, in case of a parse error, try to pop as many items off the parse stack until it finds the error resynchronization token, ``&error``. This is shifted then, and the parser comes into a new, valid state that is covered by the grammar, so the production with the error state takes place. The parse error had been recovered, respective it is not a parse error anymore. By modifying the actions in the semantic action of a error state, error messages can still be forced and errors counted, as it is done in above example. But the parser continues, and will output correct values on wrong input, e.g. "2*5+x".
 
 %!include: ``error.out``
 
@@ -1083,9 +1083,9 @@ Error resynchronization means that the error is handled by the grammar and its s
 
 ++ Abstract Syntax Tree Notations ++[ref_ast]
 
-As a new feature introduced with UniCC version 1.3, abstract syntrax tree notations can be specified within a grammar. These notations instruct the resulting parser to automatically construct an abstract syntrax tree (AST) during the full parse tree construction. The feature of constructing abstract syntrax trees rather than performing semantics during the parse process is a new approach which will become more important in a next UniCC major release (see https://github.com/phorward/unicc/wiki/UniCC-v2).
+As a new feature introduced with UniCC version 1.3, abstract syntax tree notations can be specified within a grammar. These notations instruct the resulting parser to automatically construct an abstract syntax tree (AST) during the full parse tree construction. The feature of constructing abstract syntax trees rather than performing semantics during the parse process is a new approach which will become more important in a next UniCC major release (see https://github.com/phorward/unicc/wiki/UniCC-v2).
 
-For AST notations, the grammar definition language has been slightly modified to allow for some more distinctive syntax. The following example implements the well-known expressional grammar without any semantics. The benefit is, that such kinds of grammars can be implemented in any UniCC target without any modification.
+For AST notations, the grammar definition language has been slightly modified to allow for some more distinctive syntax. The following example implements the well-known expression grammar without any semantics. The benefit is, that such kinds of grammars can be implemented in any UniCC target without any modification.
 
 %!include: ``expr.ast.par``
 

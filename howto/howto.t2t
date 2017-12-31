@@ -19,7 +19,7 @@ The ways of how data is analyzed, their syntax rules, can be defined using a so 
 
 Grammars for computer languages, so called //context-free languages//, are expressed in a special notation, which is called the //Backus-Naur-Form//, or shortened just //BNF//. It was invented in 1959 by John Backus and Peter Naur in the course of the ALGOL programming language.
 
-Grammars expressed in Backus-Naur-Form exists of three fundamental elements: The terminal-symbols, the nonterminals-symbols and the productions. Because all of these elements integrate together, it is not possible to explain them separately. Moreover, lets first define what the purpose of these elements is.
+Grammars expressed in Backus-Naur-Form exists of three fundamental elements: The terminal-symbols, the nonterminal-symbols and the productions. Because all of these elements integrate together, it is not possible to explain them separately. Moreover, lets first define what the purpose of these elements is.
 
 - **Terminal symbols**, or simply called //terminals//, are language atomics, which are directly read from the input stream. A terminal symbol can be a single character, a character from a set of possible (allowed) characters, a string sequence or a regular expression that matches a classifying pattern. It is on the language designer's choice how terminal symbols are made up in the particular implementation. Some examples for widely used terminals in programming languages are identifiers for variables and functions, operators, brackets, keywords like //IF// or //WHILE//, floating point or integer numbers. The parser will expect these terminals in a valid order according to the position it is during the parse - which is in turn defined by the underlying grammatical rules it follows.
 
@@ -116,7 +116,7 @@ Next to ``date``, nonterminal ``month`` defines all month names in its productio
 Finally, we use the same nonterminal, which is ``integer``, for day- and year-number.
 The parse tree of the input string "August 17, 2008" using this grammar will be
 
-AST#"date'" [ date [ month [ August ] integer [ integer [ 1 ] 7 ] "," integer [ integer [ integer [ integer [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree derived from the input 'August 17, 2008' (simplyfied)
+AST#"date'" [ date [ month [ August ] integer [ integer [ 1 ] 7 ] "," integer [ integer [ integer [ integer [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree derived from the input 'August 17, 2008' (simplified)
 
 @NEWPAGE@
 
@@ -186,9 +186,9 @@ Secondary, the star is a modifying operator that causes a Kleene-closure of zero
 
 UniCC provides the following three virtual production operators, which are well-known from regular expressions.
 
-- ***** for kleene closure (multiple or none repetitions)
-- **+** for positive (one or multuple repetitions)
-- **?** for optional closure (one or none repetition)
+- ***** for a "kleene closure" (multiple or none repetitions)
+- **+** for a "positive closure" (one or multiple repetitions)
+- **?** for an "optional closure" (one or none repetitions)
 
 
 For the above shortcut, the contract-out version would be
@@ -218,15 +218,15 @@ Since the first line of UniCC was written, one of its major design goals had bee
 
 UniCC provides two different parser generation target approaches. The first approach is a static, build-in code-generator working with a so called //parser code template//. This code-generator is a build-in part of UniCC and allows to directly turn a UniCC grammar definition into a program written in the syntax of a particular programming language. For now, UniCC ships with support for C and Python as target languages, but more targets can easily be adapted, actually without modifying a single line of UniCCs own sourcecode.
 
-As a total approach for target-language independency, UniCC provides a secondary way for emitting a parser. This is a parser description file. Such a file is expressed in an XML-based document and includes much information on the grammar, its symbols, the parsing states and lexical recogniziers and the parser behavior as well. Using this type of output, third-party code-generators or other related software can be used to build or analyze parsers according to their specialized task using UniCC as an universal front-end.
+As a total approach for target-language independency, UniCC provides a secondary way for emitting a parser. This is a parser description file. Such a file is expressed in an XML-based document and includes much information on the grammar, its symbols, the parsing states and lexical recognizers and the parser behavior as well. Using this type of output, third-party code-generators or other related software can be used to build or analyze parsers according to their specialized task using UniCC as an universal front-end.
 
 In the upcoming and the following chapters, we only rely on the build-in code-generator. Because the C parser template, which is delivered with UniCC is the most stable and widely used one, we implement parsers in this guide in C. You can easily adapt the knowledge from here to other languages when using other target languages. The examples we will deal with are hold simple, so even those of you who have no experience in C will understand them with ease. What is needed to run the examples in this manual is an installed C or C++ compiler, e. g. gcc on Linux.
 
 The general build order for parsers implemented using UniCC is the following, once your grammar is written and stored into a file.
 
-- Compile (generate) the grammar using UniCC into a parser
-- Compile or run the generated parser with the particular compiler your parser is written for. This step is usually not required if your target language is interpretered!
-- Run the resulting program, either in binary form or via the interpreter.
+- Generate the parser using UniCC. This step is nothing else than compiling the grammar into a program source code.
+- Compile or run the generated parser with the particular compiler your parser is written for. This step is usually not required if your target language is interpreted, like with Python.
+- Run the resulting program, either in its binary form or via the interpreter.
 
 
 Using specialized code-generation tools e.g. which use the parser definition file feature may use another approach, in order they call UniCC or use a subsequent call to a generator which builds the output file for a particular programming language or solution.
@@ -247,9 +247,9 @@ Some //warnings// are normal in the daily use of UniCC. Warnings can normally be
 
 %!include: ``unicc.out``
 
-To get an overview about all supported command-line options, run ``unicc`` without any parameters. There is also a section abount [command-line parameters #ref_commandline_parameters] in the reference manual.
+To get an overview about all supported command-line options, run ``unicc`` without any parameters. There is also a section about [command-line parameters #ref_commandline_parameters] in the reference manual.
 
-In case of the standard C parser template delivered with UniCC, above call will generate two output files, which are the program source file ``dates.c`` and ``dates.h``, a header file, containing some definitions. This output can immediatelly be compiled with a suiting C compiler. It is not required to write a main() function because the default UniCC parser template for C parsers uses a predefined main function if no individual code for the parser's footer is specified. Note, that this feature is always parser-template related; Especially third-party drivers and own modifications may not support this feature.
+In case of the standard C parser template delivered with UniCC, above call will generate two output files, which are the program source file ``dates.c`` and ``dates.h``, a header file, containing some definitions. This output can immediately be compiled with a suiting C compiler. It is not required to write a separate main() function because the default C target uses a predefined main()-function if no individual code for the parser's footer is specified. Note, that this feature is always target related. Especially third-party drivers and own modifications may not support this feature.
 
 Building, compiling and playing a little bit around with the parser looks like this.
 
@@ -340,7 +340,7 @@ That's everything required for a simple date-format compiler, parsing an input d
 
 In comparison to the grammar-draft from above, this augmented version contains programmed actions, which define what the parser should do on the different grammatical elements during the parse, and how values are passed trough the parse tree. The following, visualized parse tree shows how the input-string ``August 17, 2008`` is parsed, including the semantic values stored into every node, which is an instance of a nonterminal symbol.
 
-AST#"date'" [ "date" [ month:8 [ August ] integer:17 [ integer [ 1 ] 7 ] "," integer:2008 [ integer:200 [ integer:20 [ integer:2 [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree with augmentation (simplyfied).
+AST#"date'" [ "date" [ month:8 [ August ] integer:17 [ integer [ 1 ] 7 ] "," integer:2008 [ integer:200 [ integer:20 [ integer:2 [ 2 ] 0 ] 0 ] 8 ] ] ]#Parse tree with augmentation (simplified).
 
 Every code-segment, which is enclosed between ``[*`` and ``*]``, is executed when the parser successfully matches a production. This is why the semantic-code invoked on a rule's reduction is even called as the //reduction action// in LR and LALR-parsers.
 
@@ -356,7 +356,7 @@ date$           -> month integer:day ',' integer:year
                 ;
 ```
 
-from above, so we are able to access ``month``, ``day`` and ``year`` over their meaningful names instead of their position offsets. There is no label specified for ``month`` because UniCC automatically associates the nonterminal's name with an right-hand side value specifier. This default can be overidden by defining it manually, as its done with ``day`` and ``year``.
+from above, so we are able to access ``month``, ``day`` and ``year`` over their meaningful names instead of their position offsets. There is no label specified for ``month`` because UniCC automatically associates the nonterminal's name with an right-hand side value specifier. This default can be overridden by defining it manually, as its done with ``day`` and ``year``.
 
 By using the position offsets, the same result could be reached by writing
 
@@ -392,7 +392,7 @@ This latter step can then be performed for every digit in the integer; The alrea
 
 As a beginner, you can now say that coding parsers in UniCC is hard to understand. Well, you might be a little right. But this is only the first impression on it. The more you learn about the techniques, the more practical experience you will have, things will make sense, and the parse trees you want to climb will grow in your mind. Don't give up, even if you feel so - it wouldn't be worthwhile!
 
-If you're already familiar with parsing, this "low-level"-looking way of extracting atomic integer numbers from the input will look unconventional to most of you. This is done because UniCC allows (but not relies) to perform lexical analysis by the grammar rather than an upstreamed lexer. To let the reader become more familar with grammar definitions in UniCC first, this approach was chosen here. All possibilites and facilities on lexical analysis will be introduced later on. The advantage of this approach is, that full LALR power is available on this character-based parsing method, so even recursive "lexemes" can be parsed as true context-free grammars, not only regular ones. Terminal symbol based on regular-expressions are even possible in UniCC, but this will be discussed later on.
+If you're already familiar with parsing, this "low-level"-looking way of extracting atomic integer numbers from the input will look unconventional to most of you. This is done because UniCC allows (but not relies) to perform lexical analysis by the grammar rather than an upstreamed lexer. To let the reader become more familiar with grammar definitions in UniCC first, this approach was chosen here. All possibilities and facilities on lexical analysis will be introduced later on. The advantage of this approach is, that full LALR power is available on this character-based parsing method, so even recursive "lexemes" can be parsed as true context-free grammars, not only regular ones. Terminal symbol based on regular-expressions are even possible in UniCC, but this will be discussed later on.
 
 +++ Precedences +++
 
@@ -549,18 +549,18 @@ This is caused due the ambiguity of the grammar, which comes up in the nontermin
 AST#expression [ expression [ expression [ integer [ 1 ] ] + expression [ integer [ 2 ] ] ] + expression [ integer [ 3 ] ] ]
 AST#expression [ expression [ integer [ 1 ] ] + expression [ expression [ integer [ 2 ] ] + expression [ integer [ 3 ] ] ] ]
 CENTER
-FIGURE#Two different parse trees are yielding in ambigous grammars (simplyfied).
+FIGURE#Two different parse trees are yielding in ambiguous grammars (simplified).
 /CENTER
 
 For these cases, precedence and associativity assignments to terminals can be used to define the correct way of how UniCC should handle these conflicts.
 
-Using a ``#left`` directive, we give terminal symbols a left-sided associativity, which means that the left expression of the terminal is resolved first. When we do this to addition and subtraction, these operators will resolve the left expression first, so the parse tree grows left-derivative. The input string //1+2+3// will then be parsed as //(1+2)+3//, and //1+2+3+4// will be parsed as //((1+2)+3)+4//. Because substraction is on the same precedence level as addition, //1+2-3// will correctly be parsed as //(1+2)-3//.
+Using a ``#left`` directive, we give terminal symbols a left-sided associativity, which means that the left expression of the terminal is resolved first. When we do this to addition and subtraction, these operators will resolve the left expression first, so the parse tree grows left-derivative. The input string //1+2+3// will then be parsed as //(1+2)+3//, and //1+2+3+4// will be parsed as //((1+2)+3)+4//. Because subtraction is on the same precedence level as addition, //1+2-3// will correctly be parsed as //(1+2)-3//.
 
 But what about multiplication and division? When we assign the same, left-bounded associativity to these operators, //1+2*3// will be incorrectly parsed as //(1+2)*3//. So another, higher precedence level than to addition and subtraction must be added, which we do with yet another call to the ``#left``-directive. As deeper a precedence-directive in the grammar occurs below other ``#left``, ``#right`` and ``#nonassoc`` directives, so higher the precedence will be assigned.
 
 When this secondary precedence and associativity assignment is done, the grammar will behave the correct way, even for expressions like //1+2/3+4+5*6-7// - which will then correctly be parsed as //(((1+(2/3))+4)+(5*6))-7//.
 
-AST#e [ e [ e [ e [ e [ e [ int [ 1 ] ] ] [ + ] [ e [ e [ int [ 2 ] ] ] [ / ] [ e [ int [ 3 ] ] ] ] ] [ + ] [ e [ int [ 4 ] ] ] ] [ + ] [ e [ e [ int [ 5 ] ] ] [ \\* ] [ e [ int [ 6 ] ] ] ] ] [ - ] [ e [ int [ 7 ] ] ] ]#The unambigous parse tree of "1+2/3+4+5*6-7" (simplyfied). Symbol names had been shortened.
+AST#e [ e [ e [ e [ e [ e [ int [ 1 ] ] ] [ + ] [ e [ e [ int [ 2 ] ] ] [ / ] [ e [ int [ 3 ] ] ] ] ] [ + ] [ e [ int [ 4 ] ] ] ] [ + ] [ e [ e [ int [ 5 ] ] ] [ \\* ] [ e [ int [ 6 ] ] ] ] ] [ - ] [ e [ int [ 7 ] ] ] ]#The unambiguous parse tree of "1+2/3+4+5*6-7" (simplified). Symbol names had been shortened.
 
 Adding this precedence directives to above grammar, we'll get its unambiguous pendant.
 
@@ -573,7 +573,7 @@ This will parse and calculate the correct values, including all precedence relat
 %-------------------------------------------------------------------------------
 @NEWPAGE@
 
-++ Implementing a comiler ++[howto_xpl]
+++ Implementing a compiler ++[howto_xpl]
 
 Now that we have learned to know how to implement simple expressions using UniCC, it's time to implement a real-world example of a toy programming language. This toy language is called eXample Programming Language, shortened XPL, and is a C-styled language.
 
@@ -631,7 +631,7 @@ The second new feature that is used here but has not covered yet is the producti
 
 ``` '-' expression              #precedence '*'
 
-This special ``#precedence`` directive sets a higher precedence level to the production to overwrite its default precedence that is associated with the substraction-operator (``-``) to the precedence of the multiplication-operator ``*``. This configuration is done to allow for an unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result, because substraction is below multiplication in the operator precedence order. Setting the production precedence to the level of the multiplication-operator (or higher), it is parsed the correct way as //(-2)*4//.
+This special ``#precedence`` directive sets a higher precedence level to the production to overwrite its default precedence that is associated with the subtraction-operator (``-``) to the precedence of the multiplication-operator ``*``. This configuration is done to allow for an unary minus. Expressions like "-2*4" would be parsed as //-(2*4)// if this configuration is not done - a wrong result, because subtraction is below multiplication in the operator precedence order. Setting the production precedence to the level of the multiplication-operator (or higher), it is parsed the correct way as //(-2)*4//.
 
 ++++ Multiple left-hand sides ++++
 
@@ -664,7 +664,7 @@ if( expression )
 else
 	statement;
 ```
-The above syntax is clear and not ambigous. But what happens when we want to submit
+The above syntax is clear and not ambiguous. But what happens when we want to submit
 ```
 if( expression )
 	if( expression )
@@ -683,15 +683,15 @@ else
 	statement;
 ```
 
-Except of this warning, the draft version of the XPL parser already runs very well in the UniCC Standard C Parser Template's test mode for some simple expressions. Only function calls don't work, because the semantically determined nonterminal selection is not implemented yet. The parser now always detects a variable and throws a parse error when the opening bracket for the function call are statet, and a variable followed by an opening bracket is not valid. This problem will be solved after adding some semantic determination code soon.
+Except of this warning, the draft version of the XPL parser already runs very well in the UniCC Standard C Parser Template's test mode for some simple expressions. Only function calls don't work, because the semantically determined nonterminal selection is not implemented yet. The parser now always detects a variable and throws a parse error when the opening bracket for the function call are stated, and a variable followed by an opening bracket is not valid. This problem will be solved after adding some semantic determination code soon.
 
 @NEWPAGE@
 
 +++ The virtual machine +++
 
-The topic of intermediate code generation performed by a compiler to build a binary program or directly run it is that huge and complex, that it can't be covered in this manual or even in huger compiler textbooks. You only have to know, that every compiler creates some kind of intermediate representation of its input. In most cases some kind of a more or less abstract tree structure (abstract syntax tree) representing semantics and nesting, but there are also compilers that compile into an intermediate language that can be used for further optimization or platform-dependent code generation. Both methods are used in many of todays existing compiler implementations.
+The topic of intermediate code generation performed by a compiler to build a binary program or directly run it is that huge and complex, that it can't be covered in this manual or even in huger compiler textbooks. You only have to know, that every compiler creates some kind of intermediate representation of its input. In most cases some kind of a more or less abstract tree structure (abstract syntax tree) representing semantics and nesting, but there are also compilers that compile into an intermediate language that can be used for further optimization or platform-dependent code generation. Both methods are used in many of today's existing compiler implementations.
 
-An abstract syntax tree (AST) is the representation of a parse tree where atomic syntactical elements are hidden, and only the semantic information (e.g. a literal from the code, a variable address or a node defining a conditional statement) and its nested structure is clearly defined. Such an AST-representation could already be used for a direct interpretation of the input. In C, for example, such an abstact syntax tree could be expressed as a huge union data structure, providing several structures for every language element. There could be one structure describing a value, one structure describing an assignment, one structure describing an IF-construct, and so on. The result is a tree structure that is made-up of many of such nodes, links and leafs that can be easily interpretered by a recursively executed virtual machine. Althought this method is very simple to implement, it still requires a lot of coding efforts, and saving this tree to a file is not possible without the use of some nested structuring. The benefit of this method is, that no backpatching is required, because the structure is a logical tree.
+An abstract syntax tree (AST) is the representation of a parse tree where atomic syntactical elements are hidden, and only the semantic information (e.g. a literal from the code, a variable address or a node defining a conditional statement) and its nested structure is clearly defined. Such an AST-representation could already be used for a direct interpretation of the input. In C, for example, such an abstract syntax tree could be expressed as a huge union data structure, providing several structures for every language element. There could be one structure describing a value, one structure describing an assignment, one structure describing an IF-construct, and so on. The result is a tree structure that is made-up of many of such nodes, links and leafs that can be easily interpreted by a recursively executed virtual machine. Although this method is very simple to implement, it still requires a lot of coding efforts, and saving this tree to a file is not possible without the use of some nested structuring. The benefit of this method is, that no backpatching is required, because the structure is a logical tree.
 
 The generation of intermediate code could also be done from an abstract syntax tree, but it can also directly be done out of the parser (in simple languages), where the parser serves as the immediate representation of the abstract syntax tree during input recognition. Intermediate code, in turn, can be established on various paradigms. 3-address-code is very useful to generate optimized code for register-machines. 1-address-code can be used for stack-based machines, like the Java Virtual Machine.
 
@@ -739,7 +739,7 @@ The internal assembly language for our virtual machine consists of an opcode, de
 
 || Opcode | Operation | Parameter |
 | NOP | Does nothing. | - |
-| CAL | Call a build-in function. Expects the number of arguments as first integer item on the stack, then the arguments. Arguments will be dropped off the stack after the function was called, and the function's return value is pushed. | Function-Index |
+| CAL | Call a built-in function. Expects the number of arguments as first integer item on the stack, then the arguments. Arguments will be dropped off the stack after the function was called, and the function's return value is pushed. | Function-Index |
 | LIT | Load a literal value. Literal values are hold as ``xpl_value``-objects within a ``xpl_program`` structure. For the literal load, the literal value is duplicated and pushed onto the stack. | Literal-Index |
 | LOD | Load a variable content. Variables are hold in a ``xpl_runtime`` structure during runtime. For the variable load, the variable's ``xpl_value``-object is duplicated and pushed onto the stack. | Variable-Index |
 | STO | Stores the value on top of the stack into a variable. The variable's old value will be deleted. | Variable-Index |
@@ -754,8 +754,8 @@ The internal assembly language for our virtual machine consists of an opcode, de
 | GRT | Take two operands off the stack, check if left operand is greater than right operand, pushes integer 1 = greater, 0 = lower or equal | - |
 | GEQ | Take two operands off the stack, check if left operand is grater or equal than right operand, pushes integer 1 = greater or equal, 0 = lower | - |
 | ADD | Take two operands off the stack, perform addition and push result onto the stack. In case of string-operands, perform string-conversion of both operands, concatenate and push the concatenated string onto the stack. | - |
-| SUB | Take two operands off the stack, perform substraction and push the result onto the stack. Strings will be converted to integer. | - |
-| MUL | Take two operands off the stack, perform mulitplication and push the result onto the stack. Strings will be converted to integer. | - |
+| SUB | Take two operands off the stack, perform subtraction and push the result onto the stack. Strings will be converted to integer. | - |
+| MUL | Take two operands off the stack, perform multiplication and push the result onto the stack. Strings will be converted to integer. | - |
 | DIV | Take two operands off the stack, perform division and push the result onto the stack. Strings will be converted to integer. | - |
 
 
@@ -786,7 +786,7 @@ typedef enum
     XPL_GEQ,                                /* Check for greater-equal */
 
     XPL_ADD,                                /* Add or join two values */
-    XPL_SUB,                                /* Substract two values */
+    XPL_SUB,                                /* Subtract two values */
     XPL_MUL,                                /* Multiply two values */
     XPL_DIV                                 /* Divide two values */
 } xpl_op;
@@ -883,7 +883,7 @@ Finally, the virtual machine is implemented into ``xpl.run.c`` as function ``xpl
 
 +++ Implementing the compiler +++
 
-Now both modules, the XPL runtime environment and the parser need to convence. The parser must be extended to work as a compiler, the code must be executed when the program successfully has been compiled. To turn the parser into a compiler, semantic actions need to be inserted to appropriate positions to generate the machine code for our virtual machine along the parse process now.
+Now both modules, the XPL runtime environment and the parser need to mate. The parser must be extended to work as a compiler, the code must be executed when the program successfully has been compiled. To turn the parser into a compiler, semantic actions need to be inserted to appropriate positions to generate the machine code for our virtual machine along the parse process now.
 
 The easiest part of this implementation is the nonterminal **expression**. The productions of this nonterminal only require some code generation to push values onto the stack and perform operations and comparisons. The function call, which is part of nonterminal **expression**, first pushes and evaluates all parameter values onto the stack, then pushes the number of parameters to be taken by the CAL operation to find out how many parameters shall be used for the function call, and to clear them later on. Semantic checking if the function call provides too less or too many parameters is done here by the function ``xpl_check_function_parameters()`` already.
 
@@ -910,9 +910,9 @@ into a virtual machine code like this
  011: NOP
 ```
 
-The first operations from address 000 to adress 002 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack (0 for false, 1 for true). The JPC instruction at address 003 now compares against this value on top of the stack, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a 1-address-code machine language.
+The first operations from address 000 to address 002 are emitted from the comparison. The content of variable ``i`` and the literal ``0`` are pushed and compared for greater-than. The result of the comparison will then be pushed onto the stack (0 for false, 1 for true). The JPC instruction at address 003 now compares against this value on top of the stack, and if it is false, jumps to address 011. If the comparison is true, the machine will continue to run at address 004. The opcodes from address 004 to address 009 are the result of the decrementation of variable ``i``. At address 010, a JMP operation is performed to begin at address 000 again, compare the content of variable ``i`` greater-than ``0``. This is the way how an iteration is performed within a 1-address-code machine language.
 
-Our compiler can only emit code sequencially, and looking at the production for statement "while",
+Our compiler can only emit code sequentially, and looking at the production for statement "while",
 
 ``` statement -> "while" '(' expression ')' statement
 
@@ -936,9 +936,10 @@ statement -> "while" '(' expression ')'
                        [* backpatch the jpc-call *] ;
 ```
 
-Anonymous nonterminals make it possible to define the entire nonterminal (with all its productions) on the right-hand side of another nonterminal, avoiding the creation of a special extra nonterminal to fullfill one special task, like it is the case here.
+Anonymous nonterminals make it possible to define the entire nonterminal (with all its productions) on the right-hand side of another nonterminal, avoiding the creation of a special extra nonterminal to fulfill one special task, like it is the case here.
 
-Our anonymous nonterminal right after the closing bracked of the header of the "while"-statement generates a JPC operation with an empty address, and returns its own operation address as semantic value. Then the following nonterminal **statement** is parsed, and finally the production of the statement "while" will be reduced.
+Our anonymous nonterminal right after the closing bracket of the header of the "while"-statement generates a JPC operation with an empty address, and returns its own operation address as semantic value. Then the following nonterminal **statement** is parsed, and finally the production of the statement "while" will be reduced.
+
 In the reduction code, we then know the final address where the JPC-operation should jump to, so we now can backpatch its parameter with the correct address. To finally generate the JMP-call at the bottom of the loop right behind the last statement code was executed, we also have to remember the last program memory address before the code for statement "while" was generated. Another anonymous nonterminal helps out, and we get the following exemplary version of the backpatching construct.
 
 ```
