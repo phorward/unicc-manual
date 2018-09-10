@@ -8,6 +8,7 @@ UNICC_SRC	=	$(UNICC_MAIN) \
 				howto/howto.t2t \
 				reference/reference.t2t \
 				c-target/c-target.t2t \
+				cpp-target/cpp-target.t2t \
 				python-target/python-target.t2t \
 				appendix1/appendix1.t2t \
 				appendix2/appendix2.t2t \

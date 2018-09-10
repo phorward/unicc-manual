@@ -1,5 +1,5 @@
 
-+ Python parser target +[stdcparser]
++ Python parser target +[pythonparser]
 
 This part of the manual relates to the shipped Python parser target, version 0.3, and higher.
 

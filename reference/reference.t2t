@@ -112,8 +112,10 @@ CENTER
 /CENTER
 
 UniCC can not only be seen as a parser generator to compile a parser definition into a piece of program code to implement this parser. It is also a parser generator that can be used as the base for different ("any") kinds of parser analyzation, code generation and optimization issues. This is the reason why UniCC comes with two integrated code-generators: One code generator that builds program-modules expressed in a particular programming language, and one code generator to build an independent parser description file that describes the compiled form of the grammar and a transparent representation of the output parser.
-The output of the first code-generator can directly be fed to a compiler, whereas the output of latter code-generator can be analyzed by any type of other program with a specialized purpose.
 
+The output of the first code-generator can directly be fed into a compiler or interpreter, whereas the output of latter code-generator can be analyzed by any type of other program with a specialized purpose.
+
+@NEWPAGE@
 +++ The program-module generator +++[ref_codegen_progmod]
 The //program-module generator// is the default code generator that is used by UniCC if nothing else is explicitly specified. It is used to build a parser-module in a specific high-level programming language. Thanks to its template-based approach, this code-generator is not targetted to one specific programming language. All target-language-related code is read from tags defined in a parser template file, which must follow a static structure that is pretended by the program-module generator in order to construct the output code.
 
