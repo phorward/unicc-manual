@@ -1,0 +1,3 @@
+[submodule "xpl"]
+	path = xpl
+	url = git@github.com:phorward/xpl.git
