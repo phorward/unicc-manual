@@ -1,14 +1,14 @@
 
 + C parser target +[stdcparser]
 
-This part of the manual relates to the shipped C parser target from version 1.3 and higher.
+This part of the manual relates to the shipped C parser target from version 1.5 and higher.
 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 
 ++ Overview ++
-The C parser target shipped with UniCC enables target code generation support for the C programming language. The template also provides facilities for further grammar processing and integration of the generated parser modules with other C modules.
+The C parser target shipped with UniCC provides target code generation support for the C programming language. The template also provides facilities for further grammar processing and integration of the generated parser modules with other C modules.
 
 The C parser target is also used by UniCC itself for bootstrap, meaning that UniCC constructs its own parser out of itself.
 
@@ -22,12 +22,11 @@ Below is the feature set the C parser target provides.
 - Well tested, feature proven, used by UniCC's own grammar parser
 - Platform and C-compiler independent, based on the C standard library only
 - ANSI C89 and C99 compliant
-- Thread-safe, parsers can recursively be called using an extendible parser control block (pcb)
+- Thread-safe, parsers can be called recursively using an extendible parser control block (pcb)
 - Wide-character and UTF-8 unicode input support
 - Trace and stack trace facilities
 - Build-in error recovery
 - Automatic construction of an AST data structure when [abstract syntax tree notation #ref_ast] is provided
-- Build-in syntax tree generator
 - Symbol and production tables for debug and syntax tree construction
 - Provides a default parser test environment if no semantic code is given
 - Dynamic end-of-file behavior
@@ -37,16 +36,9 @@ Below is the feature set the C parser target provides.
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 
-++ Contributions ++
-
-Any contributions to the parser template are welcome. Contributions can be sent to us, so we will integrate them into the distribution version of UniCC and the standard template, if they are necessary and useful for everyone.
-
-%-------------------------------------------------------------------------------
-%-------------------------------------------------------------------------------
-%-------------------------------------------------------------------------------
-
 ++ Use and configuration ++
-As the C standard parser template has been developed simultaneously with UniCC itself and results in UniCC's own grammar parser, it is the best integrated parser template so far.
+
+As the C target has been developed simultaneously with UniCC itself and results in UniCC's own grammar parser, it is the best integrated target for UniCC so far.
 
 To use it with a parser, the top-level directive
 
@@ -149,6 +141,9 @@ Most of the members of the parser control block are used internally, but some of
 /* Parser Control Block */
 typedef struct
 {
+	/* Is this PCB allocated by parser? */
+	char				is_internal;
+
     /* Stack */
     @@prefix_tok*       stack;
     @@prefix_tok*       tos;
@@ -188,11 +183,6 @@ typedef struct
     unsigned int        line;
     unsigned int        column;
 
-#if UNICC_SYNTAXTREE
-    /* Syntax tree */
-    @@prefix_syntree*   syntax_tree;
-#endif
-
     @@prefix_ast*       ast;
 
     /* User-defined components */
@@ -202,7 +192,8 @@ typedef struct
 ```
 
 || Member | Type | Content |
-| act | int | The current action to perform (shift, reduce, shift&reduce). |
+| is_internal | char | Is set to 1 if the PCB was allocated internally by ``@@prefix_parse().`` |
+| act | int | The current action to perform (shift, reduce, shift&reduce, error, success). |
 | buf | [UNICC_CHAR* #unicode] | Holds the current input buffer. This input buffer holds all the characters necessary to identify the current input token. |
 | bufend | [UNICC_CHAR* #unicode] | Pointer to the end of the input buffer, for faster data appending operations. |
 | bufsize | [UNICC_CHAR* #unicode] | The pointer to the last character of the input buffer. This is used when input buffer reallocation is needed. |
@@ -224,11 +215,10 @@ typedef struct
 | sym | int | Holds the ID of the lookahead symbol which is the current token. |
 | test | [@@prefix_vtype #_vtype] | A zero test value. |
 | tos | [@@prefix_tok* #_tok] | Top of stack pointer. |
-| syntax_tree | [@@prefix_syntree* #_syntree] | Receives the pointer of the root node of an automatically constructed syntax tree. This member only exists if UNICC_SYNTAXTREE is defined. |
 | ast | [@@prefix_ast* #_ast] | Abstract syntax tree root node. |
 
 
-TABLE##Member variables of @@prefix_pcb.
+TABLE##Member variables of the Parser Control Block (PCB).
 
 To avoid compile errors, names differing from the above ones must be chosen to add members to the parser control block structure. UniCC itself does not parse or check this, because this is a template-related problem.
 
@@ -244,7 +234,7 @@ There are also some additional data structures used in the C parser target. Know
 ``@@prefix_vtype`` is the union that will hold a semantic value on the parse stack and within the syntax tree. If there is only one data-type used in the template, ``@@prefix_vtype`` is only an alias for this data-type, else it is an union containing a member called ``value_<id>`` for every value data type, where ``<id>`` is an index counted from 0 for every type. This union is automatically constructed by the code generator in UniCC.
 
 +++ The stack token description structure (@@prefix_tok) +++[_tok]
-The parse stack and the [syntax tree generator #_syntree] make use of the ``@@prefix_tok``-structure. This structure contains information about the symbol, its semantic value and informations about state and position in the input.
+The parse stack and the [abstract syntax tree #ref_ast] make use of the ``@@prefix_tok``-structure. This structure contains information about the symbol, its semantic value and informations about state and position in the input.
 
 ```
 typedef struct
@@ -333,7 +323,7 @@ TABLE##Member variables of @@prefix_prodinfo.
 @NEWPAGE@
 
 ++ Unicode support ++[unicode]
-The C parser target supports Unicode in several ways. Unicode support means that it is capable to consume Unicode-characters as input.
+The C target supports Unicode in several ways. Unicode support means that it is capable to consume Unicode-characters as input.
 
 In general, the template supports three types of input methods.
 
@@ -395,112 +385,6 @@ The target provides the following functions:
 - ``@@prefix_ast_print( FILE* stream, @@prefix_ast* node )`` to print the AST or parts of it
 - ``@@prefix_ast_free( @@prefix_ast* node )`` to recursively free any consumed memory.
 -
-
-%-------------------------------------------------------------------------------
-%-------------------------------------------------------------------------------
-%-------------------------------------------------------------------------------
-@NEWPAGE@
-
-++ The build-in syntax tree visualizer (deprecated) ++[_syntree]
-
-The C parser target features a build-in syntax tree visualizing automatism. This automatism can be enabled by defining ``UNICC_SYNTAXTREE`` to 1.
-
-The core aspect of this feature is to retrieve a visual tree representation of the parsed input, which can be used for different purposes. One example are the graphical syntax trees that are printed in this manual - most of them had been build automatically using this feature, in combination with some SVG rendering tools.
-
-This feature is marked as deprecated. A similar feature is the new [abstract syntax tree notation #ref_ast] which is always available. It will replace this feature in future.
-
-The syntax tree data structure is made up of elements of type ``@@prefix_syntree``.
-
-```
-/* Parse tree node */
-typedef struct @@prefix_SYNTREE @@prefix_syntree;
-
-struct @@prefix_SYNTREE
-{
-    @@prefix_tok        symbol;
-    UNICC_SCHAR*        token;
-
-    @@prefix_syntree*   parent;
-    @@prefix_syntree*   child;
-    @@prefix_syntree*   prev;
-    @@prefix_syntree*   next;
-};
-```
-
-|| Member | Type | Content |
-| child | @@prefix_syntree* | Pointer to the first child-node, if element is not a leaf. |
-| parent | @@prefix_syntree* | Pointer to the parent node, if any. This value is NULL in the root node. |
-| prev | @@prefix_syntree* | Pointer to previous node in the current level. |
-| symbol | [@@prefix_tok #_tok] | A copy of the stack element representing the symbol. It contains all the information that can be found in the [@@prefix_tok #_tok] structure.
-| token | [UNICC_SCHAR* #unicode] | A copy of the string that represented the token in the input. This is only filled when the symbol is a terminal symbol and a leaf. |
-| next | @@prefix_syntree* | Pointer to next node in the current level. |
-
-
-TABLE##Member variables of @@prefix_syntree.
-
-An example for a rendering function working on this parse tree:
-
-```
-void print_syntax_tree( @@prefix_pcb* pcb, @@prefix_syntree* node )
-{
-    int         i;
-    static int  rec;
-
-    if( !node )
-        return;
-
-    while( node )
-    {
-        for( i = 0; i < rec; i++ )
-            printf( "." );
-
-        printf( "%s", node->symbol.symbol->name );
-
-        if( node->token )
-            printf( ": '%s'", node->token );
-
-        printf( stream, "\n" );
-
-        rec++;
-        print_syntax_tree( pcb, node->child );
-        rec--;
-
-        node = node->next;
-    }
-}
-```
-
-results in an output like
-
-```
-calculator'
-.&whitespace*
-.calculator
-..expression
-...expression
-....integer'
-.....integer
-......0-9: '1'
-.....&whitespace*
-...+'
-....+: '+'
-....&whitespace*
-...expression
-....expression
-.....integer'
-......integer
-.......0-9: '2'
-......&whitespace*
-....*'
-.....*: '*'
-.....&whitespace*
-....expression
-.....integer'
-......integer
-.......0-9: '3'
-......&whitespace*
-..&eof: ''
-```
 
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
@@ -598,9 +482,9 @@ It should not be called in reduction actions, only on shift-operations, respecti
 %-------------------------------------------------------------------------------
 @NEWPAGE@
 
-++ Configuration macro reference ++
+++ Configuration macros and defines ++
 
-This short reference should bring an overview of the provided macros that can be pre-defined in the C parser target, and their behavior. All macros within the UniCC C Standard Template can be overridden when defined in the [``#prologue`` #ref_prologue_epilogue] semantic code area or at compiler invocation. If not submitted, the C target forces their definition to default values.
+This short reference gives an overview of the provided macros that can be pre-defined in the C parser target and their meaning. All macros within the UniCC target can be overridden by customized macros when defined in the [``#prologue`` #ref_prologue_prologue] semantic code area or at C-compiler invocation. If not submitted, the C target enforces their definition to default values.
 
 +++ UNICC_CLEARIN +++[UNICC_CLEARIN]
 Clears buffered input of the current token. This macro requires the parser control block as its parameter, and is pre-defined as
@@ -620,11 +504,13 @@ Switches parser trace, which is written to stderr. The following table gives inf
 | 4 | Additionally, enables debugging for single character fetching (only in UTF-8 mode) |
 
 
-TABLE##C parser target debug levels.
+TABLE##C target debug levels.
 
-Enable debug mode by setting
+Enable the debug mode by setting
 
 ``` #define UNICC_DEBUG 1
+
+or providing ``-DUNICC_DEBUG=1`` to the C-compiler.
 
 To show stack contents, also switch on [UNICC_STACKDEBUG #UNICC_STACKDEBUG]. Here is an example for a debug mode level 1 session with [stack debug enabled #UNICC_STACKDEBUG].
 
@@ -674,6 +560,8 @@ Defines the increment size of units allocated in one row in every allocation tas
 +++ UNICC_OUTOFMEM +++
 Is a macro that is called when a malloc/realloc call fails. It can be replaced with a product-related error function call or similar. Its default definition fprintf's a "Memory error" to stderr and exits the program with error code 1.
 
+The macro gets a pointer to the current @@prefix_pcb as well.
+
 +++ UNICC_PARSE_ERROR +++
 This macros is invoked on a parse error. It requires the parser control block as its parameter, and is pre-defined with an error text written to stderr.
 
@@ -689,14 +577,13 @@ The UNICC_PARSE_ERROR-macro defaults to
 
 but can be replaced by any other function call or macro construct.
 
-+++ UNICC_REDUCE, UNICC_SHIFT +++
-Internal use only, may not be changed or redefined.
++++ UNICC_REDUCE, UNICC_SHIFT, UNICC_ERROR, UNICC_SUCCESS +++
+Defines the parsing actions to perform. UNICC_ERROR and UNICC_SUCCESS can also be set to ``pcb->act`` within semantic actions to exit parsing.
 
 +++ UNICC_STACKDEBUG +++
 If switched 1 in combination with UNICC_DEBUG, stack content will be printed additionally to stderr.
 
 +++ UNICC_STATIC +++
-
 A define that holds the keyword ``static`` by default. It can be configured to be empty or anything else, just in case static data should be made accessible outside the parser module. The parser invocation function is always not declared to be UNICC_STATIC.
 
 +++ UNICC_UTF8 +++

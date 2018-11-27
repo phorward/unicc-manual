@@ -17,9 +17,9 @@ By default, UniCC constructs whitespace-sensitive parsers. This paradigm is a sp
 
 **One parser generator, multiple targets**
 
-By design, UniCC serves as a target language independent parser generator. Therefore, it is not bound or limited to emit parsers written in one special kind of target programming language. For now, UniCC fully supports C, C++ and Python as target languages. More targets are planned. Support for new or different target programming languages can be done with minimal effort, because every code generation target is specified in an XML-based template file which can easily be adapted for other languages.
+By design, UniCC serves as a target language independent parser generator. Therefore, it is not bound or limited to emit parsers written in one special kind of target programming language.
 
-Next to emitting parsers in a particular programming language, UniCC also offers the possibility to export all the grammar information, the parse tables, lexical recognizers, semantic actions and settings extracted from a UniCC parser definition into an independent, XML-based output format that can be handled by any individual subsequent tasks or module, like optimizing code-generators, analyzers, or direct parser interpreters.
+UniCC currently supports C, C++, Python, JavaScript as well as JSON and XML as target languages. More targets are planned. Support for new or different target languages can be done with minimal effort, because every code generation target is specified in an XML-based template file which can easily be adapted for other languages.
 
 @NEWPAGE@
 
